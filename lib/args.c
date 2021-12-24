@@ -13,17 +13,21 @@ typedef enum _mt_command {
   CMD_HELP,
 } mt_command_t;
 
-static void usage(FILE* f);
+static void usage(FILE* f, mt_command_t section);
 static void version(void);
 static mt_command_t parse_command(const char* cmd);
 
 mt_settings_t* decode_args(unsigned argc, char* const* argv) {
   mt_settings_t* s = malloc(sizeof(mt_settings_t));
   memset(s, 0, sizeof(mt_settings_t));
+  s->stage = STAGE_ARGS;
   
   if (argc < 2) {
     printf("Mutiny is a tool for managing mutiny source code\n\n");
-    usage(stdout); s->end = true; return s; }
+    usage(stdout, CMD_UNKNWOWN);
+    s->end = true;
+    return s;
+  }
   
   mt_command_t cmd = parse_command(argv[1]);
   
@@ -40,12 +44,17 @@ mt_settings_t* decode_args(unsigned argc, char* const* argv) {
       return s;
     case CMD_HELP:
       // TODO Help for specific command.
-      usage(stdout);
       s->end = true;
+      if (argc > 2) {
+        usage(stdout, parse_command(argv[2]));
+        
+      } else {
+        usage(stdout, CMD_UNKNWOWN);
+      }
       return s;
     case CMD_UNKNWOWN:
       fprintf(stderr, MT_ERROR "unknown command `%s'\n\n", argv[1]);
-      usage(stderr);
+      usage(stderr, CMD_UNKNWOWN);
       s->exit_code = EXIT_ERR_ARGS;
       return s;
   }
@@ -80,8 +89,6 @@ mt_settings_t* decode_args(unsigned argc, char* const* argv) {
     { NULL, 0, 0, 0 }
   };
   
-  opterr = false;
-  
 #define OPT_TYPE(t) \
     if (s->type != type) goto UNRECOGNIZED_OPTION
 
@@ -90,6 +97,8 @@ mt_settings_t* decode_args(unsigned argc, char* const* argv) {
       --optind; \
       goto UNRECOGNIZED_OPTION; \
     }
+  
+  opterr = false;
   
   int opt, i;
   const char* opt_name;
@@ -159,7 +168,7 @@ UNRECOGNIZED_OPTION:
         }
         fprintf(stderr, "\n");
         s->exit_code = EXIT_ERR_ARGS;
-        return s;
+        break;
 INVALID_ARGUMENT:
         fprintf(stderr, MT_ERROR "invalid argument ");
         if (optarg) {
@@ -174,7 +183,7 @@ INVALID_ARGUMENT:
         }
         fprintf(stderr, "\n");
         s->exit_code = EXIT_ERR_ARGS;
-        return s;
+        break;
 DUPLICATE_OPTION:
         fprintf(stderr, MT_ERROR "duplicate option ");
         if (!opt) {
@@ -188,24 +197,44 @@ DUPLICATE_OPTION:
         }
         fprintf(stderr, "\n");
         s->exit_code = EXIT_ERR_ARGS;
-        return s;
+        break;
     }
   }
   
   while (optind < argc) {
-    l_push(s->src_dirs, char*, strdup(argv[optind++]));
+    if (optind > 1) {
+      l_push(s->src_dirs, char*, strdup(argv[optind]));
+    }
+    ++optind;
   }
   
   return s;
 }
 
-static void usage(FILE* f) {
-  fprintf(f,
-    "Usage:\n"
-    "\tmutiny <command> [arguments]\n"
-    "\n"
-    // TODO Usage.
-  );
+static void usage(FILE* f, mt_command_t cmd) {
+  switch (cmd) {
+    case CMD_RUN:
+      fprintf(f,
+        "usage: mutiny run [flags] [package]"
+        "\n"
+        // TODO Run usage.
+      );
+      break;
+    case CMD_BUILD:
+      fprintf(f,
+        "usage: mutiny build [-o output] [flags] [package]"
+        "\n"
+        // TODO Build usage.
+      );
+      break;
+    default:
+      fprintf(f,
+        "usage: mutiny <command> [arguments]\n"
+        "\n"
+        // TODO General usage.
+      );
+      break;
+  }
 }
 
 static void version(void) {
