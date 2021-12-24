@@ -46,7 +46,7 @@ mt_settings_t* decode_args(unsigned argc, char* const* argv) {
     case CMD_UNKNWOWN:
       fprintf(stderr, MT_ERROR "unknown command `%s'\n\n", argv[1]);
       usage(stderr);
-      s->exit_code = exit_err_args;
+      s->exit_code = EXIT_ERR_ARGS;
       return s;
   }
   
@@ -158,7 +158,7 @@ UNRECOGNIZED_OPTION:
           fprintf(stderr, "`%s'", argv[optind - 1]);
         }
         fprintf(stderr, "\n");
-        s->exit_code = exit_err_args;
+        s->exit_code = EXIT_ERR_ARGS;
         return s;
 INVALID_ARGUMENT:
         fprintf(stderr, MT_ERROR "invalid argument ");
@@ -173,7 +173,7 @@ INVALID_ARGUMENT:
           fprintf(stderr, "`-%c'", opt);
         }
         fprintf(stderr, "\n");
-        s->exit_code = exit_err_args;
+        s->exit_code = EXIT_ERR_ARGS;
         return s;
 DUPLICATE_OPTION:
         fprintf(stderr, MT_ERROR "duplicate option ");
@@ -187,7 +187,7 @@ DUPLICATE_OPTION:
           fprintf(stderr, "`%s'", argv[optind - 1]);
         }
         fprintf(stderr, "\n");
-        s->exit_code = exit_err_args;
+        s->exit_code = EXIT_ERR_ARGS;
         return s;
     }
   }
