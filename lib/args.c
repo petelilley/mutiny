@@ -6,11 +6,11 @@
 #include <getopt.h>
 
 typedef enum _mt_command {
-  cmd_unknown = 0,
-  cmd_run,
-  cmd_build,
-  cmd_version,
-  cmd_help,
+  CMD_UNKNWOWN = 0,
+  CMD_RUN,
+  CMD_BUILD,
+  CMD_VERSION,
+  CMD_HELP,
 } mt_command_t;
 
 static void usage(FILE* f);
@@ -28,21 +28,22 @@ mt_settings_t* decode_args(unsigned argc, char* const* argv) {
   mt_command_t cmd = parse_command(argv[1]);
   
   switch(cmd) {
-    case cmd_run:
+    case CMD_RUN:
       s->type = JIT;
       break;
-    case cmd_build:
+    case CMD_BUILD:
       s->type = COMPILER;
       break;
-    case cmd_version:
+    case CMD_VERSION:
       version();
       s->end = true;
       return s;
-    case cmd_help:
+    case CMD_HELP:
+      // TODO Help for specific command.
       usage(stdout);
       s->end = true;
       return s;
-    case cmd_unknown:
+    case CMD_UNKNWOWN:
       fprintf(stderr, MT_ERROR "unknown command `%s'\n\n", argv[1]);
       usage(stderr);
       s->exit_code = exit_err_args;
@@ -208,13 +209,13 @@ static void usage(FILE* f) {
 }
 
 static void version(void) {
-
+  printf("mutiny version %s %s/%s\n", MT_VERSION_FULL_STR, MT_HOST_OS_STR, MT_HOST_ARCH_STR);
 }
 
 static mt_command_t parse_command(const char* cmd) {
-  if(!strcmp(cmd, "run"))           { return cmd_run; }
-  else if (!strcmp(cmd, "build"))   { return cmd_build; }
-  else if (!strcmp(cmd, "version")) { return cmd_version; }
-  else if (!strcmp(cmd, "help"))    { return cmd_help; }
-  else                              { return cmd_unknown; }
+  if(!strcmp(cmd, "run"))           { return CMD_RUN; }
+  else if (!strcmp(cmd, "build"))   { return CMD_BUILD; }
+  else if (!strcmp(cmd, "version")) { return CMD_VERSION; }
+  else if (!strcmp(cmd, "help"))    { return CMD_HELP; }
+  else                              { return CMD_UNKNWOWN; }
 }
