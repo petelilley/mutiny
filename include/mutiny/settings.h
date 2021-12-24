@@ -9,48 +9,48 @@
  * @brief Target operating system.
  */
 typedef enum _mt_os {
-  os_unknown = 0,
-  os_windows,
-  os_darwin,
-  os_linux,
-  os_none,
+  OS_UNKNOWN = 0,
+  OS_WINDOWS,
+  OS_DARWIN,
+  OS_LINUX,
+  OS_NONE,
 } mt_os_t;
 
 /**
  * @brief Target architecture.
  */
 typedef enum _mt_arch {
-  arch_unknown = 0,
-  arch_x86_64,
-  arch_i686,
-  arch_aarch64,
-  arch_armv6,
-  arch_armv7,
-  arch_wasm32,
-  arch_wasm64,
+  ARCH_UNKNOWN = 0,
+  ARCH_X86_64,
+  ARCH_I686,
+  ARCH_AARCH64,
+  ARCH_ARMV6,
+  ARCH_ARMV7,
+  ARCH_WASM32,
+  ARCH_WASM64,
 } mt_arch_t;
 
 /**
  * @brief Stage the compiler is currently executing.
  */
 typedef enum _mt_stage {
-  stage_unknown = 0,
-  stage_args,
-  stage_parse,
-  stage_sem,
-  stage_gen_ir,
-  stage_gen_bc,
-  stage_gen_asm,
-  stage_asm,
-  stage_run_link,
+  STAGE_UNKNOWN = 0,
+  STAGE_ARGS,
+  STAGE_PARSE,
+  STAGE_SEM,
+  STAGE_GEN_IR,
+  STAGE_GEN_BC,
+  STAGE_GEN_ASM,
+  STAGE_ASM,
+  STAGE_RUN_LINK,
 } mt_stage_t;
 
 /**
  * @brief The type of the compiler (jit or non-jit).
  */
 typedef enum _mt_compiler_type {
-  mt_jit = 0,
-  mt_comp,
+  JIT = 0,
+  COMPILER,
 } mt_compiler_type_t;
 
 /**

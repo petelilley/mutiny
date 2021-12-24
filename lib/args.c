@@ -29,10 +29,10 @@ mt_settings_t* decode_args(unsigned argc, char* const* argv) {
   
   switch(cmd) {
     case cmd_run:
-      s->type = mt_jit;
+      s->type = JIT;
       break;
     case cmd_build:
-      s->type = mt_comp;
+      s->type = COMPILER;
       break;
     case cmd_version:
       version();
@@ -102,30 +102,30 @@ mt_settings_t* decode_args(unsigned argc, char* const* argv) {
             break;
           // Target operating system.
           case OPT_OS:
-            OPT_ARG_TYPE(mt_comp);
+            OPT_ARG_TYPE(COMPILER);
             if (s->os) goto DUPLICATE_OPTION;
-            if      (!strcmp(optarg, "windows") || !strcmp(optarg, "win32")) s->os = os_windows;
-            else if (!strcmp(optarg, "darwin")  || !strcmp(optarg, "macOS")) s->os = os_darwin;
-            else if (!strcmp(optarg, "linux")) s->os = os_linux;
-            else if (!strcmp(optarg, "none"))  s->os = os_none;
+            if      (!strcmp(optarg, "windows") || !strcmp(optarg, "win32")) s->os = OS_WINDOWS;
+            else if (!strcmp(optarg, "darwin")  || !strcmp(optarg, "macOS")) s->os = OS_DARWIN;
+            else if (!strcmp(optarg, "linux")) s->os = OS_LINUX;
+            else if (!strcmp(optarg, "none"))  s->os = OS_NONE;
             else goto INVALID_ARGUMENT;
             break;
           // Target architecture.
           case OPT_ARCH:
-            OPT_ARG_TYPE(mt_comp);
+            OPT_ARG_TYPE(COMPILER);
             if (s->arch) goto DUPLICATE_OPTION;
-            if      (!strcmp(optarg, "x86-64") || !strcmp(optarg, "x86_64")  || !strcmp(optarg, "amd64")) s->arch = arch_x86_64;
-            else if (!strcmp(optarg, "i686")   || !strcmp(optarg, "x86")) s->arch = arch_i686;
-            else if (!strcmp(optarg, "arm64")  || !strcmp(optarg, "aarch64") || !strcmp(optarg, "armv8")) s->arch = arch_aarch64;
-            else if (!strcmp(optarg, "armv6"))  s->arch = arch_armv6;
-            else if (!strcmp(optarg, "armv7"))  s->arch = arch_armv7;
-            else if (!strcmp(optarg, "wasm32")) s->arch = arch_wasm32;
-            else if (!strcmp(optarg, "wasm64")) s->arch = arch_wasm64;
+            if      (!strcmp(optarg, "x86-64") || !strcmp(optarg, "x86_64")  || !strcmp(optarg, "amd64")) s->arch = ARCH_X86_64;
+            else if (!strcmp(optarg, "i686")   || !strcmp(optarg, "x86")) s->arch = ARCH_I686;
+            else if (!strcmp(optarg, "arm64")  || !strcmp(optarg, "aarch64") || !strcmp(optarg, "armv8")) s->arch = ARCH_AARCH64;
+            else if (!strcmp(optarg, "armv6"))  s->arch = ARCH_ARMV6;
+            else if (!strcmp(optarg, "armv7"))  s->arch = ARCH_ARMV7;
+            else if (!strcmp(optarg, "wasm32")) s->arch = ARCH_WASM32;
+            else if (!strcmp(optarg, "wasm64")) s->arch = ARCH_WASM64;
             else goto INVALID_ARGUMENT;
             break;
           // Types of output.
           case OPT_EMIT:
-            OPT_ARG_TYPE(mt_comp);
+            OPT_ARG_TYPE(COMPILER);
             // TODO Type of output for the compiler to emit.
             break;
         }
@@ -143,7 +143,7 @@ mt_settings_t* decode_args(unsigned argc, char* const* argv) {
         s->verbose = true;
         break;
       case 'o':
-        OPT_ARG_TYPE(mt_comp);
+        OPT_ARG_TYPE(COMPILER);
         if (s->output) goto DUPLICATE_OPTION;
         s->output = strdup(optarg);
         break;

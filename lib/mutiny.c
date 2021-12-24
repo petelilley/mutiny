@@ -20,10 +20,11 @@ int main(int argc, char* const* argv) {
   if (s->verbose) printf("parsed input arguments in %fs\n", args_time);
   if (s->end || s->exit_code) goto CLEANUP;
   
-  END_TIMER(prog_time);
-  
 CLEANUP:
   // TODO Free settings.
+  
+  END_TIMER(prog_time);
+  if (s->verbose) printf("compiler finished in %fs\n", prog_time);
   
   return s->exit_code;
 }
