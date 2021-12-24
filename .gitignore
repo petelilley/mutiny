@@ -82,4 +82,5 @@ _deps
 # Build dir
 [Bb]uild/
 
-
+# Configuration file
+/include/mutiny/config/config.h

@@ -1,0 +1,16 @@
+#ifndef __MT_CONFIG_H__
+#define __MT_CONFIG_H__
+
+#define MT_VERSION          @MT_VERSION_MAJOR@.@MT_VERSION_MINOR@
+#define MT_VERSION_FULL     @MT_VERSION@
+#define MT_VERSION_FULL_STR "@MT_VERSION@"
+#define MT_VERSION_MAJOR    @MT_VERSION_MAJOR@
+#define MT_VERSION_MINOR    @MT_VERSION_MINOR@
+#define MT_VERSION_PATCH    @MT_VERSION_PATCH@
+
+#define MT_HOST_OS          @MT_OS@
+#define MT_HOST_OS_STR      "@MT_OS@"
+#define MT_HOST_ARCH        @MT_ARCH@
+#define MT_HOST_ARCH_STR    "@MT_ARCH@"
+
+#endif // __MT_CONFIG_H__
