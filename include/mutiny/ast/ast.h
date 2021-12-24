@@ -12,7 +12,23 @@ typedef enum _mt_ast_type {
  * @brief The value of an AST node.
  */
 typedef struct _mt_ast_val {
-
+  // The type of the value.
+  enum {
+    VAL_NONE = 0,
+    C_VAL,
+    I_VAL,
+    F_VAL,
+    STR_VAL,
+    AST_VAL,
+  } type;
+  
+  // The value.
+  union {
+    char cval;
+    long long int ival;
+    long double fval;
+    char* strval;
+  } val;
 } mt_ast_val_t;
 
 #include <mutiny/util/list.h>
