@@ -28,8 +28,27 @@ static bool is_newline(mt_file_t* file);
 // Reads the next token in the file.
 static mt_token_t* next_token(mt_file_t* file, mt_settings_t* settings);
 
-mt_token_t* tokenize(mt_file_t* file, mt_settings_t* settings) {
-  return NULL;
+mt_token_t* tokenize(mt_file_t* f, mt_settings_t* s) {
+  mt_token_t* toks = NULL;
+  
+  mt_token_t* t = NULL;
+  while ((t = next_token(f, s))) {
+    if (!toks) {
+      toks = t;
+    }
+    else {
+      toks->next = t;
+    }
+    t->first = toks;
+    
+    if (t->kind == TK_EOF || s->exit_code) {
+      break;
+    }
+  }
+  if (!toks) {
+    // TODO Warning. "empty file"
+  }
+  return toks;
 }
 
 static void skip_line_comment(mt_file_t* file);
