@@ -26,7 +26,7 @@ mt_file_t* file_open(const char* path) {
     return NULL;
   }
   int fd;
-  if ((fd = open(path, O_RDONLY) == -1)) {
+  if ((fd = open(path, O_RDONLY)) == -1) {
     fprintf(stderr, MT_ERROR "failed to open file '%s': %s\n", path, strerror(errno));
     return NULL;
   }
