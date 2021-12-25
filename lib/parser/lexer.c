@@ -1,5 +1,6 @@
 #include <mutiny/mutiny.h>
 #include <mutiny/parser/lexer.h>
+#include <mutiny/parser/token.h>
 #include <mutiny/settings.h>
 #include <mutiny/error/error.h>
 #include <mutiny/util/filesystem.h>
@@ -76,12 +77,10 @@ static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
       continue;
     }
     else if (START(f->ptr, "//")) {
-      next_n(f, 2);
       skip_line_comment(f);
       continue;
     }
     else if (START(f->ptr, "/*")) {
-      next_n(f, 2);
       skip_block_comment(f);
       continue;
     }
@@ -125,7 +124,7 @@ static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
       case TK_KEYWORD:
         printf("%s\n", kw_strs[t->ival]);
         break;
-      case TK_PUNCT:
+      case TK_PUNCTUATOR:
         printf("%s\n", t->strval);
         break;
       case TK_INTEGER:
@@ -155,6 +154,7 @@ static void skip_line_comment(mt_file_t* f) {
 }
 
 static void skip_block_comment(mt_file_t* f) {
+  next_n(f, 2);
   for (char c = *f->ptr; c; c = next(f)) {
     if (c == '/') {
       if (*(f->ptr + 1) == '*') {
@@ -329,7 +329,7 @@ static bool is_punctuator(const mt_file_t* f) {
 static mt_token_t* read_punctuator(mt_file_t* f, mt_settings_t* s) {
   mt_token_t* t;
   INIT_TOKEN(t, f);
-  t->kind = TK_PUNCT;
+  t->kind = TK_PUNCTUATOR;
   t->len = 1;
   
   char c = *f->ptr;
