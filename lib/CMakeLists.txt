@@ -4,3 +4,4 @@ add_mutiny_sources(
 )
 
 include("${MT_LIB_DIR}/parser/CMakeLists.txt")
+include("${MT_LIB_DIR}/util/CMakeLists.txt")
