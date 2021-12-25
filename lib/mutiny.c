@@ -2,7 +2,7 @@
 #include <mutiny/exit_code.h>
 #include <mutiny/settings.h>
 #include <mutiny/args.h>
-#include <mutiny/parser/parser.h>
+#include <mutiny/parser/translation_unit.h>
 #include <mutiny/ast/ast.h>
 #include <mutiny/util/timer.h>
 
