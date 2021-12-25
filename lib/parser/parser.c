@@ -30,7 +30,6 @@ mt_ast_t* parse(mt_settings_t* s) {
     }
     
     if (!(f = file_open(path))) {
-      fprintf(stderr, MT_ERROR "no such file '%s'\n", path);
       s->exit_code = EXIT_ERR_FILE;
       return NULL;
     }

@@ -62,6 +62,8 @@ static mt_token_t* read_punctuator(mt_file_t* file, mt_settings_t* settings);
 static mt_token_t* read_eof(mt_file_t* file);
 static void read_keyword(mt_token_t* token);
 
+static const char* kw_strs[]; // TODO Take out when done debugging lexer.
+
 static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
   mt_token_t* t = NULL;
   
@@ -114,6 +116,36 @@ static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
     }
   }
   
+  if (t) {
+    printf("[%ld-%ld_%ld][%ld] tok: %d, ", t->line, t->col, t->len, t->fpos, t->kind);
+    switch (t->kind) {
+      case TK_IDENTIFIER:
+        printf("%s\n", t->strval);
+        break;
+      case TK_KEYWORD:
+        printf("%s\n", kw_strs[t->ival]);
+        break;
+      case TK_PUNCT:
+        printf("%s\n", t->strval);
+        break;
+      case TK_INTEGER:
+        printf("%lld\n", t->ival);
+        break;
+      case TK_FLOAT:
+        printf("%Lf\n", t->fval);
+        break;
+      case TK_STRING:
+        printf("%s\n", t->strval);
+        break;
+      case TK_CHAR:
+        printf("%c\n", t->cval);
+        break;
+      case TK_EOF:
+        printf("EOF\n");
+        break;
+    }
+  }
+  
   return t;
 }
 
@@ -145,6 +177,7 @@ static mt_token_t* read_identifier(mt_file_t* f) {
   mt_token_t* t;
   INIT_TOKEN(t, f);
   t->kind = TK_IDENTIFIER;
+  t->len = 1;
   
   char* first = f->ptr;
   
@@ -162,6 +195,7 @@ static mt_token_t* read_identifier(mt_file_t* f) {
 static mt_token_t* read_numeric_literal(mt_file_t* f, mt_settings_t* s) {
   mt_token_t* t;
   INIT_TOKEN(t, f);
+  t->len = 1;
   
   char c = *f->ptr;
   char* first = f->ptr;
@@ -234,8 +268,6 @@ static mt_token_t* read_string_literal(mt_file_t* f, mt_settings_t* s) {
     ++t->len;
   }
   
-  // TODO Read escape sequences.
-  
   if (!c) {
     // TODO Syntax error. "Unterminated string literal"
     t->kind = TK_EOF;
@@ -263,8 +295,6 @@ static mt_token_t* read_char_literal(mt_file_t* f, mt_settings_t* s) {
     ++t->len;
   }
   
-  // TODO Read escape sequences.
-  
   if (t->len != 1) {
     // TODO Syntax error. "Character constant empty / too long"
     return t;
@@ -284,19 +314,13 @@ static mt_token_t* read_char_literal(mt_file_t* f, mt_settings_t* s) {
 
 static bool is_punctuator(const mt_file_t* f) {
   char c = *f->ptr;
-  if (c == '+' ||
-      c == '-' ||
-      c == '*' ||
-      c == '/' ||
-      c == '%' ||
-      c == '~' ||
-      c == '&' ||
-      c == '|' ||
-      c == '^' ||
-      c == '<' ||
-      c == '>' ||
-      c == '=' ||
-      (c == '!' && *(f->ptr + 1) == '=')) {
+  if (c == '+' || c == '-' || c == '*' || c == '/' ||
+      c == '%' || c == '~' || c == '&' || c == '|' ||
+      c == '^' || c == '<' || c == '>' || c == '=' ||
+      c == '#' || c == '.' || c == ',' || c == ':' ||
+      c == ';' || c == '?' || c == '(' || c == ')' ||
+      c == '[' || c == ']' || c == '{' || c == '}' ||
+      START(f->ptr, "!=")) {
     return true;
   }
   return false;
@@ -306,12 +330,15 @@ static mt_token_t* read_punctuator(mt_file_t* f, mt_settings_t* s) {
   mt_token_t* t;
   INIT_TOKEN(t, f);
   t->kind = TK_PUNCT;
+  t->len = 1;
   
   char c = *f->ptr;
+  char c1 = *(f->ptr + 1);
+  char c2 = *(f->ptr + 2);
   switch (c) {
     case '+':
     case '-':
-      if (*(f->ptr + 1) == c) {
+      if (c1 == c || (c == '-' && c1 == '>')) { // ++ or -- or ->
         t->len = 2;
         break;
       }
@@ -321,29 +348,34 @@ static mt_token_t* read_punctuator(mt_file_t* f, mt_settings_t* s) {
     case '&':
     case '|':
     case '^':
-      if (*(f->ptr + 1) == '=') {
+      if (c1 == '=') { // += or -= or *= or /= or %= or &= or |= or ^=
         t->len = 2;
       }
       break;
     case '<':
     case '>':
-      if (*(f->ptr + 1) == c) {
+      if (c1 == c) { // << or >>
         t->len = 2;
-        if (*(f->ptr + 2) == '=') {
+        if (c2 == '=') { // <<= or >>=
           t->len = 3;
         }
       }
-      else if (*(f->ptr + 1) == '=') {
+      else if (c1 == '=') { // <= or >=
         t->len = 2;
       }
       break;
     case '=':
-      if (*(f->ptr + 1) == '=') {
+      if (c1 == '=') { // ==
         t->len = 2;
       }
       break;
-    case '!':
+    case '!': // !=
       t->len = 2;
+      break;
+    case ':':
+      if (c1 == '=' || c1 == ':') { // := or ::
+        t->len = 2;
+      }
       break;
   }
   
@@ -361,7 +393,7 @@ static mt_token_t* read_eof(mt_file_t* f) {
   return t;
 }
 
-static const char* keywords[] = {
+static const char* kw_strs[] = {
   [KW_NOT]      = "not",
   [KW_AND]      = "and",
   [KW_OR]       = "or",
@@ -399,8 +431,8 @@ static const char* keywords[] = {
 };
 
 static void read_keyword(mt_token_t* t) {
-  for (size_t i = 0; i < sizeof(keywords) / sizeof(char*); ++i) {
-    if (!strncmp(t->strval, keywords[i], t->len)) {
+  for (size_t i = 0; i < sizeof(kw_strs) / sizeof(char*); ++i) {
+    if (!strncmp(t->strval, kw_strs[i], t->len)) {
       t->kind = TK_KEYWORD;
       t->ival = i;
       free(t->strval);
@@ -417,6 +449,8 @@ static char next(mt_file_t* f) {
   else {
     ++f->cur_col;
   }
+  // TODO Read escape sequences.
+  
   ++f->cur_pos;
   return *++f->ptr;
 }
