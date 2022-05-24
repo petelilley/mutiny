@@ -36,6 +36,7 @@ typedef enum _mt_arch {
 typedef enum _mt_stage {
   STAGE_UNKNOWN = 0,
   STAGE_ARGS,
+  STAGE_SCAN_DEPENDICIES,
   STAGE_PARSE,
   STAGE_SEM,
   STAGE_GEN_IR,
@@ -49,8 +50,10 @@ typedef enum _mt_stage {
  * @brief The type of the compiler (jit or non-jit).
  */
 typedef enum _mt_compiler_type {
-  JIT = 0,
-  COMPILER,
+  ANY      = -1,
+  JIT      = 0,
+  COMPILER = 1,
+  PARSER   = 2,
 } mt_compiler_type_t;
 
 /**
@@ -62,18 +65,31 @@ typedef struct _mt_settings {
   
   mt_compiler_type_t type;
   
+  bool emit_asm;
+  bool emit_irgen;
+  bool emit_ir;
+  bool emit_bc;
+  bool emit_obj;
+  bool emit_exe;
+  bool emit_lib;
+  
   mt_os_t os;
   mt_arch_t arch;
+  
+  bool print_ast;
+  bool verbose;
+  bool debug;
+  unsigned job_num;
+  bool optimize;
+  bool no_warnings;
+  
+  list_t(char*) import_paths;
+  list_t(char*) lib_paths;
+  list_t(char*) link_libs;
   
   char* output;
   
   list_t(char*) src_dirs;
-  list_t(char*) lib_dirs;
-  
-  bool optimize;
-  bool hide_warnings;
-  bool print_ast;
-  bool verbose;
   
   mt_stage_t stage;
 } mt_settings_t;
