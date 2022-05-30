@@ -3,6 +3,7 @@
 #include <mutiny/parser/translation_unit.h>
 #include <mutiny/parser/token.h>
 #include <mutiny/parser/lexer.h>
+#include <mutiny/parser/parser_util.h>
 #include <mutiny/ast/ast.h>
 #include <mutiny/settings.h>
 #include <mutiny/error/error.h>
@@ -34,17 +35,24 @@ mt_ast_t* parse(mt_settings_t* s) {
       // TODO Something.
     }
     
-    if (!(f = file_open(path))) {
+    f = file_open(path);
+    if (!f) {
       s->exit_code = EXIT_ERR_FILE;
       return NULL;
     }
     
-    if (!(t = tokenize(f, s))) {
+    if (!END(path, ".mutiny")) {
+      fprintf(stderr, "\033[1m%s:\033[0m " MT_WARNING "filename extension does not match '.mutiny' but will be treated as a mutiny source file.\n", path);
+    }
+    
+    t = tokenize(f, s);
+    if (!t) {
       // TODO Cleanup file.
       return NULL;
     }
     
-    if (!(a = parse_tokens(t, s))) {
+    a = parse_tokens(t, s);
+    if (!a) {
       // TODO Cleanup file.
       // TODO Cleanup tokens.
       return NULL;
