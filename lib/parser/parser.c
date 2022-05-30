@@ -41,7 +41,7 @@ mt_ast_t* parse(mt_settings_t* s) {
       return NULL;
     }
     
-    if (!END(path, ".mutiny")) {
+    if (!END(path, ".mutiny") && !s->no_warnings) {
       fprintf(stderr, "\033[1m%s:\033[0m " MT_WARNING "filename extension does not match '.mutiny' but will be treated as a mutiny source file.\n", path);
     }
     
