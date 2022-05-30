@@ -1,12 +1,10 @@
 #include <mutiny/mutiny.h>
 #include <mutiny/parser/lexer.h>
 #include <mutiny/parser/token.h>
+#include <mutiny/parser/parser_util.h>
 #include <mutiny/settings.h>
 #include <mutiny/error/error.h>
 #include <mutiny/util/filesystem.h>
-
-#define START(x, y) (!strncmp((x), (y), strlen((y))))
-#define END(x, y)   (!strncmp((x) + strlen((x)) - strlen((y)) - 1, (y), strlen((y))))
 
 #define INIT_TOKEN(t, f) \
   do {                                \
@@ -318,8 +316,9 @@ static bool is_punctuator(const mt_file_t* f) {
       c == '%' || c == '~' || c == '&' || c == '|' ||
       c == '^' || c == '<' || c == '>' || c == '=' ||
       c == '#' || c == '.' || c == ',' || c == ':' ||
-      c == ';' || c == '?' || c == '(' || c == ')' ||
-      c == '[' || c == ']' || c == '{' || c == '}' ||
+      c == ';' || c == '?' || c == '@' ||
+      c == '(' || c == ')' || c == '[' || c == ']' ||
+      c == '{' || c == '}' ||
       START(f->ptr, "!=")) {
     return true;
   }
@@ -334,7 +333,6 @@ static mt_token_t* read_punctuator(mt_file_t* f, mt_settings_t* s) {
   
   char c = *f->ptr;
   char c1 = *(f->ptr + 1);
-  char c2 = *(f->ptr + 2);
   switch (c) {
     case '+':
     case '-':
@@ -355,6 +353,8 @@ static mt_token_t* read_punctuator(mt_file_t* f, mt_settings_t* s) {
     case '<':
     case '>':
       if (c1 == c) { // << or >>
+        char c2 = *(f->ptr + 2);
+        
         t->len = 2;
         if (c2 == '=') { // <<= or >>=
           t->len = 3;
@@ -394,6 +394,8 @@ static mt_token_t* read_eof(mt_file_t* f) {
 }
 
 static const char* kw_strs[] = {
+  [KW_IMPORT]   = "import",
+  
   [KW_NOT]      = "not",
   [KW_AND]      = "and",
   [KW_OR]       = "or",
@@ -401,7 +403,8 @@ static const char* kw_strs[] = {
   [KW_ENUM]     = "enum",
   [KW_STRUCT]   = "struct",
   [KW_UNION]    = "union",
-  [KW_FN]       = "fn",
+  [KW_FUNC]     = "func",
+  [KW_VAR]      = "var",
   
   [KW_IF]       = "if",
   [KW_ELIF]     = "elif",
