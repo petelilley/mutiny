@@ -18,6 +18,14 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release") # Default to release
 endif()
 
+# Turn on warnings.
+if (MSVC)
+  add_compile_options(/W4)
+else()
+  add_compile_options(-Wall -Wextra -pedantic)
+  # add_compile_options(-Weverything)
+endif()
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # compile_commands.json
   set(MT_DEBUG ON)
