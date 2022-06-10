@@ -5,16 +5,9 @@
  * @brief Represents a file (for reading purposes).
  */
 typedef struct _mt_file {
-  // The given path to the file.
   char* path;
-  
-  // The contents of the file.
   char* contents;
-  
-  // A pointer to the current position in the file.
   char* ptr;
-  
-  // The position in the source file.
   long int cur_line, cur_col, cur_pos;
 } mt_file_t;
 
@@ -48,5 +41,12 @@ bool is_directory(const char* path);
  * @see mt_file_t
  */
 mt_file_t* file_open(const char* path);
+
+/**
+ * @brief De-initializes a file.
+ *
+ * @param file The file to de-initialize.
+ */
+void file_deinit(mt_file_t* file);
 
 #endif // __MT_FILESYSTEM_H__

@@ -108,10 +108,13 @@ static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
     }
     else {
       // TODO Syntax error. "invalid token"
+      puts("invalid token");
       next(f);
       continue;
     }
   }
+  
+#if 0
   
   if (t) {
     printf("[%ld-%ld_%ld][%ld] tok: %d, ", t->line, t->col, t->len, t->fpos, t->kind);
@@ -142,6 +145,8 @@ static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
         break;
     }
   }
+
+#endif
   
   return t;
 }
@@ -229,8 +234,18 @@ static mt_token_t* read_numeric_literal(mt_file_t* f, mt_settings_t* s) {
   else if (*(f->ptr + 1) == 'x' || *(f->ptr + 1) == 'X') {
     next(f);
     first += 2;
-    for (c = next(f); c && (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')); c = next(f)) {
+    for (c = next(f); c && (isdigit(c) || isalpha(c)); c = next(f)) {
+      if ((c > 'f' && c <= 'z') || (c > 'F' && c <= 'Z')) {
+        // TODO Syntax error. "Invalid suffix 'xG' on integer literal"
+        printf("invalid suffix 'x%c' on integer literal\n", c);
+        break;
+      }
+    /* for (c = next(f); c && (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')); c = next(f)) { */
       ++t->len;
+    }
+    if (t->len == 1) {
+        puts("invalid suffix 'x' on integer literal");
+      // TODO Syntax error. "Invalid suffix 'x' on integer literal"
     }
     t->kind = TK_INTEGER;
     val = strndup(first, t->len);
@@ -241,6 +256,10 @@ static mt_token_t* read_numeric_literal(mt_file_t* f, mt_settings_t* s) {
   else {
     for (c = next(f); c && isdigit(c); c = next(f)) {
       ++t->len;
+      if (c - '0' > 7) {
+        printf("invalid digit '%d' in octal numeric literal\n", c - '0');
+        // TODO Syntax error. "Invalid digit '8' in octal numeric literal"
+      }
     }
     t->kind = TK_INTEGER;
     val = strndup(first, t->len);

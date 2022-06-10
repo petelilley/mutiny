@@ -321,12 +321,12 @@ mt_input_option_t next_opt(unsigned argc, char* const* argv, mt_compiler_type_t 
     continue;
     
 FOUND:
-    opt.index = n;
+    opt.index = (ssize_t)n;
     ++*i;
     return opt;
   }
   
-UNRECOGNIZED_OPTION:
+// UNRECOGNIZED_OPTION:
   fprintf(stderr, MT_ERROR "unrecognized option `%s'\n", argv[*i]);
   goto ERROR;
   

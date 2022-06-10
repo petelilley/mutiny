@@ -20,7 +20,7 @@
 /**
  * @brief Frees a list from memory.
  */
-#define l_destroy(l) \
+#define l_deinit(l) \
   free((l).a)
 
 /**

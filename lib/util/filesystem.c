@@ -50,3 +50,16 @@ mt_file_t* file_open(const char* path) {
   
   return f;
 }
+
+void file_deinit(mt_file_t* f) {
+  if (!f) return;
+  
+  if (f->path) {
+    free(f->path);
+  }
+  if (f->contents) {
+    free(f->contents);
+  }
+  
+  free(f);
+}

@@ -2,13 +2,12 @@
 #include <mutiny/exit_code.h>
 #include <mutiny/settings.h>
 #include <mutiny/args.h>
-#include <mutiny/parser/parser.h>
-#include <mutiny/ast/ast.h>
+#include <mutiny/translation_unit.h>
 #include <mutiny/util/timer.h>
 
 int main(int argc, char* const* argv) {
   mt_settings_t* s = NULL;
-  mt_ast_t* ast = NULL;
+  mt_translation_unit_t* tu = NULL;
   
   BEGIN_TIMER(prog_time);
   
@@ -25,7 +24,9 @@ int main(int argc, char* const* argv) {
   
   BEGIN_TIMER(parse_time);
   
-  ast = parse(s);
+  tu = translation_unit_init(s);
+  
+  translation_unit_exec(tu);
   
   END_TIMER(parse_time);
   if (s->verbose) printf("parsed source files in %fs\n", parse_time);
