@@ -11,28 +11,27 @@ int main(int argc, char* const* argv) {
   
   BEGIN_TIMER(prog_time);
   
-  // --- Input arguments ---
+  do {
+    BEGIN_TIMER(args_time);
+    
+    // Parse and interpert the input arguments.
+    s = decode_args(argc, argv);
+    
+    END_TIMER(args_time);
+    if (s->verbose) printf("parsed input arguments in %fs\n", args_time);
+    if (s->end || s->exit_code) break;
+    
+    tu = translation_unit_init(s);
+    
+    BEGIN_TIMER(parse_time);
+    
+    bool parser_res = translation_unit_parse_exec(tu);
+    
+    END_TIMER(parse_time);
+    if (s->verbose) printf("parsed source files in %fs\n", parse_time);
+    if (s->end || s->exit_code || !parser_res) break;
+  } while (0);
   
-  BEGIN_TIMER(args_time);
-  
-  // Parse and interpert the input arguments.
-  s = decode_args(argc, argv);
-  
-  END_TIMER(args_time);
-  if (s->verbose) printf("parsed input arguments in %fs\n", args_time);
-  if (s->end || s->exit_code) goto CLEANUP;
-  
-  BEGIN_TIMER(parse_time);
-  
-  tu = translation_unit_init(s);
-  
-  translation_unit_exec(tu);
-  
-  END_TIMER(parse_time);
-  if (s->verbose) printf("parsed source files in %fs\n", parse_time);
-  if (s->end || s->exit_code) goto CLEANUP;
-  
-CLEANUP:
   // TODO Free settings.
   
   END_TIMER(prog_time);

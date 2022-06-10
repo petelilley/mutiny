@@ -69,8 +69,7 @@ void translation_unit_deinit(mt_translation_unit_t* tu) {
   free(tu);
 }
 
-bool translation_unit_exec(mt_translation_unit_t* tu) {
-  
+bool translation_unit_parse_exec(mt_translation_unit_t* tu) {
   // TODO Use thread pool to parse multiple source files simultaneously.
   for (size_t i = 0; i < l_size(tu->files); ++i) {
     tu->tokens = tokenize(l_at(tu->files, i), tu->settings);
@@ -85,6 +84,14 @@ bool translation_unit_exec(mt_translation_unit_t* tu) {
     
     // TODO Concatenate ast.
   }
-  
+
   return true;
+}
+
+bool translation_unit_semantic_analysis_exec(mt_translation_unit_t* tu) {
+  return false;
+}
+
+bool translation_unit_irgen_exec(mt_translation_unit_t* tu) {
+  return false;
 }
