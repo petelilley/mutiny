@@ -20,7 +20,7 @@ bool is_directory(const char* path) {
   return s.st_mode & S_IFDIR;
 }
 
-mt_file_t* file_open(const char* path) {
+mt_file_t* mt_file_init(const char* path) {
   mt_log_t err_log = mt_log_init(stderr, MT_ERROR);
   
   if (!is_file(path)) {
@@ -55,7 +55,7 @@ mt_file_t* file_open(const char* path) {
   return f;
 }
 
-void file_deinit(mt_file_t* f) {
+void mt_file_deinit(mt_file_t* f) {
   if (!f) return;
   
   if (f->path) {

@@ -40,13 +40,13 @@ bool is_directory(const char* path);
  *
  * @see mt_file_t
  */
-mt_file_t* file_open(const char* path);
+mt_file_t* mt_file_init(const char* path);
 
 /**
  * @brief De-initializes a file.
  *
  * @param file The file to de-initialize.
  */
-void file_deinit(mt_file_t* file);
+void mt_file_deinit(mt_file_t* file);
 
 #endif // __MT_FILESYSTEM_H__

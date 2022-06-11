@@ -10,7 +10,7 @@
 #include <mutiny/util/log.h>
 #include <mutiny/util/filesystem.h>
 
-mt_translation_unit_t* translation_unit_init(struct _mt_settings* s) {
+mt_translation_unit_t* mt_translation_unit_init(struct _mt_settings* s) {
   mt_log_t err_log = mt_log_init(stderr, MT_ERROR);
   mt_log_t warn_log = mt_log_init(stderr, MT_WARNING);
   
@@ -38,7 +38,7 @@ mt_translation_unit_t* translation_unit_init(struct _mt_settings* s) {
       // TODO Something.
     }
     
-    f = file_open(path);
+    f = mt_file_init(path);
     if (!f) {
       s->exit_code = EXIT_ERR_FILE;
       break;
@@ -53,18 +53,18 @@ mt_translation_unit_t* translation_unit_init(struct _mt_settings* s) {
   }
   
   if (s->exit_code == EXIT_ERR_FILE) {
-    translation_unit_deinit(tu);
+    mt_translation_unit_deinit(tu);
     return NULL;
   }
   
   return tu;
 }
 
-void translation_unit_deinit(mt_translation_unit_t* tu) {
+void mt_translation_unit_deinit(mt_translation_unit_t* tu) {
   if (!tu) return;
   
   for (size_t i = 0; i < l_size(tu->files); i++) {
-    file_deinit(l_at(tu->files, i));
+    mt_file_deinit(l_at(tu->files, i));
   }
   l_deinit(tu->files);
   if (tu->tokens) {
@@ -76,7 +76,7 @@ void translation_unit_deinit(mt_translation_unit_t* tu) {
   free(tu);
 }
 
-bool translation_unit_parse_exec(mt_translation_unit_t* tu) {
+bool mt_translation_unit_parse_exec(mt_translation_unit_t* tu) {
   // TODO Use thread pool to parse multiple source files simultaneously.
   for (size_t i = 0; i < l_size(tu->files); ++i) {
     tu->tokens = tokenize(l_at(tu->files, i), tu->settings);
@@ -95,10 +95,10 @@ bool translation_unit_parse_exec(mt_translation_unit_t* tu) {
   return true;
 }
 
-bool translation_unit_semantic_analysis_exec(mt_translation_unit_t* tu) {
+bool mt_translation_unit_semantic_analysis_exec(mt_translation_unit_t* tu) {
   return false;
 }
 
-bool translation_unit_irgen_exec(mt_translation_unit_t* tu) {
+bool mt_translation_unit_irgen_exec(mt_translation_unit_t* tu) {
   return false;
 }

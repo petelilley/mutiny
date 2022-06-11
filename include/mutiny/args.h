@@ -13,6 +13,6 @@ struct _mt_settings;
  *
  * @see mt_settings_t
  */
-struct _mt_settings* decode_args(unsigned argc, char* const* argv);
+struct _mt_settings* mt_args_decode(unsigned argc, char* const* argv);
 
 #endif // __MT_ARGS_H__

@@ -19,7 +19,7 @@ int main(int argc, char* const* argv) {
     {
       mt_timer_t arg_timer = mt_timer_init();
       
-      settings = decode_args(argc, argv);
+      settings = mt_args_decode(argc, argv);
       
       if (settings && settings->verbose) {
         mt_log_add(&verbose_log, "Argument parser stage finished in %.2fs\n", mt_timer_get(&arg_timer));
@@ -38,7 +38,7 @@ int main(int argc, char* const* argv) {
     
     // --- Initialize Translation Unit ---
     {
-      t_unit = translation_unit_init(settings);
+      t_unit = mt_translation_unit_init(settings);
       if (!t_unit || settings->exit_code) {
         mt_log_add(&err_log, "Translation unit failed to initialize. Exiting now.\n");
         mt_log_dump(&err_log);
@@ -50,7 +50,7 @@ int main(int argc, char* const* argv) {
     {
       mt_timer_t parser_timer = mt_timer_init();
       
-      bool parser_res = translation_unit_parse_exec(t_unit);
+      bool parser_res = mt_translation_unit_parse_exec(t_unit);
       
       if (settings->verbose) {
         mt_log_add(&verbose_log, "Parser stage finished in %.2fs\n", mt_timer_get(&parser_timer));

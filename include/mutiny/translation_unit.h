@@ -34,7 +34,7 @@ typedef struct _mt_translation_unit {
  * @see mt_settings_t
  * @see mt_translation_unit_t
  */
-mt_translation_unit_t* translation_unit_init(struct _mt_settings* settings);
+mt_translation_unit_t* mt_translation_unit_init(struct _mt_settings* settings);
 
 /**
  * @brief De-initializes the translation unit and frees all allocated memory contained by it.
@@ -43,7 +43,7 @@ mt_translation_unit_t* translation_unit_init(struct _mt_settings* settings);
  *
  * @see mt_translation_unit_t
  */
-void translation_unit_deinit(mt_translation_unit_t* translation_unit);
+void mt_translation_unit_deinit(mt_translation_unit_t* translation_unit);
 
 /**
  * @brief Executes the lexical analysis and parsing stages of the translation unit.
@@ -54,7 +54,7 @@ void translation_unit_deinit(mt_translation_unit_t* translation_unit);
  *
  * @see mt_translation_unit_t
  */
-bool translation_unit_parse_exec(mt_translation_unit_t* translation_unit);
+bool mt_translation_unit_parse_exec(mt_translation_unit_t* translation_unit);
 
 /**
  * @brief Executes the semantic analysis stage of the translation unit.
@@ -65,7 +65,7 @@ bool translation_unit_parse_exec(mt_translation_unit_t* translation_unit);
  *
  * @see mt_translation_unit_t
  */
-bool translation_unit_semantic_analysis_exec(mt_translation_unit_t* translation_unit);
+bool mt_translation_unit_semantic_analysis_exec(mt_translation_unit_t* translation_unit);
 
 /**
  * @brief Executes the LLVM IR generation stage of the translation unit.
@@ -76,6 +76,6 @@ bool translation_unit_semantic_analysis_exec(mt_translation_unit_t* translation_
  *
  * @see mt_translation_unit_t
  */
-bool translation_unit_irgen_exec(mt_translation_unit_t* translation_unit);
+bool mt_translation_unit_irgen_exec(mt_translation_unit_t* translation_unit);
 
 #endif  // __MT_TRANSLATION_UNIT_H__

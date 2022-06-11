@@ -87,7 +87,7 @@ static mt_command_t parse_command(const char* cmd);
 
 mt_input_option_t next_opt(unsigned argc, char* const* argv, mt_compiler_type_t type, size_t* i, mt_log_t* err_log);
 
-mt_settings_t* decode_args(unsigned argc, char* const* argv) {
+mt_settings_t* mt_args_decode(unsigned argc, char* const* argv) {
   mt_settings_t* s = malloc(sizeof(mt_settings_t));
   memset(s, 0, sizeof(mt_settings_t));
   s->stage = STAGE_ARGS;
