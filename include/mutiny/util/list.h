@@ -21,7 +21,11 @@
  * @brief Frees a list from memory.
  */
 #define l_deinit(l) \
-  free((l).a)
+  do {              \
+    if ((l).a) {    \
+      free((l).a);  \
+    }               \
+  } while (0)
 
 /**
  * @brief Accesses a list at a specified index.
@@ -44,7 +48,6 @@
       realloc((l).a, ++(l).n * sizeof(type)) : \
       malloc(++(l).n * sizeof(type));          \
     l_at(l, (l).n - 1) = e;                    \
-  } while(0)
-
+  } while (0)
 
 #endif // __MT_LIST_H__
