@@ -132,7 +132,7 @@ mt_settings_t* mt_args_decode(unsigned argc, char* const* argv) {
       mt_log_add(&err_log, "Unknown command `%s'\n\n", argv[1]);
       mt_log_dump(&err_log);
       usage(&err_log, CMD_UNKNOWN);
-      s->exit_code = EXIT_ERR_ARGS;
+      s->exit_code = MT_EXIT_ERR_ARGS;
       return s;
   }
   
@@ -150,7 +150,7 @@ mt_settings_t* mt_args_decode(unsigned argc, char* const* argv) {
       }
       else {
         if (opt.error) {
-          s->exit_code = EXIT_ERR_ARGS;
+          s->exit_code = MT_EXIT_ERR_ARGS;
         }
         break;
       }
@@ -250,14 +250,14 @@ mt_settings_t* mt_args_decode(unsigned argc, char* const* argv) {
 INVALID_ARGUMENT:
   mt_log_add(&err_log, "Invalid argument `%s' to option `%.*s'\n", opt.arg, (int)opt_len, opt_name);
   mt_log_dump(&err_log);
-  s->exit_code = EXIT_ERR_ARGS;
+  s->exit_code = MT_EXIT_ERR_ARGS;
   free(opt.arg);
   return s;
   
 DUPLICATE_OPTION:
   mt_log_add(&err_log, "Duplicate option `%.*s'\n", (int)opt_len, opt_name);
   mt_log_dump(&err_log);
-  s->exit_code = EXIT_ERR_ARGS;
+  s->exit_code = MT_EXIT_ERR_ARGS;
   if (opt.arg) free(opt.arg);
   return s;
 }

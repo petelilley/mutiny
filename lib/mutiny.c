@@ -71,8 +71,12 @@ int main(int argc, char* const* argv) {
   }
   
   int exit_code;
-  if (settings) exit_code = settings->exit_code;
-  else exit_code = -1;
+  if (settings) {
+    exit_code = settings->exit_code;
+  }
+  else {
+    exit_code = MT_EXIT_ERR_INTERNAL;
+  }
   
   // TODO: Cleanup.
   

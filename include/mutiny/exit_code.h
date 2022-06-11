@@ -5,13 +5,13 @@
  * @brief An enumeration of the compiler's possible exit codes.
  */
 typedef enum mt_exit_code {
-  EXIT_ERR_INTERNAL = -1,
-  EXIT_SUCCEEDED    = 0,
-  EXIT_ERR_ARGS     = 1,
-  EXIT_ERR_FILE     = 2,
-  EXIT_ERR_SYNTAX   = 3,
-  EXIT_ERR_OS       = 4,
-  EXIT_ERR_ARCH     = 5,
+  MT_EXIT_ERR_INTERNAL = -1,
+  MT_EXIT_SUCCEESS     = 0,
+  MT_EXIT_ERR_ARGS     = 1,
+  MT_EXIT_ERR_FILE     = 2,
+  MT_EXIT_ERR_SYNTAX   = 3,
+  MT_EXIT_ERR_OS       = 4,
+  MT_EXIT_ERR_ARCH     = 5,
 } mt_exit_code_t;
 
 #endif // __MT_EXIT_CODE_H__

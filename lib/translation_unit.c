@@ -18,7 +18,7 @@ mt_translation_unit_t* mt_translation_unit_init(struct _mt_settings* s) {
   if (!src_num) {
     mt_log_add(&err_log, "No input files\n");
     mt_log_dump(&err_log);
-    s->exit_code = EXIT_ERR_FILE;
+    s->exit_code = MT_EXIT_ERR_FILE;
     return NULL;
   }
   
@@ -40,7 +40,7 @@ mt_translation_unit_t* mt_translation_unit_init(struct _mt_settings* s) {
     
     f = mt_file_init(path);
     if (!f) {
-      s->exit_code = EXIT_ERR_FILE;
+      s->exit_code = MT_EXIT_ERR_FILE;
       break;
     }
     
@@ -52,7 +52,7 @@ mt_translation_unit_t* mt_translation_unit_init(struct _mt_settings* s) {
     l_push(tu->files, mt_file_t*, f);
   }
   
-  if (s->exit_code == EXIT_ERR_FILE) {
+  if (s->exit_code == MT_EXIT_ERR_FILE) {
     mt_translation_unit_deinit(tu);
     return NULL;
   }
