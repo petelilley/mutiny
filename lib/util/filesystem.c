@@ -1,6 +1,7 @@
 #include <mutiny/mutiny.h>
 #include <mutiny/error/error.h>
 #include <mutiny/util/filesystem.h>
+#include <mutiny/util/log.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -21,13 +22,17 @@ bool is_directory(const char* path) {
 }
 
 mt_file_t* file_open(const char* path) {
+  mt_log_t err_log = mt_log_init(stderr, MT_ERROR);
+  
   if (!is_file(path)) {
-    fprintf(stderr, MT_ERROR "no such file '%s'\n", path);
+    mt_log_add(&err_log, "No such file '%s'\n", path);
+    mt_log_dump(&err_log);
     return NULL;
   }
   int fd;
   if ((fd = open(path, O_RDONLY)) == -1) {
-    fprintf(stderr, MT_ERROR "failed to open file '%s': %s\n", path, strerror(errno));
+    mt_log_add(&err_log, "Failed to open file '%s': %s\n", path, strerror(errno));
+    mt_log_dump(&err_log);
     return NULL;
   }
   

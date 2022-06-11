@@ -3,6 +3,7 @@
 #include <mutiny/settings.h>
 #include <mutiny/error/error.h>
 #include <mutiny/util/list.h>
+#include <mutiny/util/log.h>
 #include <getopt.h>
 
 typedef enum _mt_command {
@@ -80,22 +81,25 @@ static const mt_option_t opts[] = {
 };
 
 #define OPT_NUM (sizeof(opts) / sizeof(mt_option_t))
-  
 
-static void usage(FILE* f, mt_command_t section);
+static void usage(mt_log_t* log, mt_command_t section);
 static void version(void);
 static mt_command_t parse_command(const char* cmd);
 
-mt_input_option_t next_opt(unsigned argc, char* const* argv, mt_compiler_type_t type, size_t* i);
+mt_input_option_t next_opt(unsigned argc, char* const* argv, mt_compiler_type_t type, size_t* i, mt_log_t* err_log);
 
 mt_settings_t* decode_args(unsigned argc, char* const* argv) {
   mt_settings_t* s = malloc(sizeof(mt_settings_t));
   memset(s, 0, sizeof(mt_settings_t));
   s->stage = STAGE_ARGS;
   
+  mt_log_t help_log = mt_log_init(stderr, "");
+  mt_log_t err_log = mt_log_init(stderr, MT_ERROR);
+  
   if (argc < 2) {
-    printf("Mutiny is a tool for managing mutiny source code\n\n");
-    usage(stdout, CMD_UNKNOWN);
+    mt_log_add(&help_log, "Mutiny is a tool for managing mutiny source code\n\n");
+    mt_log_dump(&help_log);
+    usage(&help_log, CMD_UNKNOWN);
     s->end = true;
     return s;
   }
@@ -120,14 +124,15 @@ mt_settings_t* decode_args(unsigned argc, char* const* argv) {
       // TODO Help for specific command.
       s->end = true;
       if (argc > 2) {
-        usage(stdout, parse_command(argv[2]));
+        usage(&help_log, parse_command(argv[2]));
       } else {
-        usage(stdout, CMD_UNKNOWN);
+        usage(&help_log, CMD_UNKNOWN);
       }
       return s;
     case CMD_UNKNOWN:
-      fprintf(stderr, MT_ERROR "unknown command `%s'\n\n", argv[1]);
-      usage(stderr, CMD_UNKNOWN);
+      mt_log_add(&err_log, "Unknown command `%s'\n\n", argv[1]);
+      mt_log_dump(&err_log);
+      usage(&err_log, CMD_UNKNOWN);
       s->exit_code = EXIT_ERR_ARGS;
       return s;
   }
@@ -139,7 +144,7 @@ mt_settings_t* decode_args(unsigned argc, char* const* argv) {
   size_t opt_len;
   mt_input_option_t opt;
   while (true) {
-    if ((opt = next_opt(argc - 1, argv + 2, s->type, &i)).index == -1) {
+    if ((opt = next_opt(argc - 1, argv + 2, s->type, &i, &err_log)).index == -1) {
       if (opt.file_path) {
         l_push(s->src_dirs, char*, opt.file_path);
         continue;
@@ -244,19 +249,21 @@ mt_settings_t* decode_args(unsigned argc, char* const* argv) {
   return s;
   
 INVALID_ARGUMENT:
-  fprintf(stderr, MT_ERROR "invalid argument `%s' to option `%.*s'\n", opt.arg, (int)opt_len, opt_name);
+  mt_log_add(&err_log, "Invalid argument `%s' to option `%.*s'\n", opt.arg, (int)opt_len, opt_name);
+  mt_log_dump(&err_log);
   s->exit_code = EXIT_ERR_ARGS;
   free(opt.arg);
   return s;
   
 DUPLICATE_OPTION:
-  fprintf(stderr, MT_ERROR "duplicate option `%.*s'\n", (int)opt_len, opt_name);
+  mt_log_add(&err_log, "Duplicate option `%.*s'\n", (int)opt_len, opt_name);
+  mt_log_dump(&err_log);
   s->exit_code = EXIT_ERR_ARGS;
   if (opt.arg) free(opt.arg);
   return s;
 }
 
-mt_input_option_t next_opt(unsigned argc, char* const* argv, mt_compiler_type_t type, size_t* i) {
+mt_input_option_t next_opt(unsigned argc, char* const* argv, mt_compiler_type_t type, size_t* i, mt_log_t* err_log) {
   mt_input_option_t opt = {-1, NULL, NULL, false};
   
   if (*i + 1 >= argc) {
@@ -327,11 +334,13 @@ FOUND:
   }
   
 // UNRECOGNIZED_OPTION:
-  fprintf(stderr, MT_ERROR "unrecognized option `%s'\n", argv[*i]);
+  mt_log_add(err_log, "Unrecognized option `%s'\n", argv[*i]);
+  mt_log_dump(err_log);
   goto ERROR;
   
 MISSING_ARGUMENT:
-  fprintf(stderr, MT_ERROR "missing argument to option `%s'\n", argv[*i]);
+  mt_log_add(err_log, "Missing argument to option `%s'\n", argv[*i]);
+  mt_log_dump(err_log);
   goto ERROR;
   
 ERROR:
@@ -362,35 +371,35 @@ static void print_options(FILE* f, mt_compiler_type_t type) {
   }
 }
 
-static void usage(FILE* f, mt_command_t section) {
+static void usage(mt_log_t* l, mt_command_t section) {
   switch (section) {
     case CMD_RUN:
-      fprintf(f,
-        "usage: mutiny run [sources] [flags]\n"
+      fprintf(l->file,
+        "Usage: mutiny run [sources] [flags]\n"
         "\n"
         "Available options:\n"
       );
-      print_options(f, JIT);
+      print_options(l->file, JIT);
       break;
     case CMD_BUILD:
-      fprintf(f,
-        "usage: mutiny build [-o output] [sources] [flags]\n"
+      fprintf(l->file,
+        "Usage: mutiny build [-o output] [sources] [flags]\n"
         "\n"
         "Available options:\n"
       );
-      print_options(f, COMPILER);
+      print_options(l->file, COMPILER);
       break;
     case CMD_PARSE:
-      fprintf(f,
-        "usage: mutiny parse [sources] [flags]\n"
+      fprintf(l->file,
+        "Usage: mutiny parse [sources] [flags]\n"
         "\n"
         "Available options:\n"
       );
-      print_options(f, PARSER);
+      print_options(l->file, PARSER);
       break;
     default:
-      fprintf(f,
-        "usage: mutiny <command> [arguments]\n"
+      fprintf(l->file,
+        "Usage: mutiny <command> [arguments]\n"
         "\n"
         "Available commands:\n"
         "\trun\t\tCompile and run a Mutiny program\n"

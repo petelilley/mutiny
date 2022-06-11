@@ -4,38 +4,77 @@
 #include <mutiny/args.h>
 #include <mutiny/translation_unit.h>
 #include <mutiny/util/timer.h>
+#include <mutiny/util/log.h>
 
 int main(int argc, char* const* argv) {
-  mt_settings_t* s = NULL;
-  mt_translation_unit_t* tu = NULL;
+  mt_log_t verbose_log = mt_log_init(stdout, MT_VERBOSE);
+  mt_log_t err_log = mt_log_init(stderr, MT_ERROR);
+  mt_timer_t prog_timer = mt_timer_init();
   
-  BEGIN_TIMER(prog_time);
+  mt_settings_t* settings = NULL;
+  mt_translation_unit_t* t_unit = NULL;
   
   do {
-    BEGIN_TIMER(args_time);
+    // --- Command-Line Argument Parsing ---
+    {
+      mt_timer_t arg_timer = mt_timer_init();
+      
+      settings = decode_args(argc, argv);
+      
+      if (settings && settings->verbose) {
+        mt_log_add(&verbose_log, "Argument parser stage finished in %.2fs\n", mt_timer_get(&arg_timer));
+        mt_log_dump(&verbose_log);
+      }
+      
+      if (!settings || settings->exit_code) {
+        mt_log_add(&err_log, "Argument parser failed. Exiting now.\n");
+        mt_log_dump(&err_log);
+        break;
+      }
+      if (settings->end) {
+        break;
+      }
+    }
     
-    // Parse and interpert the input arguments.
-    s = decode_args(argc, argv);
+    // --- Initialize Translation Unit ---
+    {
+      t_unit = translation_unit_init(settings);
+      if (!t_unit || settings->exit_code) {
+        mt_log_add(&err_log, "Translation unit failed to initialize. Exiting now.\n");
+        mt_log_dump(&err_log);
+        break;
+      }
+    }
     
-    END_TIMER(args_time);
-    if (s->verbose) printf("parsed input arguments in %fs\n", args_time);
-    if (s->end || s->exit_code) break;
-    
-    tu = translation_unit_init(s);
-    
-    BEGIN_TIMER(parse_time);
-    
-    bool parser_res = translation_unit_parse_exec(tu);
-    
-    END_TIMER(parse_time);
-    if (s->verbose) printf("parsed source files in %fs\n", parse_time);
-    if (s->end || s->exit_code || !parser_res) break;
-  } while (0);
+    // --- Execute the Parser ---
+    {
+      mt_timer_t parser_timer = mt_timer_init();
+      
+      bool parser_res = translation_unit_parse_exec(t_unit);
+      
+      if (settings->verbose) {
+        mt_log_add(&verbose_log, "Parser stage finished in %.2fs\n", mt_timer_get(&parser_timer));
+        mt_log_dump(&verbose_log);
+      }
+      
+      if (!parser_res) {
+        mt_log_add(&err_log, "Parser failed. Exiting now.\n");
+        mt_log_dump(&err_log);
+        break;
+      }
+    }
+  } while(0);
   
-  // TODO Free settings.
+  if (settings && settings->verbose) {
+    mt_log_add(&verbose_log, "Compiler finished in %.2fs\n", mt_timer_get(&prog_timer));
+    mt_log_dump(&verbose_log);
+  }
   
-  END_TIMER(prog_time);
-  if (s->verbose) printf("compiler finished in %fs\n", prog_time);
+  int exit_code;
+  if (settings) exit_code = settings->exit_code;
+  else exit_code = -1;
   
-  return s->exit_code;
+  // TODO: Cleanup.
+  
+  return exit_code;
 }
