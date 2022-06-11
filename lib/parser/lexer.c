@@ -3,7 +3,6 @@
 #include <mutiny/parser/token.h>
 #include <mutiny/parser/parser_util.h>
 #include <mutiny/settings.h>
-#include <mutiny/error/error.h>
 #include <mutiny/util/filesystem.h>
 
 #define INIT_TOKEN(t, f) \

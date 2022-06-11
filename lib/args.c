@@ -1,7 +1,6 @@
 #include <mutiny/mutiny.h>
 #include <mutiny/args.h>
 #include <mutiny/settings.h>
-#include <mutiny/error/error.h>
 #include <mutiny/util/list.h>
 #include <mutiny/util/log.h>
 #include <getopt.h>

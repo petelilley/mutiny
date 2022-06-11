@@ -6,7 +6,6 @@
 #include <mutiny/parser/parser_util.h>
 #include <mutiny/ast/ast.h>
 #include <mutiny/settings.h>
-#include <mutiny/error/error.h>
 #include <mutiny/util/list.h>
 #include <mutiny/util/log.h>
 #include <mutiny/util/filesystem.h>

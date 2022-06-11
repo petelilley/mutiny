@@ -1,5 +1,4 @@
 #include <mutiny/mutiny.h>
-#include <mutiny/error/error.h>
 #include <mutiny/util/filesystem.h>
 #include <mutiny/util/log.h>
 #include <sys/stat.h>
