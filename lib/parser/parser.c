@@ -7,7 +7,7 @@
 
 static mt_ast_t* parse_global_expr(mt_token_t* token, mt_settings_t* settings);
 
-mt_ast_t* parse_tokens(mt_token_t* t, mt_settings_t* s) {
+mt_ast_t* mt_parse_tokens(mt_token_t* t, mt_settings_t* s) {
   mt_ast_t* ast = NULL;
   
   return ast;

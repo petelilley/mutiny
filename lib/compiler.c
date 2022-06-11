@@ -1,16 +1,17 @@
 #include <mutiny/mutiny.h>
 #include <mutiny/parser/parser.h>
-#include <mutiny/translation_unit.h>
+#include <mutiny/compiler.h>
 #include <mutiny/parser/token.h>
 #include <mutiny/parser/lexer.h>
 #include <mutiny/parser/parser_util.h>
+#include <mutiny/parser/translation_unit.h>
 #include <mutiny/ast/ast.h>
 #include <mutiny/settings.h>
 #include <mutiny/util/list.h>
 #include <mutiny/util/log.h>
 #include <mutiny/util/filesystem.h>
 
-mt_translation_unit_t* mt_translation_unit_init(struct _mt_settings* s) {
+mt_compiler_t* mt_compiler_init(struct _mt_settings* s) {
   mt_log_t err_log = mt_log_init(stderr, MT_ERROR);
   mt_log_t warn_log = mt_log_init(stderr, MT_WARNING);
   
@@ -22,11 +23,11 @@ mt_translation_unit_t* mt_translation_unit_init(struct _mt_settings* s) {
     return NULL;
   }
   
-  mt_translation_unit_t* tu = malloc(sizeof(mt_translation_unit_t));
-  tu->settings = s;
-  l_init(tu->files);
-  tu->tokens = NULL;
-  tu->ast = NULL;
+  mt_compiler_t* c = malloc(sizeof(mt_compiler_t));
+  c->settings = s;
+  l_init(c->files);
+  l_init(c->t_unit);
+  c->ast = NULL;
   
   const char* path;
   mt_file_t* f = NULL;
@@ -49,58 +50,62 @@ mt_translation_unit_t* mt_translation_unit_init(struct _mt_settings* s) {
       mt_log_dump(&warn_log);
     }
     
-    l_push(tu->files, mt_file_t*, f);
+    l_push(c->files, mt_file_t*, f);
   }
   
   if (s->exit_code == MT_EXIT_ERR_FILE) {
-    mt_translation_unit_deinit(tu);
+    mt_compiler_deinit(c);
     return NULL;
   }
   
-  return tu;
+  return c;
 }
 
-void mt_translation_unit_deinit(mt_translation_unit_t* tu) {
-  if (!tu) return;
+void mt_compiler_deinit(mt_compiler_t* c) {
+  if (!c) return;
   
-  for (size_t i = 0; i < l_size(tu->files); i++) {
-    mt_file_deinit(l_at(tu->files, i));
+  for (size_t i = 0; i < l_size(c->files); i++) {
+    mt_file_deinit(l_at(c->files, i));
   }
-  l_deinit(tu->files);
-  if (tu->tokens) {
-    // TODO Deinit tokens.
+  l_deinit(c->files);
+  
+  for (size_t i = 0; i < l_size(c->t_unit); i++) {
+    mt_translation_unit_deinit(l_at(c->t_unit, i));
   }
-  if (tu->ast) {
+  l_deinit(c->t_unit);
+  
+  if (c->ast) {
     // TODO Deinit ast.
   }
-  free(tu);
+  
+  free(c);
 }
 
-bool mt_translation_unit_parse_exec(mt_translation_unit_t* tu) {
-  tu->settings->stage = MT_STAGE_PARSE;
+bool mt_compiler_parse_exec(mt_compiler_t* c) {
+  c->settings->stage = MT_STAGE_PARSE;
   
   // TODO Use thread pool to parse multiple source files simultaneously.
-  for (size_t i = 0; i < l_size(tu->files); ++i) {
-    tu->tokens = tokenize(l_at(tu->files, i), tu->settings);
-    if (!tu->tokens) {
+  for (size_t i = 0; i < l_size(c->files); ++i) {
+    mt_translation_unit_t* t_unit = mt_translation_unit_init(l_at(c->files, i), c->settings);
+    if (!t_unit) {
       return false;
     }
     
-    tu->ast = parse_tokens(tu->tokens, tu->settings);
-    if (!tu->ast) {
+    bool parse_res = mt_translation_unit_parse_exec(t_unit);
+    if (!parse_res) {
       return false;
     }
     
-    // TODO Concatenate ast.
+    // TODO Concatenate t_unit->ast with c->ast.
   }
 
   return true;
 }
 
-bool mt_translation_unit_semantic_analysis_exec(mt_translation_unit_t* tu) {
+bool mt_compiler_semantic_analysis_exec(mt_compiler_t* c) {
   return false;
 }
 
-bool mt_translation_unit_irgen_exec(mt_translation_unit_t* tu) {
+bool mt_compiler_irgen_exec(mt_compiler_t* c) {
   return false;
 }

@@ -26,7 +26,7 @@ static bool is_newline(mt_file_t* file);
 // Reads the next token in the file.
 static mt_token_t* next_token(mt_file_t* file, mt_settings_t* settings);
 
-mt_token_t* tokenize(mt_file_t* f, mt_settings_t* s) {
+mt_token_t* mt_tokenize(mt_file_t* f, mt_settings_t* s) {
   mt_token_t* toks = NULL;
   
   mt_token_t* t = NULL;

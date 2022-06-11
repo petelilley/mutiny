@@ -17,6 +17,6 @@ struct _mt_token;
  * @see mt_settings_t
  * @see mt_token_t
  */
-struct _mt_token* tokenize(struct _mt_file* file, struct _mt_settings* settings);
+struct _mt_token* mt_tokenize(struct _mt_file* file, struct _mt_settings* settings);
 
 #endif // __MT_LEXER_H__

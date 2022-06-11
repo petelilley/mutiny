@@ -62,4 +62,8 @@ typedef struct _mt_token {
   struct _mt_token* first;
 } mt_token_t;
 
+mt_token_t* mt_token_init();
+
+void mt_token_deinit(mt_token_t* token);
+
 #endif // __MT_TOKEN_H__

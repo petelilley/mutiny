@@ -2,7 +2,7 @@
 #include <mutiny/exit_code.h>
 #include <mutiny/settings.h>
 #include <mutiny/args.h>
-#include <mutiny/translation_unit.h>
+#include <mutiny/compiler.h>
 #include <mutiny/util/timer.h>
 #include <mutiny/util/log.h>
 
@@ -12,7 +12,7 @@ int main(int argc, char* const* argv) {
   mt_timer_t prog_timer = mt_timer_init();
   
   mt_settings_t* settings = NULL;
-  mt_translation_unit_t* t_unit = NULL;
+  mt_compiler_t* compiler = NULL;
   
   int exit_code = MT_EXIT_SUCCEESS;
   
@@ -31,7 +31,7 @@ int main(int argc, char* const* argv) {
       if (!settings || settings->exit_code) {
         mt_log_add(&err_log, "Argument parser failed. Exiting now.\n");
         mt_log_dump(&err_log);
-        exit_code = settings->exit_code ? settings->exit_code : MT_EXIT_ERR_INTERNAL;
+        exit_code = settings && settings->exit_code ? settings->exit_code : MT_EXIT_ERR_INTERNAL;
         break;
       }
       if (settings->end) {
@@ -39,10 +39,10 @@ int main(int argc, char* const* argv) {
       }
     }
     
-    // --- Initialize Translation Unit ---
+    // --- Initialize Compiler ---
     {
-      t_unit = mt_translation_unit_init(settings);
-      if (!t_unit || settings->exit_code) {
+      compiler = mt_compiler_init(settings);
+      if (!compiler || settings->exit_code) {
         mt_log_add(&err_log, "Translation unit failed to initialize. Exiting now.\n");
         mt_log_dump(&err_log);
         break;
@@ -53,7 +53,7 @@ int main(int argc, char* const* argv) {
     {
       mt_timer_t parser_timer = mt_timer_init();
       
-      bool parser_res = mt_translation_unit_parse_exec(t_unit);
+      bool parser_res = mt_compiler_parse_exec(compiler);
       
       if (settings->verbose) {
         mt_log_add(&verbose_log, "Parser stage finished in %.2fs\n", mt_timer_get(&parser_timer));
@@ -77,7 +77,7 @@ int main(int argc, char* const* argv) {
     mt_log_dump(&verbose_log);
   }
   
-  mt_translation_unit_deinit(t_unit);
+  mt_compiler_deinit(compiler);
   mt_settings_deinit(settings);
   
   return exit_code;

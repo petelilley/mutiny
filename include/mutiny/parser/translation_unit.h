@@ -19,25 +19,26 @@ struct _mt_ast;
  */
 typedef struct _mt_translation_unit {
   struct _mt_settings* settings;
-  list_t(struct _mt_file*) files;
+  struct _mt_file* file;
   struct _mt_token* tokens;
   struct _mt_ast* ast;
 } mt_translation_unit_t;
 
 /**
- * @brief Initializes the mutiny translation unit.
+ * @brief Initializes a translation unit.
  *
+ * @param file The file to be parsed for the translation unit.
  * @param settings The compiler's runtime settings.
  *
- * @return A struct containing data regarding the status of a translation unit. NULL if error.
+ * @return A new translation unit. NULL if error.
  *
  * @see mt_settings_t
  * @see mt_translation_unit_t
  */
-mt_translation_unit_t* mt_translation_unit_init(struct _mt_settings* settings);
+mt_translation_unit_t* mt_translation_unit_init(struct _mt_file* file, struct _mt_settings* settings);
 
 /**
- * @brief De-initializes the translation unit and frees all allocated memory contained by it.
+ * @brief De-initializes the translation unit and frees all allocated memory contained in it.
  *
  * @param translation_unit The translation unit to be de-initialized.
  *
@@ -55,27 +56,5 @@ void mt_translation_unit_deinit(mt_translation_unit_t* translation_unit);
  * @see mt_translation_unit_t
  */
 bool mt_translation_unit_parse_exec(mt_translation_unit_t* translation_unit);
-
-/**
- * @brief Executes the semantic analysis stage of the translation unit.
- *
- * @param translation_unit The translation unit to be executed.
- *
- * @return Whether the translation executed successfully.
- *
- * @see mt_translation_unit_t
- */
-bool mt_translation_unit_semantic_analysis_exec(mt_translation_unit_t* translation_unit);
-
-/**
- * @brief Executes the LLVM IR generation stage of the translation unit.
- *
- * @param translation_unit The translation unit to be executed.
- *
- * @return Whether the translation executed successfully.
- *
- * @see mt_translation_unit_t
- */
-bool mt_translation_unit_irgen_exec(mt_translation_unit_t* translation_unit);
 
 #endif  // __MT_TRANSLATION_UNIT_H__

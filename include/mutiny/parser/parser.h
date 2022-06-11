@@ -17,6 +17,6 @@ struct _mt_ast;
  * @see mt_settings_t
  * @see mt_ast_t
  */
-struct _mt_ast* parse_tokens(struct _mt_token* tokens, struct _mt_settings* settings);
+struct _mt_ast* mt_parse_tokens(struct _mt_token* tokens, struct _mt_settings* settings);
 
 #endif // __MT_PARSER_H__
