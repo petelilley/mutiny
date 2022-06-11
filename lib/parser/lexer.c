@@ -5,15 +5,6 @@
 #include <mutiny/settings.h>
 #include <mutiny/util/filesystem.h>
 
-#define INIT_TOKEN(t, f) \
-  do {                                \
-    t = malloc(sizeof(mt_token_t));   \
-    memset(t, 0, sizeof(mt_token_t)); \
-    t->line = f->cur_line;            \
-    t->col = f->cur_col;              \
-    t->fpos = f->cur_pos;             \
-  } while(0)
-
 // Increments the file by one character.
 static char next(mt_file_t* file);
 
@@ -113,7 +104,7 @@ static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
     }
   }
   
-#if 0
+#if 1
   
   if (t) {
     printf("[%ld-%ld_%ld][%ld] tok: %d, ", t->line, t->col, t->len, t->fpos, t->kind);
@@ -176,8 +167,7 @@ static void skip_block_comment(mt_file_t* f) {
 }
 
 static mt_token_t* read_identifier(mt_file_t* f) {
-  mt_token_t* t;
-  INIT_TOKEN(t, f);
+  mt_token_t* t = mt_token_init(f);
   t->kind = TK_IDENTIFIER;
   t->len = 1;
   
@@ -195,8 +185,7 @@ static mt_token_t* read_identifier(mt_file_t* f) {
 }
 
 static mt_token_t* read_numeric_literal(mt_file_t* f, mt_settings_t* s) {
-  mt_token_t* t;
-  INIT_TOKEN(t, f);
+  mt_token_t* t = mt_token_init(f);
   t->len = 1;
   
   char c = *f->ptr;
@@ -239,7 +228,6 @@ static mt_token_t* read_numeric_literal(mt_file_t* f, mt_settings_t* s) {
         printf("invalid suffix 'x%c' on integer literal\n", c);
         break;
       }
-    /* for (c = next(f); c && (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')); c = next(f)) { */
       ++t->len;
     }
     if (t->len == 1) {
@@ -270,8 +258,7 @@ static mt_token_t* read_numeric_literal(mt_file_t* f, mt_settings_t* s) {
 }
 
 static mt_token_t* read_string_literal(mt_file_t* f, mt_settings_t* s) {
-  mt_token_t* t;
-  INIT_TOKEN(t, f);
+  mt_token_t* t = mt_token_init(f);
   t->kind = TK_STRING;
   
   ++t->col;
@@ -297,8 +284,7 @@ static mt_token_t* read_string_literal(mt_file_t* f, mt_settings_t* s) {
 }
 
 static mt_token_t* read_char_literal(mt_file_t* f, mt_settings_t* s) {
-  mt_token_t* t;
-  INIT_TOKEN(t, f);
+  mt_token_t* t = mt_token_init(f);
   t->kind = TK_CHAR;
   
   ++t->col;
@@ -344,8 +330,7 @@ static bool is_punctuator(const mt_file_t* f) {
 }
 
 static mt_token_t* read_punctuator(mt_file_t* f, mt_settings_t* s) {
-  mt_token_t* t;
-  INIT_TOKEN(t, f);
+  mt_token_t* t = mt_token_init(f);
   t->kind = TK_PUNCTUATOR;
   t->len = 1;
   
@@ -405,8 +390,7 @@ static mt_token_t* read_punctuator(mt_file_t* f, mt_settings_t* s) {
 }
 
 static mt_token_t* read_eof(mt_file_t* f) {
-  mt_token_t* t;
-  INIT_TOKEN(t, f);
+  mt_token_t* t = mt_token_init(f);
   t->kind = TK_EOF;
   return t;
 }

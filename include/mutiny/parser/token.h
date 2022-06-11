@@ -62,7 +62,7 @@ typedef struct _mt_token {
   struct _mt_token* first;
 } mt_token_t;
 
-mt_token_t* mt_token_init();
+mt_token_t* mt_token_init(struct _mt_file* file);
 
 void mt_token_deinit(mt_token_t* token);
 
