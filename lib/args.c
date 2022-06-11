@@ -55,28 +55,28 @@ enum {
 };
 
 static const mt_option_t opts[] = {
-  [OPT_EMIT_ASSEMBLY]    = { "emit-assembly",   'S', false, COMPILER, "Emit assembly file(s) (-S)"                         },
-  [OPT_EMIT_IRGEN]       = { "emit-irgen",       0 , false, COMPILER, "Emit LLVM IR file(s) before LLVM optimizations"     },
-  [OPT_EMIT_IR]          = { "emit-ir",          0 , false, COMPILER, "Emit LLVM IR file(s) after LLVM optimizations"      },
-  [OPT_EMIT_BC]          = { "emit-bc",          0 , false, COMPILER, "Emit LLVM BC file(s)"                               },
-  [OPT_EMIT_OBJECT]      = { "emit-object",     'c', false, COMPILER, "Emit object file(s) (-c)"                           },
-  [OPT_EMIT_EXECUTABLE]  = { "emit-executable",  0 , false, COMPILER, "Emit a linked executable"                           },
-  [OPT_EMIT_LIBRARY]     = { "emit-library",     0 , false, COMPILER, "Emit a linked library"                              },
+  [OPT_EMIT_ASSEMBLY]    = { "emit-assembly",   'S', false, MT_COMPILER_COMPILER, "Emit assembly file(s) (-S)"                         },
+  [OPT_EMIT_IRGEN]       = { "emit-irgen",       0 , false, MT_COMPILER_COMPILER, "Emit LLVM IR file(s) before LLVM optimizations"     },
+  [OPT_EMIT_IR]          = { "emit-ir",          0 , false, MT_COMPILER_COMPILER, "Emit LLVM IR file(s) after LLVM optimizations"      },
+  [OPT_EMIT_BC]          = { "emit-bc",          0 , false, MT_COMPILER_COMPILER, "Emit LLVM BC file(s)"                               },
+  [OPT_EMIT_OBJECT]      = { "emit-object",     'c', false, MT_COMPILER_COMPILER, "Emit object file(s) (-c)"                           },
+  [OPT_EMIT_EXECUTABLE]  = { "emit-executable",  0 , false, MT_COMPILER_COMPILER, "Emit a linked executable"                           },
+  [OPT_EMIT_LIBRARY]     = { "emit-library",     0 , false, MT_COMPILER_COMPILER, "Emit a linked library"                              },
   
-  [OPT_OS]               = { "os",               0,  true,  COMPILER, "Specify the target operating system"                },
-  [OPT_ARCH]             = { "arch",             0,  true,  COMPILER, "Specify the target architecture"                    },
+  [OPT_OS]               = { "os",               0,  true,  MT_COMPILER_COMPILER, "Specify the target operating system"                },
+  [OPT_ARCH]             = { "arch",             0,  true,  MT_COMPILER_COMPILER, "Specify the target architecture"                    },
   
-  [OPT_PRINT_AST]        = { "print-ast",        0 , false, ANY,      "Print generated AST(s)"                             },
+  [OPT_PRINT_AST]        = { "print-ast",        0 , false, MT_COMPILER_ANY,      "Print generated AST(s)"                             },
   
-  [OPT_VERBOSE]          = { NULL,              'v', false, ANY,      "Use verbose output"                                 },
-  [OPT_DEBUG]            = { NULL,              'g', false, ANY,      "Emit debug symbols"                                 },
-  [OPT_IMPORT_PATH]      = { NULL,              'I', true , ANY,      "Add path to the import search path"                 },
-  [OPT_JOB_NUM]          = { NULL,              'j', true , ANY,      "Max number of jobs to execute in parallel"          },
-  [OPT_LIBRARY_PATH]     = { NULL,              'L', true , ANY,      "Add path to library link search path"               },
-  [OPT_LINK_LIBRARY]     = { NULL,              'l', true , ANY,      "Specifies a library which should be linked against" },
-  [OPT_OPTIMIZE]         = { NULL,              'O', false, ANY,      "Compile with optimizations"                         },
-  [OPT_OUTPUT]           = { NULL,              'o', true , COMPILER, "Specify file to write output to"                    },
-  [OPT_NO_WARNINGS]      = { NULL,              'w', false, ANY,      "Hide all compiler warnings"                         },
+  [OPT_VERBOSE]          = { NULL,              'v', false, MT_COMPILER_ANY,      "Use verbose output"                                 },
+  [OPT_DEBUG]            = { NULL,              'g', false, MT_COMPILER_ANY,      "Emit debug symbols"                                 },
+  [OPT_IMPORT_PATH]      = { NULL,              'I', true , MT_COMPILER_ANY,      "Add path to the import search path"                 },
+  [OPT_JOB_NUM]          = { NULL,              'j', true , MT_COMPILER_ANY,      "Max number of jobs to execute in parallel"          },
+  [OPT_LIBRARY_PATH]     = { NULL,              'L', true , MT_COMPILER_ANY,      "Add path to library link search path"               },
+  [OPT_LINK_LIBRARY]     = { NULL,              'l', true , MT_COMPILER_ANY,      "Specifies a library which should be linked against" },
+  [OPT_OPTIMIZE]         = { NULL,              'O', false, MT_COMPILER_ANY,      "Compile with optimizations"                         },
+  [OPT_OUTPUT]           = { NULL,              'o', true , MT_COMPILER_COMPILER, "Specify file to write output to"                    },
+  [OPT_NO_WARNINGS]      = { NULL,              'w', false, MT_COMPILER_ANY,      "Hide all compiler warnings"                         },
 };
 
 #define OPT_NUM (sizeof(opts) / sizeof(mt_option_t))
@@ -88,9 +88,8 @@ static mt_command_t parse_command(const char* cmd);
 mt_input_option_t next_opt(unsigned argc, char* const* argv, mt_compiler_type_t type, size_t* i, mt_log_t* err_log);
 
 mt_settings_t* mt_args_decode(unsigned argc, char* const* argv) {
-  mt_settings_t* s = malloc(sizeof(mt_settings_t));
-  memset(s, 0, sizeof(mt_settings_t));
-  s->stage = STAGE_ARGS;
+  mt_settings_t* s = mt_settings_init();
+  s->stage = MT_STAGE_ARGS;
   
   mt_log_t help_log = mt_log_init(stderr, "");
   mt_log_t err_log = mt_log_init(stderr, MT_ERROR);
@@ -107,13 +106,13 @@ mt_settings_t* mt_args_decode(unsigned argc, char* const* argv) {
   
   switch(cmd) {
     case CMD_RUN:
-      s->type = JIT;
+      s->type = MT_COMPILER_JIT;
       break;
     case CMD_BUILD:
-      s->type = COMPILER;
+      s->type = MT_COMPILER_COMPILER;
       break;
     case CMD_PARSE:
-      s->type = PARSER;
+      s->type = MT_COMPILER_PARSER;
       break;
     case CMD_VERSION:
       version();
@@ -189,22 +188,22 @@ mt_settings_t* mt_args_decode(unsigned argc, char* const* argv) {
         break;
       case OPT_OS:
         if (s->os) goto DUPLICATE_OPTION;
-        if      (!strcmp(opt.arg, "windows") || !strcmp(opt.arg, "win32")) s->os = OS_WINDOWS;
-        else if (!strcmp(opt.arg, "darwin")  || !strcmp(opt.arg, "macOS")) s->os = OS_DARWIN;
-        else if (!strcmp(opt.arg, "linux")) s->os = OS_LINUX;
-        else if (!strcmp(opt.arg, "none"))  s->os = OS_NONE;
+        if      (!strcmp(opt.arg, "windows") || !strcmp(opt.arg, "win32")) s->os = MT_OS_WINDOWS;
+        else if (!strcmp(opt.arg, "darwin")  || !strcmp(opt.arg, "macOS")) s->os = MT_OS_DARWIN;
+        else if (!strcmp(opt.arg, "linux")) s->os = MT_OS_LINUX;
+        else if (!strcmp(opt.arg, "none"))  s->os = MT_OS_NONE;
         else goto INVALID_ARGUMENT;
         free(opt.arg);
         break;
       case OPT_ARCH:
         if (s->arch) goto DUPLICATE_OPTION;
-        if      (!strcmp(opt.arg, "x86-64") || !strcmp(opt.arg, "x86_64")  || !strcmp(opt.arg, "amd64")) s->arch = ARCH_X86_64;
-        else if (!strcmp(opt.arg, "i686")   || !strcmp(opt.arg, "x86")) s->arch = ARCH_I686;
-        else if (!strcmp(opt.arg, "arm64")  || !strcmp(opt.arg, "aarch64") || !strcmp(opt.arg, "armv8")) s->arch = ARCH_AARCH64;
-        else if (!strcmp(opt.arg, "armv6"))  s->arch = ARCH_ARMV6;
-        else if (!strcmp(opt.arg, "armv7"))  s->arch = ARCH_ARMV7;
-        else if (!strcmp(opt.arg, "wasm32")) s->arch = ARCH_WASM32;
-        else if (!strcmp(opt.arg, "wasm64")) s->arch = ARCH_WASM64;
+        if      (!strcmp(opt.arg, "x86-64") || !strcmp(opt.arg, "x86_64")  || !strcmp(opt.arg, "amd64")) s->arch = MT_ARCH_X86_64;
+        else if (!strcmp(opt.arg, "i686")   || !strcmp(opt.arg, "x86")) s->arch = MT_ARCH_I686;
+        else if (!strcmp(opt.arg, "arm64")  || !strcmp(opt.arg, "aarch64") || !strcmp(opt.arg, "armv8")) s->arch = MT_ARCH_AARCH64;
+        else if (!strcmp(opt.arg, "armv6"))  s->arch = MT_ARCH_ARMV6;
+        else if (!strcmp(opt.arg, "armv7"))  s->arch = MT_ARCH_ARMV7;
+        else if (!strcmp(opt.arg, "wasm32")) s->arch = MT_ARCH_WASM32;
+        else if (!strcmp(opt.arg, "wasm64")) s->arch = MT_ARCH_WASM64;
         else goto INVALID_ARGUMENT;
         free(opt.arg);
         break;
@@ -291,7 +290,7 @@ mt_input_option_t next_opt(unsigned argc, char* const* argv, mt_compiler_type_t 
     const mt_option_t* o = &opts[n];
     
     // Check if a type was given.
-    if (o->type != ANY && o->type != type) {
+    if (o->type != MT_COMPILER_ANY && o->type != type) {
       continue;
     }
     
@@ -351,7 +350,7 @@ ERROR:
 static void print_options(FILE* f, mt_compiler_type_t type) {
   for (unsigned i = 0; i < OPT_NUM; ++i) {
     const mt_option_t* opt = &opts[i];
-    if (opt->type == ANY || opt->type == type) {
+    if (opt->type == MT_COMPILER_ANY || opt->type == type) {
       if (opt->name) {
         fprintf(f, "\t-%s", opt->name);
         size_t len = strlen(opt->name);
@@ -378,7 +377,7 @@ static void usage(mt_log_t* l, mt_command_t section) {
         "\n"
         "Available options:\n"
       );
-      print_options(l->file, JIT);
+      print_options(l->file, MT_COMPILER_JIT);
       break;
     case CMD_BUILD:
       fprintf(l->file,
@@ -386,7 +385,7 @@ static void usage(mt_log_t* l, mt_command_t section) {
         "\n"
         "Available options:\n"
       );
-      print_options(l->file, COMPILER);
+      print_options(l->file, MT_COMPILER_COMPILER);
       break;
     case CMD_PARSE:
       fprintf(l->file,
@@ -394,7 +393,7 @@ static void usage(mt_log_t* l, mt_command_t section) {
         "\n"
         "Available options:\n"
       );
-      print_options(l->file, PARSER);
+      print_options(l->file, MT_COMPILER_PARSER);
       break;
     default:
       fprintf(l->file,

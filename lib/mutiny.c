@@ -14,6 +14,8 @@ int main(int argc, char* const* argv) {
   mt_settings_t* settings = NULL;
   mt_translation_unit_t* t_unit = NULL;
   
+  int exit_code = MT_EXIT_SUCCEESS;
+  
   do {
     // --- Command-Line Argument Parsing ---
     {
@@ -29,6 +31,7 @@ int main(int argc, char* const* argv) {
       if (!settings || settings->exit_code) {
         mt_log_add(&err_log, "Argument parser failed. Exiting now.\n");
         mt_log_dump(&err_log);
+        exit_code = settings->exit_code ? settings->exit_code : MT_EXIT_ERR_INTERNAL;
         break;
       }
       if (settings->end) {
@@ -57,28 +60,25 @@ int main(int argc, char* const* argv) {
         mt_log_dump(&verbose_log);
       }
       
-      if (!parser_res) {
+      if (!parser_res || settings->exit_code) {
         mt_log_add(&err_log, "Parser failed. Exiting now.\n");
         mt_log_dump(&err_log);
+        exit_code = settings->exit_code ? settings->exit_code : MT_EXIT_ERR_INTERNAL;
+        break;
+      }
+      if (settings->end || settings->type == MT_COMPILER_PARSER) {
         break;
       }
     }
-  } while(0);
+  } while (0);
   
   if (settings && settings->verbose) {
     mt_log_add(&verbose_log, "Compiler finished in %.2fs\n", mt_timer_get(&prog_timer));
     mt_log_dump(&verbose_log);
   }
   
-  int exit_code;
-  if (settings) {
-    exit_code = settings->exit_code;
-  }
-  else {
-    exit_code = MT_EXIT_ERR_INTERNAL;
-  }
-  
-  // TODO: Cleanup.
+  mt_translation_unit_deinit(t_unit);
+  mt_settings_deinit(settings);
   
   return exit_code;
 }

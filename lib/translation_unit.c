@@ -77,6 +77,8 @@ void mt_translation_unit_deinit(mt_translation_unit_t* tu) {
 }
 
 bool mt_translation_unit_parse_exec(mt_translation_unit_t* tu) {
+  tu->settings->stage = MT_STAGE_PARSE;
+  
   // TODO Use thread pool to parse multiple source files simultaneously.
   for (size_t i = 0; i < l_size(tu->files); ++i) {
     tu->tokens = tokenize(l_at(tu->files, i), tu->settings);

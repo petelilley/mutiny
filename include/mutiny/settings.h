@@ -9,51 +9,51 @@
  * @brief Target operating system.
  */
 typedef enum _mt_os {
-  OS_UNKNOWN = 0,
-  OS_WINDOWS,
-  OS_DARWIN,
-  OS_LINUX,
-  OS_NONE,
+  MT_OS_UNKNOWN = 0,
+  MT_OS_WINDOWS,
+  MT_OS_DARWIN,
+  MT_OS_LINUX,
+  MT_OS_NONE,
 } mt_os_t;
 
 /**
  * @brief Target architecture.
  */
 typedef enum _mt_arch {
-  ARCH_UNKNOWN = 0,
-  ARCH_X86_64,
-  ARCH_I686,
-  ARCH_AARCH64,
-  ARCH_ARMV6,
-  ARCH_ARMV7,
-  ARCH_WASM32,
-  ARCH_WASM64,
+  MT_ARCH_UNKNOWN = 0,
+  MT_ARCH_X86_64,
+  MT_ARCH_I686,
+  MT_ARCH_AARCH64,
+  MT_ARCH_ARMV6,
+  MT_ARCH_ARMV7,
+  MT_ARCH_WASM32,
+  MT_ARCH_WASM64,
 } mt_arch_t;
 
 /**
  * @brief Stage the compiler is currently executing.
  */
 typedef enum _mt_stage {
-  STAGE_UNKNOWN = 0,
-  STAGE_ARGS,
-  STAGE_SCAN_DEPENDICIES,
-  STAGE_PARSE,
-  STAGE_SEM,
-  STAGE_GEN_IR,
-  STAGE_GEN_BC,
-  STAGE_GEN_ASM,
-  STAGE_ASM,
-  STAGE_RUN_LINK,
+  MT_STAGE_UNKNOWN = 0,
+  MT_STAGE_ARGS,
+  MT_STAGE_SCAN_DEPENDICIES,
+  MT_STAGE_PARSE,
+  MT_STAGE_SEM,
+  MT_STAGE_GEN_IR,
+  MT_STAGE_GEN_BC,
+  MT_STAGE_GEN_ASM,
+  MT_STAGE_ASM,
+  MT_STAGE_RUN_LINK,
 } mt_stage_t;
 
 /**
  * @brief The type of the compiler (jit or non-jit).
  */
 typedef enum _mt_compiler_type {
-  ANY      = -1,
-  JIT      = 0,
-  COMPILER = 1,
-  PARSER   = 2,
+  MT_COMPILER_ANY      = -1,
+  MT_COMPILER_JIT      = 0,
+  MT_COMPILER_COMPILER = 1,
+  MT_COMPILER_PARSER   = 2,
 } mt_compiler_type_t;
 
 /**
@@ -93,5 +93,9 @@ typedef struct _mt_settings {
   
   mt_stage_t stage;
 } mt_settings_t;
+
+mt_settings_t* mt_settings_init();
+
+void mt_settings_deinit(mt_settings_t* settings);
 
 #endif // __MT_SETTINGS_H__
