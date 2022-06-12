@@ -7,7 +7,7 @@
 struct _mt_settings;
 struct _mt_file;
 struct _mt_token;
-struct _mt_ast;
+struct _mt_ast_node;
 
 /**
  * @brief Data regarding the status of a translation unit.
@@ -15,13 +15,13 @@ struct _mt_ast;
  * @see mt_settings_t
  * @see mt_file_t
  * @see mt_token_t
- * @see mt_ast_t
+ * @see mt_ast_node_t
  */
 typedef struct _mt_translation_unit {
   struct _mt_settings* settings;
   struct _mt_file* file;
   struct _mt_token* tokens;
-  struct _mt_ast* ast;
+  struct _mt_ast_node* ast;
 } mt_translation_unit_t;
 
 /**

@@ -1,6 +1,7 @@
 #include <mutiny/mutiny.h>
 #include <mutiny/parser/lexer.h>
 #include <mutiny/parser/token.h>
+#include <mutiny/parser/translation_unit.h>
 #include <mutiny/parser/parser_util.h>
 #include <mutiny/settings.h>
 #include <mutiny/util/filesystem.h>
@@ -17,27 +18,31 @@ static bool is_newline(mt_file_t* file);
 // Reads the next token in the file.
 static mt_token_t* next_token(mt_file_t* file, mt_settings_t* settings);
 
-mt_token_t* mt_tokenize(mt_file_t* f, mt_settings_t* s) {
-  mt_token_t* toks = NULL;
+bool mt_translation_unit_tokenize(mt_translation_unit_t* t_unit) {
+  mt_token_t* first = NULL;
+  mt_token_t* head = NULL;
   
   mt_token_t* t = NULL;
-  while ((t = next_token(f, s))) {
-    if (!toks) {
-      toks = t;
+  while ((t = next_token(t_unit->file, t_unit->settings))) {
+    if (!first) {
+      first = t;
+      head = t;
     }
     else {
-      toks->next = t;
+      t->first = first;
+      head->next = t;
+      head = t;
     }
-    t->first = toks;
     
-    if (t->kind == TK_EOF || s->exit_code) {
+    if (head->kind == TK_EOF || t_unit->settings->exit_code) {
       break;
     }
   }
-  if (!toks) {
+  if (!first) {
     // TODO Warning. "empty file"
   }
-  return toks;
+  t_unit->tokens = first;
+  return true;
 }
 
 static void skip_line_comment(mt_file_t* file);
@@ -50,8 +55,6 @@ static bool is_punctuator(const mt_file_t* file);
 static mt_token_t* read_punctuator(mt_file_t* file, mt_settings_t* settings);
 static mt_token_t* read_eof(mt_file_t* file);
 static void read_keyword(mt_token_t* token);
-
-static const char* kw_strs[]; // TODO Take out when done debugging lexer.
 
 static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
   mt_token_t* t = NULL;
@@ -113,7 +116,7 @@ static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
         printf("%s\n", t->strval);
         break;
       case TK_KEYWORD:
-        printf("%s\n", kw_strs[t->ival]);
+        printf("%s\n", mt_keyword_to_str(t->ival));
         break;
       case TK_PUNCTUATOR:
         printf("%s\n", t->strval);
@@ -395,54 +398,13 @@ static mt_token_t* read_eof(mt_file_t* f) {
   return t;
 }
 
-static const char* kw_strs[] = {
-  [KW_IMPORT]   = "import",
-  
-  [KW_NOT]      = "not",
-  [KW_AND]      = "and",
-  [KW_OR]       = "or",
-  
-  [KW_ENUM]     = "enum",
-  [KW_STRUCT]   = "struct",
-  [KW_UNION]    = "union",
-  [KW_FUNC]     = "func",
-  [KW_VAR]      = "var",
-  
-  [KW_IF]       = "if",
-  [KW_ELIF]     = "elif",
-  [KW_ELSE]     = "else",
-  [KW_WHILE]    = "while",
-  [KW_FOR]      = "for",
-  [KW_SWITCH]   = "switch",
-  [KW_CASE]     = "case",
-  [KW_DEFAULT]  = "default",
-  [KW_GOTO]     = "goto",
-  
-  [KW_RETURN]   = "return",
-  [KW_BREAK]    = "break",
-  [KW_CONTINUE] = "continue",
-  
-  [KW_AUTO]     = "auto",
-  [KW_REGISTER] = "register",
-  [KW_STATIC]   = "static",
-  
-  [KW_CONST]    = "const",
-  [KW_VOLATILE] = "volatile",
-  
-  [KW_INLINE]   = "inline",
-  
-  [KW_SIGNED]   = "signed",
-  [KW_UNSIGNED] = "unsigned",
-};
-
 static void read_keyword(mt_token_t* t) {
-  for (size_t i = 0; i < sizeof(kw_strs) / sizeof(char*); ++i) {
-    if (!strncmp(t->strval, kw_strs[i], t->len)) {
+  int kw = mt_str_to_keyword(t->strval, t->len);
+  if (kw != -1) {
       t->kind = TK_KEYWORD;
-      t->ival = i;
+      t->ival = kw;
       free(t->strval);
       return;
-    }
   }
 }
 

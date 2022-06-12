@@ -32,13 +32,13 @@ void mt_translation_unit_deinit(mt_translation_unit_t* tu) {
 }
 
 bool mt_translation_unit_parse_exec(mt_translation_unit_t* tu) {
-  tu->tokens = mt_tokenize(tu->file, tu->settings);
-  if (!tu->tokens) {
+  bool tok_res = mt_translation_unit_tokenize(tu);
+  if (!tok_res) {
     return false;
   }
   
-  tu->ast = mt_parse_tokens(tu->tokens, tu->settings);
-  if (!tu->ast) {
+  bool parse_res = mt_translation_unit_parse_tokens(tu);
+  if (!parse_res) {
     return false;
   }
   

@@ -1,22 +1,19 @@
 #ifndef __MT_PARSER_H__
 #define __MT_PARSER_H__
 
-struct _mt_token;
-struct _mt_settings;
-struct _mt_ast;
+#include <mutiny/mutiny.h>
+
+struct _mt_translation_unit;
 
 /**
- * @brief Parses tokens representing mutiny source code.
+ * @brief Parses tokens of a translation unit.
  *
- * @param tokens A linked list of tokens.
- * @param settings The compiler's runtime settings.
+ * @param translation_unit the translation unit to be tokenized.
  *
- * @return An abstract sytnax tree representing the source code. NULL if error.
+ * @return Whether the parser parsed the tokens successfully.
  *
- * @see mt_token_t
- * @see mt_settings_t
- * @see mt_ast_t
+ * @see mt_translation_unit_t
  */
-struct _mt_ast* mt_parse_tokens(struct _mt_token* tokens, struct _mt_settings* settings);
+bool mt_translation_unit_parse_tokens(struct _mt_translation_unit* translation_unit);
 
 #endif // __MT_PARSER_H__

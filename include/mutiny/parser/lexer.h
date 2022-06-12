@@ -1,22 +1,19 @@
 #ifndef __MT_LEXER_H__
 #define __MT_LEXER_H__
 
-struct _mt_file;
-struct _mt_settings;
-struct _mt_token;
+#include <mutiny/mutiny.h>
+
+struct _mt_translation_unit;
 
 /**
- * @brief Tokenizes a singular mutiny source file.
+ * @brief Tokenizes a translation unit.
  *
- * @param file The file to tokenize.
- * @param settings The compiler's runtime settings.
+ * @param translation_unit the translation unit to be tokenized.
  *
- * @return A linked list of the file's sources. NULL if error.
+ * @return Whether the lexer tokenized the translation unit successfully.
  *
- * @see mt_file_t
- * @see mt_settings_t
- * @see mt_token_t
+ * @see mt_translation_unit_t
  */
-struct _mt_token* mt_tokenize(struct _mt_file* file, struct _mt_settings* settings);
+bool mt_translation_unit_tokenize(struct _mt_translation_unit* translation_unit);
 
 #endif // __MT_LEXER_H__
