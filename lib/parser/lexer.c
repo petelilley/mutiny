@@ -3,8 +3,10 @@
 #include <mutiny/parser/token.h>
 #include <mutiny/parser/translation_unit.h>
 #include <mutiny/parser/parser_util.h>
+#include <mutiny/parser/parser_error.h>
 #include <mutiny/settings.h>
 #include <mutiny/util/filesystem.h>
+#include <mutiny/util/log.h>
 
 // Increments the file by one character.
 static char next(mt_file_t* file);
@@ -16,14 +18,14 @@ static void next_n(mt_file_t* file, size_t n);
 static bool is_newline(mt_file_t* file);
 
 // Reads the next token in the file.
-static mt_token_t* next_token(mt_file_t* file, mt_settings_t* settings);
+static mt_token_t* next_token(mt_file_t* file, mt_log_t* err_log);
 
 bool mt_translation_unit_tokenize(mt_translation_unit_t* t_unit) {
   mt_token_t* first = NULL;
   mt_token_t* head = NULL;
   
   mt_token_t* t = NULL;
-  while ((t = next_token(t_unit->file, t_unit->settings))) {
+  while ((t = next_token(t_unit->file, &t_unit->err_log))) {
     if (!first) {
       first = t;
       head = t;
@@ -46,17 +48,17 @@ bool mt_translation_unit_tokenize(mt_translation_unit_t* t_unit) {
 }
 
 static void skip_line_comment(mt_file_t* file);
-static void skip_block_comment(mt_file_t* file);
+static void skip_block_comment(mt_file_t* file, mt_log_t* err_log);
 static mt_token_t* read_identifier(mt_file_t* file);
-static mt_token_t* read_numeric_literal(mt_file_t* file, mt_settings_t* settings);
-static mt_token_t* read_string_literal(mt_file_t* file, mt_settings_t* settings);
-static mt_token_t* read_char_literal(mt_file_t* file, mt_settings_t* settings);
+static mt_token_t* read_numeric_literal(mt_file_t* file, mt_log_t* err_log);
+static mt_token_t* read_string_literal(mt_file_t* file, mt_log_t* err_log);
+static mt_token_t* read_char_literal(mt_file_t* file, mt_log_t* err_log);
 static bool is_punctuator(const mt_file_t* file);
-static mt_token_t* read_punctuator(mt_file_t* file, mt_settings_t* settings);
+static mt_token_t* read_punctuator(mt_file_t* file, mt_log_t* err_log);
 static mt_token_t* read_eof(mt_file_t* file);
 static void read_keyword(mt_token_t* token);
 
-static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
+static mt_token_t* next_token(mt_file_t* f, mt_log_t* e) {
   mt_token_t* t = NULL;
   
   char c;
@@ -72,7 +74,8 @@ static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
       continue;
     }
     else if (START(f->ptr, "/*")) {
-      skip_block_comment(f);
+      next_n(f, 2);
+      skip_block_comment(f, e);
       continue;
     }
     else if (isalpha(c) || c == '_') {
@@ -80,19 +83,19 @@ static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
       break;
     }
     else if (isdigit(c) || (c == '.' && isdigit(*(f->ptr + 1)))) {
-      t = read_numeric_literal(f, s);
+      t = read_numeric_literal(f, e);
       break;
     }
     else if (c == '"') {
-      t = read_string_literal(f, s);
+      t = read_string_literal(f, e);
       break;
     }
     else if (c == '\'') {
-      t = read_char_literal(f, s);
+      t = read_char_literal(f, e);
       break;
     }
     else if (is_punctuator(f)) {
-      t = read_punctuator(f, s);
+      t = read_punctuator(f, e);
       break;
     }
     else if (!c) {
@@ -100,14 +103,13 @@ static mt_token_t* next_token(mt_file_t* f, mt_settings_t* s) {
       break;
     }
     else {
-      // TODO Syntax error. "invalid token"
-      puts("invalid token");
+      mt_log_syntax_error(e, f, f->cur_line, f->cur_col, 1, "Invalid Token `%c'", c);
       next(f);
       continue;
     }
   }
   
-#if 1
+#if 0
   
   if (t) {
     printf("[%ld-%ld_%ld][%ld] tok: %d, ", t->line, t->col, t->len, t->fpos, t->kind);
@@ -149,24 +151,27 @@ static void skip_line_comment(mt_file_t* f) {
   while ((c = next(f)) && (c != '\n' && c != '\r'));
 }
 
-static void skip_block_comment(mt_file_t* f) {
-  next_n(f, 2);
-  for (char c = *f->ptr; c; c = next(f)) {
-    if (c == '/') {
-      if (*(f->ptr + 1) == '*') {
-        next(f);
-        // Nested block comments. What's so hard about this C and C++????
-        skip_block_comment(f);
-      }
+static void skip_block_comment(mt_file_t* f, mt_log_t* e) {
+  char c = *f->ptr;
+  
+  while (1) {
+    if (!c) {
+      mt_log_syntax_error(e, f, f->cur_line, f->cur_col, 0, "Unterminated /* Comment");
+      break;
     }
-    else if (c == '*') {
-      if (*(f->ptr + 1) == '/') {
-        next(f);
-        break;
-      }
+    
+    if (c == '/' && *(f->ptr + 1) == '*') {
+      next_n(f, 2);
+      skip_block_comment(f, e);
+      if (!*f->ptr) break;
     }
+    if (c == '*' && *(f->ptr + 1) == '/') {
+      next(f);
+      break;
+    }
+    
+    c = next(f);
   }
-  next(f);
 }
 
 static mt_token_t* read_identifier(mt_file_t* f) {
@@ -187,7 +192,7 @@ static mt_token_t* read_identifier(mt_file_t* f) {
   return t;
 }
 
-static mt_token_t* read_numeric_literal(mt_file_t* f, mt_settings_t* s) {
+static mt_token_t* read_numeric_literal(mt_file_t* f, mt_log_t* e) {
   mt_token_t* t = mt_token_init(f);
   t->len = 1;
   
@@ -225,18 +230,20 @@ static mt_token_t* read_numeric_literal(mt_file_t* f, mt_settings_t* s) {
   else if (*(f->ptr + 1) == 'x' || *(f->ptr + 1) == 'X') {
     next(f);
     first += 2;
-    for (c = next(f); c && (isdigit(c) || isalpha(c)); c = next(f)) {
-      if ((c > 'f' && c <= 'z') || (c > 'F' && c <= 'Z')) {
-        // TODO Syntax error. "Invalid suffix 'xG' on integer literal"
-        printf("invalid suffix 'x%c' on integer literal\n", c);
-        break;
-      }
+    
+    c = next(f);
+    while (c && (isdigit(c) || isalpha(c))) {
       ++t->len;
+      
+      if ((c > 'f' && c <= 'z') || (c > 'F' && c <= 'Z')) {
+        mt_log_syntax_error(e, f, f->cur_line, f->cur_col, 1, "Invalid suffix `x%c' on integer literal", c);
+      }
+      c = next(f);
     }
     if (t->len == 1) {
-        puts("invalid suffix 'x' on integer literal");
-      // TODO Syntax error. "Invalid suffix 'x' on integer literal"
+      mt_log_syntax_error(e, f, f->cur_line, f->cur_col - 1, 1, "Invalid suffix 'x' on integer literal");
     }
+    
     t->kind = TK_INTEGER;
     val = strndup(first, t->len);
     t->ival = strtoll(val, NULL, 16);
@@ -247,8 +254,7 @@ static mt_token_t* read_numeric_literal(mt_file_t* f, mt_settings_t* s) {
     for (c = next(f); c && isdigit(c); c = next(f)) {
       ++t->len;
       if (c - '0' > 7) {
-        printf("invalid digit '%d' in octal numeric literal\n", c - '0');
-        // TODO Syntax error. "Invalid digit '8' in octal numeric literal"
+        mt_log_syntax_error(e, f, f->cur_line, f->cur_col, 1, "Invalid digit '%d' in octal numeric literal", c - '0');
       }
     }
     t->kind = TK_INTEGER;
@@ -260,7 +266,7 @@ static mt_token_t* read_numeric_literal(mt_file_t* f, mt_settings_t* s) {
   return t;
 }
 
-static mt_token_t* read_string_literal(mt_file_t* f, mt_settings_t* s) {
+static mt_token_t* read_string_literal(mt_file_t* f, mt_log_t* err_log) {
   mt_token_t* t = mt_token_init(f);
   t->kind = TK_STRING;
   
@@ -286,7 +292,7 @@ static mt_token_t* read_string_literal(mt_file_t* f, mt_settings_t* s) {
   return t;
 }
 
-static mt_token_t* read_char_literal(mt_file_t* f, mt_settings_t* s) {
+static mt_token_t* read_char_literal(mt_file_t* f, mt_log_t* err_log) {
   mt_token_t* t = mt_token_init(f);
   t->kind = TK_CHAR;
   
@@ -332,7 +338,7 @@ static bool is_punctuator(const mt_file_t* f) {
   return false;
 }
 
-static mt_token_t* read_punctuator(mt_file_t* f, mt_settings_t* s) {
+static mt_token_t* read_punctuator(mt_file_t* f, mt_log_t* err_log) {
   mt_token_t* t = mt_token_init(f);
   t->kind = TK_PUNCTUATOR;
   t->len = 1;

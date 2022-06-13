@@ -11,12 +11,30 @@ typedef struct _mt_log {
 
 mt_log_t mt_log_init(FILE* file, const char* start_txt);
 
+void mt_log_add_v(mt_log_t* log, const char* fmt, va_list args);
 void mt_log_add(mt_log_t* log, const char* fmt, ...);
+
+void mt_log_append_v(mt_log_t* log, const char* fmt, va_list args);
+void mt_log_append(mt_log_t* log, const char* fmt, ...);
 
 void mt_log_dump(mt_log_t* log);
 
-#define MT_VERBOSE "\033[35m\033[1mVerbose: \033[0m"
-#define MT_WARNING "\033[33m\033[1mWarning: \033[0m"
-#define MT_ERROR   "\033[31m\033[1mError: \033[0m"
+#define MT_ANSI_CLR "\033[0m"
+
+#define MT_BOLD "\033[1m"
+#define MT_RED "\033[31m"
+#define MT_GREEN "\033[32m"
+#define MT_YELLOW "\033[33m"
+#define MT_BLUE "\033[34m"
+#define MT_MAGENTA "\033[35m"
+#define MT_CYAN "\033[36m"
+#define MT_WHITE "\033[37m"
+
+#define MT_VERBOSE \
+  (MT_BOLD MT_MAGENTA "Verbose: " MT_ANSI_CLR)
+#define MT_WARNING \
+  (MT_BOLD MT_YELLOW "Warning: " MT_ANSI_CLR)
+#define MT_ERROR \
+  (MT_BOLD MT_RED "Error: " MT_ANSI_CLR)
 
 #endif // __MT_LOG_H__

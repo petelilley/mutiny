@@ -33,11 +33,12 @@ bool mt_translation_unit_parse_tokens(mt_translation_unit_t* t_unit) {
   mt_ast_node_t* node;
   while (tok->kind != TK_EOF) {
     node = global_decl(&tok);
-    if (!node) {
-      // TODO: Error.
-      break;
-    }
+    if (!node) break;
     l_push(t_unit->ast->sub, mt_ast_node_t*, node);
+  }
+  
+  if (!l_size(t_unit->ast->sub)) {
+    // TODO: Error: translation unit required to contain at least one declaration.
   }
   
   return true;
