@@ -94,7 +94,8 @@ endif()
 
 # --- Install ---
 
-# TODO Install
+include(GNUInstallDirs)
+install(TARGETS ${PROJECT_NAME})
 
 # --- Configuration file ---
 
