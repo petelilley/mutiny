@@ -31,7 +31,7 @@ typedef enum _mt_arch {
 } mt_arch_t;
 
 /**
- * @brief Stage the compiler is currently executing.
+ * @brief Compiler stage.
  */
 typedef enum _mt_stage {
   MT_STAGE_UNKNOWN = 0,
@@ -47,7 +47,7 @@ typedef enum _mt_stage {
 } mt_stage_t;
 
 /**
- * @brief The type of the compiler (jit or non-jit).
+ * @brief The type of the compiler.
  */
 typedef enum _mt_compiler_type {
   MT_COMPILER_ANY      = -1,
@@ -57,7 +57,7 @@ typedef enum _mt_compiler_type {
 } mt_compiler_type_t;
 
 /**
- * @brief Represents the compiler's runtime settings.
+ * @brief The compiler's runtime settings.
  */
 typedef struct _mt_settings {
   mt_exit_code_t exit_code;
@@ -94,8 +94,16 @@ typedef struct _mt_settings {
   mt_stage_t stage;
 } mt_settings_t;
 
+/**
+ * @brief Creates a new compiler settings.
+ * @return A new compiler settings.
+ */
 mt_settings_t* mt_settings_init();
 
+/**
+ * @brief Destroys a compiler settings.
+ * @param settings The compiler settings to destroy.
+ */
 void mt_settings_deinit(mt_settings_t* settings);
 
 #endif // __MT_SETTINGS_H__

@@ -1,8 +1,10 @@
 #ifndef __MT_FILESYSTEM_H__
 #define __MT_FILESYSTEM_H__
 
+#include <mutiny/mutiny.h>
+
 /**
- * @brief Represents a file (for reading purposes).
+ * @brief Represents a file for reading.
  */
 typedef struct _mt_file {
   char* path;
@@ -11,41 +13,28 @@ typedef struct _mt_file {
   long int cur_line, cur_col, cur_pos;
 } mt_file_t;
 
-#include <stdbool.h>
-
 /**
- * @brief Checks if a given path is a file.
- *
- * @param path The path to a file.
- *
- * @return True if the path points to a file, false if not.
+ * @brief Checks if a file exists.
+ * @return Whether the file exists.
  */
 bool is_file(const char* path);
 
 /**
- * @brief Checks if a given path is a directory.
- *
- * @param path The path to a directory.
- *
- * @return True if the path points to a directory, false if not.
+ * @brief Checks if a directory exists.
+ * @return Whether the directory exists.
  */
 bool is_directory(const char* path);
 
 /**
- * @brief Opens a file and returns it's contents.
- *
- * @param path The path to a file.
- *
- * @return The contents of the file. NULL if empty or non-existent.
- *
- * @see mt_file_t
+ * @brief Opens a file.
+ * @param path The path to the file.
+ * @return The file.
  */
 mt_file_t* mt_file_init(const char* path);
 
 /**
- * @brief De-initializes a file.
- *
- * @param file The file to de-initialize.
+ * @brief Closes a file.
+ * @param file The file to close.
  */
 void mt_file_deinit(mt_file_t* file);
 

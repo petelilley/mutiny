@@ -4,14 +4,10 @@
 struct _mt_settings;
 
 /**
- * @brief Parses and interperts the compiler's command-line invocation.
- *
- * @param args Number of command-line arguments.
- * @param argv Array of command-line arguments.
- *
- * @return Generated runtime settings for the compiler.
- *
- * @see mt_settings_t
+ * @brief Parses command line arguments.
+ * @param argc The number of command line arguments.
+ * @param argv The command line arguments.
+ * @return The settings for the compiler to use.
  */
 struct _mt_settings* mt_args_decode(unsigned argc, char* const* argv);
 

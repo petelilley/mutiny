@@ -2,7 +2,7 @@
 #define __MT_EXIT_CODE_H__
 
 /**
- * @brief An enumeration of the compiler's possible exit codes.
+ * @brief The exit codes for the compiler.
  */
 typedef enum mt_exit_code {
   MT_EXIT_ERR_INTERNAL = -1,

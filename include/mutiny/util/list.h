@@ -4,21 +4,22 @@
 #include <stddef.h>
 
 /**
- * @brief Represents a list of a specified type.
- *
- * @param type The type of each element in the list.
+ * @brief Represents a list.
+ * @param type The data type of the list.
  */
 #define list_t(type) \
   struct { size_t n; type* a; }
 
 /**
  * @brief Initializes a list.
+ * @param l The list to initialize.
  */
 #define l_init(l) \
   ((l).n = 0, (l).a = 0)
 
 /**
- * @brief Frees a list from memory.
+ * @brief Destroys a list.
+ * @param l The list to destroy.
  */
 #define l_deinit(l) \
   do {              \
@@ -28,19 +29,25 @@
   } while (0)
 
 /**
- * @brief Accesses a list at a specified index.
+ * @brief Accesses the nth element of a list.
+ * @param l The list.
+ * @param n The index of the element.
  */
-#define l_at(l, i) \
-  ((l).a[(i)])
+#define l_at(l, n) \
+  ((l).a[(n)])
 
 /**
- * @brief Returns the number of elements in the list.
+ * @brief The number of elements in a list.
+ * @param l The list to get the number of elements from.
  */
 #define l_size(l) \
   ((const size_t)(l).n)
 
 /**
- * @brief Pushes a single element to the end of the list.
+ * @brief Adds an element to the end of a list.
+ * @param l The list to add to.
+ * @param type The data type of the list.
+ * @param e The element to add.
  */
 #define l_push(l, type, e) \
   do {                                         \

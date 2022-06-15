@@ -7,7 +7,7 @@ struct _mt_file;
 struct _mt_settings;
 
 /**
- * @brief The kind of token in the mutiny source code.
+ * @brief The kind of a token.
  */
 typedef enum _mt_token_kind {
   TK_IDENTIFIER = 0,
@@ -21,7 +21,7 @@ typedef enum _mt_token_kind {
 } mt_token_kind_t;
 
 /**
- * @brief A keyword in the mutiny source code.
+ * @brief A keyword in the language.
  */
 typedef enum _mt_keyword {
   KW_IMPORT = 0,
@@ -39,30 +39,21 @@ typedef enum _mt_keyword {
 } mt_keyword_t;
 
 /**
- * @brief Converts a keyword into a string.
- *
- * @param keyword The keyword to be converted.
- *
+ * @brief Converts a keyword to a string.
+ * @param keyword The keyword to convert.
  * @return The string representation of the keyword.
- *
- * @see mt_keyword_t
  */
 const char* mt_keyword_to_str(mt_keyword_t keyword);
 
 /**
- * @brief Attempts to convert a string into a keyword.
- *
+ * @brief Converts a string to a keyword.
  * @param str The string to convert.
- * @param len The length of the string to convert.
- *
- * @return The keyword if the string matches, -1 if not.
- *
- * @see mt_keyword_t
+ * @return The keyword representation of the string.
  */
 int mt_str_to_keyword(const char* str, size_t len);
 
 /**
- * @brief Represents a token.
+ * @brief A token in the language.
  */
 typedef struct _mt_token {
   // The kind of token.
@@ -77,18 +68,27 @@ typedef struct _mt_token {
   long double fval;
   char* strval;
   
-  // The length of the token in the source code.
+  // The length of the token.
   size_t len;
   
-  // The position of the token in the source file.
+  // The position of the token.
   long int line, col, fpos;
   
   // The beginning of the linked list.
   struct _mt_token* first;
 } mt_token_t;
 
+/**
+ * @brief Creates a new token.
+ * @param file The file where the token is located.
+ * @return A new token.
+ */
 mt_token_t* mt_token_init(struct _mt_file* file);
 
+/**
+ * @brief Destroys a token.
+ * @param token The token to destroy.
+ */
 void mt_token_deinit(mt_token_t* token);
 
 #endif // __MT_TOKEN_H__

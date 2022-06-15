@@ -5,11 +5,7 @@
 #include <mutiny/ast/ast.h>
 #include <mutiny/util/list.h>
 
-#include <mutiny/translation_unit/parser/global_decl.h>
-#include <mutiny/translation_unit/parser/enum_decl.h>
-#include <mutiny/translation_unit/parser/struct_decl.h>
 #include <mutiny/translation_unit/parser/func_decl.h>
-#include <mutiny/translation_unit/parser/var_decl.h>
 
 static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks);
 static mt_ast_node_t* mt_parse_func_body(mt_token_t** toks);

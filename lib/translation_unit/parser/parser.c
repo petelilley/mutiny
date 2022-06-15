@@ -20,14 +20,6 @@ enum {
 typedef unsigned mt_type_qual_t;
 */
 
-static mt_ast_node_t* global_decl(mt_token_t** token);
-static mt_ast_node_t* enum_decl(mt_token_t** token);
-static mt_ast_node_t* struct_decl(mt_token_t** token);
-static mt_ast_node_t* func_decl(mt_token_t** token);
-static mt_ast_node_t* func_decl_param_list(mt_token_t** token);
-static mt_ast_node_t* func_body(mt_token_t** token);
-static mt_ast_node_t* var_decl(mt_token_t** token);
-
 bool mt_translation_unit_parse_tokens(mt_translation_unit_t* t_unit) {
   t_unit->ast = mt_ast_node_init(ND_GLOBAL_SCOPE);
   
