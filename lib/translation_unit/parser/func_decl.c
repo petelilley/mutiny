@@ -6,9 +6,9 @@
 #include <mutiny/util/list.h>
 
 #include <mutiny/translation_unit/parser/func_decl.h>
+#include <mutiny/translation_unit/parser/statement.h>
 
 static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks);
-static mt_ast_node_t* mt_parse_func_body(mt_token_t** toks);
 
 mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks) {
   mt_token_t* tok = *toks;
@@ -59,15 +59,11 @@ mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks) {
     }
 
     if (!mt_tok_punct_match(tok, "{")) break;
-    tok = tok->next;
     
-    mt_ast_node_t* body = mt_parse_func_body(&tok);
+    mt_ast_node_t* body = mt_parse_compound_stmt(&tok);
     if (body) {
         // TODO: Add body to func ast node.
     }
-    
-    if (!mt_tok_punct_match(tok, "}")) break;
-    tok = tok->next;
   } while (0);
 
   *toks = tok;
@@ -121,20 +117,4 @@ static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks) {
   *toks = tok;
   
   return param_list_nd;
-}
-
-static mt_ast_node_t* mt_parse_func_body(mt_token_t** toks) {
-  mt_token_t* tok = *toks;
-  
-  if (mt_tok_punct_comp(tok, "}")) {
-    return NULL;
-  }
-  
-  do {
-    // TODO: Parse statement.
-    if (mt_tok_punct_comp(tok, "}")) break;
-  } while (1);
-
-  *toks = tok;
-  return NULL;
 }

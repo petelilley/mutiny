@@ -3,4 +3,5 @@ add_mutiny_sources(
   "${MT_LIB_DIR}/translation_unit/parser/parser_util.c"
   "${MT_LIB_DIR}/translation_unit/parser/global_decl.c"
   "${MT_LIB_DIR}/translation_unit/parser/func_decl.c"
+  "${MT_LIB_DIR}/translation_unit/parser/statement.c"
 )

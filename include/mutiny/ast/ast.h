@@ -32,6 +32,7 @@ typedef enum _mt_ast_node_type {
   ND_VAR_TYPE_QUAL,         // Variable type qualifier.
   ND_VAR_VAL,               // Variable value.
   
+  ND_STMT_COMPOUND,         // Compound statement.
   ND_STMT_IF,               // If statement.
   ND_STMT_DO_WHILE,         // Do-while statement.
   ND_STMT_WHILE,            // While statement.
@@ -51,7 +52,7 @@ typedef enum _mt_ast_node_type {
 } mt_ast_type_t;
 
 /**
- * @brief Abstract syntax tree node that represents the syntax of mutiny source code.
+ * @brief An AST node.
  */
 typedef struct _mt_ast_node {
   mt_ast_type_t type;
@@ -64,8 +65,17 @@ typedef struct _mt_ast_node {
   list_t(struct _mt_ast_node*) sub;
 } mt_ast_node_t;
 
+/**
+ * @brief Creates a new AST node.
+ * @param type The type of the node.
+ * @return A new AST node.
+ */
 mt_ast_node_t* mt_ast_node_init(mt_ast_type_t type);
 
+/**
+ * Destroys an AST node.
+ * @param node The node to destroy.
+ */
 void mt_ast_node_deinit(mt_ast_node_t* ast);
 
 #endif // __MT_AST_H__
