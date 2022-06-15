@@ -109,31 +109,31 @@ static mt_token_t* next_token(mt_file_t* f, mt_log_t* e) {
     }
   }
   
-#if 0
+#if 1
   
   if (t) {
-    printf("[%ld-%ld_%ld][%ld] tok: %d, ", t->line, t->col, t->len, t->fpos, t->kind);
+    printf("[%ld-%ld_%ld][%ld] tok: ", t->line, t->col, t->len, t->fpos);
     switch (t->kind) {
       case TK_IDENTIFIER:
-        printf("%s\n", t->strval);
+        printf("id, \"%s\"\n", t->strval);
         break;
       case TK_KEYWORD:
-        printf("%s\n", mt_keyword_to_str(t->ival));
+        printf("kw, %s\n", mt_keyword_to_str(t->ival));
         break;
       case TK_PUNCTUATOR:
-        printf("%s\n", t->strval);
+        printf("pct, '%s'\n", t->strval);
         break;
       case TK_INTEGER:
-        printf("%lld\n", t->ival);
+        printf("int, %lld\n", t->ival);
         break;
       case TK_FLOAT:
-        printf("%Lf\n", t->fval);
+        printf("fl, %Lf\n", t->fval);
         break;
       case TK_STRING:
-        printf("%s\n", t->strval);
+        printf("str, \"%s\"\n", t->strval);
         break;
       case TK_CHAR:
-        printf("%c\n", t->cval);
+        printf("chr, '%c'\n", t->cval);
         break;
       case TK_EOF:
         printf("EOF\n");
@@ -266,7 +266,7 @@ static mt_token_t* read_numeric_literal(mt_file_t* f, mt_log_t* e) {
   return t;
 }
 
-static mt_token_t* read_string_literal(mt_file_t* f, mt_log_t* err_log) {
+static mt_token_t* read_string_literal(mt_file_t* f, mt_log_t* e) {
   mt_token_t* t = mt_token_init(f);
   t->kind = TK_STRING;
   
@@ -275,13 +275,14 @@ static mt_token_t* read_string_literal(mt_file_t* f, mt_log_t* err_log) {
   
   char* first = f->ptr + 1;
   
+  size_t line = f->cur_line, col = f->cur_col;
+  
   char c;
   for (c = next(f); c && c != '"'; c = next(f)) {
     ++t->len;
   }
-  
   if (!c) {
-    // TODO Syntax error. "Unterminated string literal"
+    mt_log_syntax_error(e, f, line, col, 1, "Unterminated string literal");
     t->kind = TK_EOF;
     return t;
   }
@@ -292,7 +293,7 @@ static mt_token_t* read_string_literal(mt_file_t* f, mt_log_t* err_log) {
   return t;
 }
 
-static mt_token_t* read_char_literal(mt_file_t* f, mt_log_t* err_log) {
+static mt_token_t* read_char_literal(mt_file_t* f, mt_log_t* e) {
   mt_token_t* t = mt_token_init(f);
   t->kind = TK_CHAR;
   
@@ -301,22 +302,28 @@ static mt_token_t* read_char_literal(mt_file_t* f, mt_log_t* err_log) {
   
   char* first = f->ptr + 1;
   
+  size_t line = f->cur_line, col = f->cur_col;
+  
   char c;
   for (c = next(f); c && c != '\''; c = next(f)) {
     ++t->len;
   }
   
-  if (t->len != 1) {
-    // TODO Syntax error. "Character constant empty / too long"
+  if (!c) {
+    mt_log_syntax_error(e, f, line, col, 1, "Unterminated character literal");
     return t;
   }
   
-  if (!c) {
-    // TODO Syntax error. "Unterminated character literal"
-    t->kind = TK_EOF;
+  next(f);
+  
+  if (t->len < 1) {
+    mt_log_syntax_error(e, f, line, col, 2, "Character constant empty");
     return t;
   }
-  next(f);
+  else if (t->len > 1) {
+    mt_log_syntax_error(e, f, line, col, 1, "Character constant too long");
+    return t;
+  }
   
   t->cval = *first;
   
@@ -352,6 +359,7 @@ static mt_token_t* read_punctuator(mt_file_t* f, mt_log_t* err_log) {
         t->len = 2;
         break;
       }
+      // fall through
     case '*':
     case '/':
     case '%':
