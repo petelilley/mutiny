@@ -58,6 +58,9 @@ dkms.conf
 # Temp files
 *~
 
+# VSCode
+.vscode/
+
 # macOS
 .DS_Store
 
