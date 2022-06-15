@@ -49,7 +49,7 @@ static mt_ast_node_t* mt_parse_stmt_list(mt_token_t** toks) {
     }
     
     if (stmt_nd) {
-      l_push(comp_stmt_nd->sub, mt_ast_node_t*, stmt_nd);
+      l_push(comp_stmt_nd->sub, stmt_nd);
     }
     
     if (mt_tok_punct_comp(tok, "}")) break;

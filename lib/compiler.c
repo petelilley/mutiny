@@ -25,8 +25,8 @@ mt_compiler_t* mt_compiler_init(struct _mt_settings* s) {
   
   mt_compiler_t* c = malloc(sizeof(mt_compiler_t));
   c->settings = s;
-  l_init(c->files);
-  l_init(c->t_unit);
+  l_init(c->files, mt_file_t*);
+  l_init(c->t_unit, mt_translation_unit_t*);
   c->ast = NULL;
   
   const char* path;
@@ -50,7 +50,7 @@ mt_compiler_t* mt_compiler_init(struct _mt_settings* s) {
       mt_log_dump(&warn_log);
     }
     
-    l_push(c->files, mt_file_t*, f);
+    l_push(c->files, f);
   }
   
   if (s->exit_code == MT_EXIT_ERR_FILE) {

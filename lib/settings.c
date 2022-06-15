@@ -9,10 +9,10 @@ mt_settings_t* mt_settings_init() {
   
   s->exit_code = MT_EXIT_SUCCEESS;
   
-  l_init(s->import_paths);
-  l_init(s->lib_paths);
-  l_init(s->link_libs);
-  l_init(s->src_dirs);
+  l_init(s->import_paths, char*);
+  l_init(s->lib_paths, char*);
+  l_init(s->link_libs, char*);
+  l_init(s->src_dirs, char*);
   
   return s;
 }

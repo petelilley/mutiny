@@ -144,7 +144,7 @@ mt_settings_t* mt_args_decode(unsigned argc, char* const* argv) {
   while (true) {
     if ((opt = next_opt(argc - 1, argv + 2, s->type, &i, &err_log)).index == -1) {
       if (opt.file_path) {
-        l_push(s->src_dirs, char*, opt.file_path);
+        l_push(s->src_dirs, opt.file_path);
         continue;
       }
       else {
@@ -217,7 +217,7 @@ mt_settings_t* mt_args_decode(unsigned argc, char* const* argv) {
         s->debug = true;
         break;
       case OPT_IMPORT_PATH:
-        l_push(s->import_paths, char*, opt.arg);
+        l_push(s->import_paths, opt.arg);
         break;
       case OPT_JOB_NUM:
         if ((s->job_num = (unsigned)atoi(opt.arg)) <= 0) {
@@ -226,10 +226,10 @@ mt_settings_t* mt_args_decode(unsigned argc, char* const* argv) {
         free(opt.arg);
         break;
       case OPT_LIBRARY_PATH:
-        l_push(s->lib_paths, char*, opt.arg);
+        l_push(s->lib_paths, opt.arg);
         break;
       case OPT_LINK_LIBRARY:
-        l_push(s->link_libs, char*, opt.arg);
+        l_push(s->link_libs, opt.arg);
         break;
       case OPT_OPTIMIZE:
         s->optimize = true;

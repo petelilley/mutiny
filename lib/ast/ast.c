@@ -7,7 +7,7 @@ mt_ast_node_t* mt_ast_node_init(mt_ast_type_t type) {
   memset(ast, 0, sizeof(mt_ast_node_t));
   ast->type = type;
   
-  l_init(ast->sub);
+  l_init(ast->sub, mt_ast_node_t*);
   
   return ast;
 }

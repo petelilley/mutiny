@@ -8,14 +8,15 @@
  * @param type The data type of the list.
  */
 #define list_t(type) \
-  struct { size_t n; type* a; }
+  struct { size_t n; type* a; size_t s; }
 
 /**
  * @brief Initializes a list.
  * @param l The list to initialize.
+ * @param type The data type of the list.
  */
-#define l_init(l) \
-  ((l).n = 0, (l).a = 0)
+#define l_init(l, type) \
+  ((l).n = 0, (l).a = 0, (l).s = sizeof(type))
 
 /**
  * @brief Destroys a list.
@@ -46,14 +47,13 @@
 /**
  * @brief Adds an element to the end of a list.
  * @param l The list to add to.
- * @param type The data type of the list.
  * @param e The element to add.
  */
-#define l_push(l, type, e) \
+#define l_push(l, e) \
   do {                                         \
     (l).a = (l).a ?                            \
-      realloc((l).a, ++(l).n * sizeof(type)) : \
-      malloc(++(l).n * sizeof(type));          \
+      realloc((l).a, ++(l).n * (l).s) : \
+      malloc(++(l).n * (l).s);          \
     l_at(l, (l).n - 1) = e;                    \
   } while (0)
 

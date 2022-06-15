@@ -104,9 +104,9 @@ static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks) {
     type_nd->strval = type;
     
     param_nd = mt_ast_node_init(ND_FUNC_DECL_PARAM);
-    l_push(param_nd->sub, mt_ast_node_t*, name_nd);
-    l_push(param_nd->sub, mt_ast_node_t*, type_nd);
-    l_push(param_list_nd->sub, mt_ast_node_t*, param_nd);
+    l_push(param_nd->sub, name_nd);
+    l_push(param_nd->sub, type_nd);
+    l_push(param_list_nd->sub, param_nd);
     
     if (mt_tok_punct_comp(tok, ")")) break;
     
