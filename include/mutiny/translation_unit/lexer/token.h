@@ -23,7 +23,7 @@ typedef enum _mt_token_kind {
 /**
  * @brief A keyword in the mutiny source code.
  */
-typedef enum {
+typedef enum _mt_keyword {
   KW_IMPORT = 0,
   KW_NOT, KW_AND, KW_OR,
   KW_ENUM, KW_STRUCT, KW_FUNC, KW_VAR,

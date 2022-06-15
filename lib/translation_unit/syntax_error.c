@@ -1,4 +1,4 @@
-#include <mutiny/parser/parser_error.h>
+#include <mutiny/translation_unit/syntax_error.h>
 #include <mutiny/util/log.h>
 #include <mutiny/util/filesystem.h>
 #include <mutiny/mutiny.h>

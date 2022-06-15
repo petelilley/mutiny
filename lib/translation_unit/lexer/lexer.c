@@ -1,9 +1,9 @@
 #include <mutiny/mutiny.h>
-#include <mutiny/parser/lexer.h>
-#include <mutiny/parser/token.h>
-#include <mutiny/parser/translation_unit.h>
-#include <mutiny/parser/parser_util.h>
-#include <mutiny/parser/parser_error.h>
+#include <mutiny/translation_unit/lexer/lexer.h>
+#include <mutiny/translation_unit/lexer/token.h>
+#include <mutiny/translation_unit/translation_unit.h>
+#include <mutiny/translation_unit/parser/parser_util.h>
+#include <mutiny/translation_unit/syntax_error.h>
 #include <mutiny/settings.h>
 #include <mutiny/util/filesystem.h>
 #include <mutiny/util/log.h>
@@ -69,11 +69,11 @@ static mt_token_t* next_token(mt_file_t* f, mt_log_t* e) {
       next(f);
       continue;
     }
-    else if (START(f->ptr, "//")) {
+    else if (MT_STR_START(f->ptr, "//")) {
       skip_line_comment(f);
       continue;
     }
-    else if (START(f->ptr, "/*")) {
+    else if (MT_STR_START(f->ptr, "/*")) {
       next_n(f, 2);
       skip_block_comment(f, e);
       continue;
@@ -332,7 +332,7 @@ static bool is_punctuator(const mt_file_t* f) {
       c == ';' || c == '?' || c == '@' ||
       c == '(' || c == ')' || c == '[' || c == ']' ||
       c == '{' || c == '}' ||
-      START(f->ptr, "!=")) {
+      MT_STR_START(f->ptr, "!=")) {
     return true;
   }
   return false;

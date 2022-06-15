@@ -1,9 +1,9 @@
 #include <mutiny/mutiny.h>
-#include <mutiny/parser/parser.h>
-#include <mutiny/parser/translation_unit.h>
-#include <mutiny/parser/token.h>
-#include <mutiny/parser/lexer.h>
-#include <mutiny/parser/parser_util.h>
+#include <mutiny/translation_unit/parser/parser.h>
+#include <mutiny/translation_unit/translation_unit.h>
+#include <mutiny/translation_unit/lexer/token.h>
+#include <mutiny/translation_unit/lexer/lexer.h>
+#include <mutiny/translation_unit/syntax_error.h>
 #include <mutiny/ast/ast.h>
 #include <mutiny/settings.h>
 #include <mutiny/util/list.h>

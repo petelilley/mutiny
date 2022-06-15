@@ -1,10 +1,10 @@
 #include <mutiny/mutiny.h>
-#include <mutiny/parser/parser.h>
+#include <mutiny/translation_unit/parser/parser.h>
 #include <mutiny/compiler.h>
-#include <mutiny/parser/token.h>
-#include <mutiny/parser/lexer.h>
-#include <mutiny/parser/parser_util.h>
-#include <mutiny/parser/translation_unit.h>
+#include <mutiny/translation_unit/lexer/token.h>
+#include <mutiny/translation_unit/lexer/lexer.h>
+#include <mutiny/translation_unit/parser/parser_util.h>
+#include <mutiny/translation_unit/translation_unit.h>
 #include <mutiny/ast/ast.h>
 #include <mutiny/settings.h>
 #include <mutiny/util/list.h>
@@ -45,7 +45,7 @@ mt_compiler_t* mt_compiler_init(struct _mt_settings* s) {
       break;
     }
     
-    if (!END(path, ".mutiny") && !s->no_warnings) {
+    if (!MT_STR_END(path, ".mutiny") && !s->no_warnings) {
       mt_log_add(&warn_log, "Filename extension does not match '.mutiny' but will be treated as a mutiny source file.\n", path);
       mt_log_dump(&warn_log);
     }

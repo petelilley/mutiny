@@ -1,4 +1,4 @@
-#include <mutiny/parser/token.h>
+#include <mutiny/translation_unit/lexer/token.h>
 #include <mutiny/mutiny.h>
 #include <mutiny/util/filesystem.h>
 
