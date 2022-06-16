@@ -3,7 +3,6 @@
 #include <mutiny/translation_unit/translation_unit.h>
 #include <mutiny/translation_unit/lexer/token.h>
 #include <mutiny/translation_unit/lexer/lexer.h>
-#include <mutiny/translation_unit/syntax_error.h>
 #include <mutiny/ast/ast.h>
 #include <mutiny/settings.h>
 #include <mutiny/util/list.h>
@@ -16,8 +15,7 @@ mt_translation_unit_t* mt_translation_unit_init(struct _mt_file* file, struct _m
   tu->file = file;
   tu->tokens = NULL;
   tu->ast = NULL;
-  tu->err_log = mt_log_init(stderr, MT_ERROR);
-  tu->warn_log = mt_log_init(stderr, MT_WARNING);
+  tu->error_reporter = mt_error_reporter_init();
   return tu;
 }
 
@@ -35,15 +33,13 @@ void mt_translation_unit_deinit(mt_translation_unit_t* tu) {
 
 bool mt_translation_unit_parse_exec(mt_translation_unit_t* tu) {
   bool tok_res = mt_translation_unit_tokenize(tu);
-  mt_log_dump(&tu->err_log);
-  /* mt_log_dump(&tu->warn_log); */
+  mt_log_dump(&tu->error_reporter.err_log);
   if (!tok_res) {
     return false;
   }
   
   bool parse_res = mt_translation_unit_parse_tokens(tu);
-  mt_log_dump(&tu->err_log);
-  /* mt_log_dump(&tu->warn_log); */
+  mt_log_dump(&tu->error_reporter.err_log);
   if (!parse_res) {
     return false;
   }

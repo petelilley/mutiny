@@ -4,7 +4,7 @@
 /**
  * @brief The exit codes for the compiler.
  */
-typedef enum mt_exit_code {
+typedef enum _mt_exit_code {
   MT_EXIT_ERR_INTERNAL = -1,
   MT_EXIT_SUCCEESS     = 0,
   MT_EXIT_ERR_ARGS     = 1,

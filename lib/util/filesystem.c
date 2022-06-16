@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-// TODO Make file handling cross-platform.
+// TODO: Make file handling cross-platform.
 
 bool is_file(const char* path) {
   struct stat s;
@@ -66,4 +66,35 @@ void mt_file_deinit(mt_file_t* f) {
   }
   
   free(f);
+}
+
+static bool is_newline(mt_file_t* f) {
+  char c = *f->ptr;
+  if (c == '\n') return true;
+  if (c != '\r') return false;
+  if (*(f->ptr + 1) == '\n') {
+    ++f->cur_col;
+    ++f->cur_pos;
+    ++f->ptr;
+  }
+  return true;
+}
+
+char mt_file_getc(mt_file_t* f) {
+  if (is_newline(f)) {
+    ++f->cur_line;
+    f->cur_col = 1;
+  }
+  else {
+    ++f->cur_col;
+  }
+  
+  ++f->cur_pos;
+  return *++f->ptr;
+}
+
+char mt_file_skip(mt_file_t* f, size_t n) {
+  for (size_t i = 0; i < n; i++) {
+    mt_file_getc(f);
+  }
 }

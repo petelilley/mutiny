@@ -1,6 +1,6 @@
 #include <mutiny/translation_unit/parser/parser_util.h>
 #include <mutiny/translation_unit/lexer/token.h>
-#include <mutiny/translation_unit/syntax_error.h>
+#include <mutiny/error/syntax_error.h>
 #include <mutiny/mutiny.h>
 
 bool mt_tok_match(mt_token_t* t, mt_token_kind_t k) {

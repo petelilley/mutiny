@@ -38,4 +38,18 @@ mt_file_t* mt_file_init(const char* path);
  */
 void mt_file_deinit(mt_file_t* file);
 
+/**
+ * @brief Reads the next character from a file.
+ * @param file The file to read from.
+ * @return The next character.
+ */
+char mt_file_getc(mt_file_t* file);
+
+/**
+ * @brief Skips n characters in a file.
+ * @param file The file to skip in.
+ * @param n The number of characters to skip.
+ */
+char mt_file_skip(mt_file_t* file, size_t n);
+
 #endif // __MT_FILESYSTEM_H__

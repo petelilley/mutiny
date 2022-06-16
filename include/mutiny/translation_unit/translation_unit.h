@@ -3,7 +3,7 @@
 
 #include <mutiny/mutiny.h>
 #include <mutiny/util/list.h>
-#include <mutiny/util/log.h>
+#include <mutiny/error/error_reporter.h>
 
 struct _mt_settings;
 struct _mt_file;
@@ -18,8 +18,7 @@ typedef struct _mt_translation_unit {
   struct _mt_file* file;
   struct _mt_token* tokens;
   struct _mt_ast_node* ast;
-  mt_log_t err_log;
-  mt_log_t warn_log;
+  mt_error_reporter_t error_reporter;
 } mt_translation_unit_t;
 
 /**
