@@ -54,10 +54,34 @@ int mt_str_to_keyword(const char* s, size_t l) {
   return -1;
 }
 
+const char* mt_token_kind_to_str(mt_token_kind_t k) {
+  switch (k) {
+    case TK_IDENTIFIER:
+      return "identifier";
+    case TK_KEYWORD:
+      return "keyword";
+    case TK_PUNCTUATOR:
+      return "punctuator";
+    case TK_INTEGER:
+      return "integer";
+    case TK_FLOAT:
+      return "float";
+    case TK_STRING:
+      return "string";
+    case TK_CHAR:
+      return "char";
+    case TK_EOF:
+      return "EOF";
+    default:
+      return "unknown token";
+  }
+}
+
 mt_token_t* mt_token_init(struct _mt_file* f) {
   mt_token_t* t = malloc(sizeof(mt_token_t));
   memset(t, 0, sizeof(mt_token_t));
   
+  t->file = f;
   t->line = f->cur_line;
   t->col = f->cur_col;
   t->fpos = f->cur_pos;

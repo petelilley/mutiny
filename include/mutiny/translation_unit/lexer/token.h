@@ -10,14 +10,15 @@ struct _mt_settings;
  * @brief The kind of a token.
  */
 typedef enum _mt_token_kind {
-  TK_IDENTIFIER = 0,
-  TK_KEYWORD,
-  TK_PUNCTUATOR,
-  TK_INTEGER,
-  TK_FLOAT,
-  TK_STRING,
-  TK_CHAR,
-  TK_EOF,
+  TK_UNKNOWN    = 0,
+  TK_IDENTIFIER = 1 << 0,
+  TK_KEYWORD    = 1 << 1,
+  TK_PUNCTUATOR = 1 << 2,
+  TK_INTEGER    = 1 << 3,
+  TK_FLOAT      = 1 << 4,
+  TK_STRING     = 1 << 5,
+  TK_CHAR       = 1 << 6,
+  TK_EOF        = 1 << 7,
 } mt_token_kind_t;
 
 /**
@@ -53,6 +54,13 @@ const char* mt_keyword_to_str(mt_keyword_t keyword);
 int mt_str_to_keyword(const char* str, size_t len);
 
 /**
+ * @brief Converts a token kind to a string.
+ * @param kind The token kind to convert.
+ * @return The string representation of the token kind.
+ */
+const char* mt_token_kind_to_str(mt_token_kind_t kind);
+
+/**
  * @brief A token in the language.
  */
 typedef struct _mt_token {
@@ -70,6 +78,8 @@ typedef struct _mt_token {
   
   // The length of the token.
   size_t len;
+  
+  struct _mt_file* file;
   
   // The position of the token.
   long int line, col, fpos;

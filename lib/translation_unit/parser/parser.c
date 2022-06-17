@@ -26,7 +26,7 @@ bool mt_translation_unit_parse_tokens(mt_translation_unit_t* t_unit) {
   mt_token_t* tok = t_unit->tokens;
   mt_ast_node_t* node;
   while (tok->kind != TK_EOF) {
-    node = mt_parse_global_decl(&tok);
+    node = mt_parse_global_decl(&tok, &t_unit->error_reporter);
     if (!node) break;
     l_push(t_unit->ast->sub, node);
   }

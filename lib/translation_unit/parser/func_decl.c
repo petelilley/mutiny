@@ -2,36 +2,37 @@
 #include <mutiny/translation_unit/parser/parser.h>
 #include <mutiny/translation_unit/lexer/token.h>
 #include <mutiny/translation_unit/parser/parser_util.h>
+#include <mutiny/error/error_reporter.h>
 #include <mutiny/ast/ast.h>
 #include <mutiny/util/list.h>
 
 #include <mutiny/translation_unit/parser/func_decl.h>
 #include <mutiny/translation_unit/parser/statement.h>
 
-static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks);
+static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_reporter_t* err_reporter);
 
-mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks) {
+mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks, mt_error_reporter_t* err) {
   mt_token_t* tok = *toks;
   
   mt_ast_node_t* param_list_nd;
   
   do {
-    if (!mt_tok_kw_match(tok, KW_FUNC)) break;
+    if (!mt_tok_kw_match(tok, KW_FUNC, err)) break;
     tok = tok->next;
     
-    if (!mt_tok_match(tok, TK_IDENTIFIER)) break;
+    if (!mt_tok_match(tok, TK_IDENTIFIER, err)) break;
     const char* name = tok->strval;
     tok = tok->next;
     
-    if (!mt_tok_punct_match(tok, ":")) break;
+    if (!mt_tok_punct_match(tok, ":", err)) break;
     tok = tok->next;
     
-    if (!mt_tok_punct_match(tok, "(")) break;
+    if (!mt_tok_punct_match(tok, "(", err)) break;
     tok = tok->next;
     
-    param_list_nd = mt_parse_func_decl_param_list(&tok);
+    param_list_nd = mt_parse_func_decl_param_list(&tok, err);
     
-    if (!mt_tok_punct_match(tok, ")")) break;
+    if (!mt_tok_punct_match(tok, ")", err)) break;
     tok = tok->next;
     
     // Return type.
@@ -40,7 +41,7 @@ mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks) {
     if (mt_tok_punct_comp(tok, "->")) {
       tok = tok->next;
       
-      if (!mt_tok_match(tok, TK_IDENTIFIER)) break;
+      if (!mt_tok_match(tok, TK_IDENTIFIER, err)) break;
       ret_type = tok->strval;
       tok = tok->next;
     }
@@ -58,9 +59,9 @@ mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks) {
         break;
     }
 
-    if (!mt_tok_punct_match(tok, "{")) break;
+    if (!mt_tok_punct_match(tok, "{", err)) break;
     
-    mt_ast_node_t* body = mt_parse_compound_stmt(&tok);
+    mt_ast_node_t* body = mt_parse_compound_stmt(&tok, err);
     if (body) {
         // TODO: Add body to func ast node.
     }
@@ -71,7 +72,7 @@ mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks) {
   return NULL;
 }
 
-static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks) {
+static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_reporter_t* err) {
   mt_token_t* tok = *toks;
   
   if (mt_tok_punct_comp(tok, ")")) return NULL;
@@ -80,16 +81,16 @@ static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks) {
   mt_ast_node_t* param_nd, *name_nd, *type_nd;
   
   do {
-    if (!mt_tok_match(tok, TK_IDENTIFIER)) break;
+    if (!mt_tok_match(tok, TK_IDENTIFIER, err)) break;
     char* name = tok->strval;
     tok = tok->next;
     
-    if (!mt_tok_punct_match(tok, ":")) break;
+    if (!mt_tok_punct_match(tok, ":", err)) break;
     tok = tok->next;
     
     // TODO: Dedicated type parser.
     
-    if (!mt_tok_match(tok, TK_IDENTIFIER)) break;
+    if (!mt_tok_match(tok, TK_IDENTIFIER, err)) break;
     char* type = tok->strval;
     tok = tok->next;
     
@@ -110,7 +111,7 @@ static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks) {
     
     if (mt_tok_punct_comp(tok, ")")) break;
     
-    if (!mt_tok_punct_match(tok, ",")) break;
+    if (!mt_tok_punct_match(tok, ",", err)) break;
     tok = tok->next;
   } while (1);
   
