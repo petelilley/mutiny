@@ -76,7 +76,7 @@ mt_token_t* mt_tokenize_punctuator(mt_file_t* f) {
       break;
   }
   
-  t->strval = strndup(f->ptr, t->len);
+  t->punct_val = mt_str_to_punct(f->ptr, t->len);
   
   mt_file_skip(f, t->len);
   

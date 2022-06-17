@@ -33,11 +33,11 @@ mt_token_t* mt_tokenize_numeric_literal(mt_file_t* f, mt_error_reporter_t* e) {
     val = strndup(first, t->len);
     if (fp) {
       t->kind = TK_FLOAT;
-      t->fval = atof(val);
+      t->f_val = atof(val);
     }
     else {
       t->kind = TK_INTEGER;
-      t->ival = atoll(val);
+      t->i_val = atoll(val);
     }
     free(val);
   }
@@ -61,7 +61,7 @@ mt_token_t* mt_tokenize_numeric_literal(mt_file_t* f, mt_error_reporter_t* e) {
     
     t->kind = TK_INTEGER;
     val = strndup(first, t->len);
-    t->ival = strtoll(val, NULL, 16);
+    t->i_val = strtoll(val, NULL, 16);
     free(val);
   }
   // Octal number.
@@ -74,7 +74,7 @@ mt_token_t* mt_tokenize_numeric_literal(mt_file_t* f, mt_error_reporter_t* e) {
     }
     t->kind = TK_INTEGER;
     val = strndup(first, t->len);
-    t->ival = strtoll(val, NULL, 8);
+    t->i_val = strtoll(val, NULL, 8);
     free(val);
   }
   

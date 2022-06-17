@@ -34,7 +34,7 @@ static inline bool mt_tok_comp(mt_token_t* token, mt_token_kind_t kind) {
   * @return True if the token is a keyword and its keyword value matches the given keyword, false otherwise.
   */
 static inline bool mt_tok_kw_comp(mt_token_t* token, mt_keyword_t keyword) {
-  return mt_tok_comp(token, TK_KEYWORD) && token->ival == keyword;
+  return mt_tok_comp(token, TK_KEYWORD) && token->kw_val == keyword;
 }
 
 /**
@@ -43,8 +43,8 @@ static inline bool mt_tok_kw_comp(mt_token_t* token, mt_keyword_t keyword) {
   * @param punct The punctuator to compare.
   * @return True if the token is a punctuator and its punctuator value matches the given punctuator, false otherwise.
   */
-static inline bool mt_tok_punct_comp(mt_token_t* token, const char* punct) {
-  return mt_tok_comp(token, TK_PUNCTUATOR) && strncmp(token->strval, punct, token->len) == 0;
+static inline bool mt_tok_punct_comp(mt_token_t* token, mt_punctuator_t punct) {
+  return mt_tok_comp(token, TK_PUNCTUATOR) && token->punct_val == punct;
 }
 
 /**
@@ -72,6 +72,6 @@ bool mt_tok_kw_match(mt_token_t* token, mt_keyword_t keyword, struct _mt_error_r
   * @param error_reporter The translator's error reporter.
   * @return True if the token's kind matches punctuator and its punctuator matches the given punctuator, false otherwise.
   */
-bool mt_tok_punct_match(mt_token_t* token, const char* punct, struct _mt_error_reporter* error_reporter);
+bool mt_tok_punct_match(mt_token_t* token, mt_punctuator_t punct, struct _mt_error_reporter* error_reporter);
 
 #endif // __MT_PARSER_UTIL_H__

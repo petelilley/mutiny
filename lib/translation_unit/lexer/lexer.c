@@ -102,25 +102,25 @@ static mt_token_t* next_token(mt_file_t* f, mt_error_reporter_t* e) {
     printf("[%ld-%ld_%ld][%ld] tok: ", t->line, t->col, t->len, t->fpos);
     switch (t->kind) {
       case TK_IDENTIFIER:
-        printf("id, \"%s\"\n", t->strval);
+        printf("id, \"%s\"\n", t->str_val);
         break;
       case TK_KEYWORD:
-        printf("kw, %s\n", mt_keyword_to_str(t->ival));
+        printf("kw, %s\n", mt_keyword_to_str(t->kw_val));
         break;
       case TK_PUNCTUATOR:
-        printf("pct, '%s'\n", t->strval);
+        printf("pct, '%s'\n", mt_punct_to_str(t->punct_val));
         break;
       case TK_INTEGER:
-        printf("int, %lld\n", t->ival);
+        printf("int, %lld\n", t->i_val);
         break;
       case TK_FLOAT:
-        printf("fl, %Lf\n", t->fval);
+        printf("fl, %Lf\n", t->f_val);
         break;
       case TK_STRING:
-        printf("str, \"%s\"\n", t->strval);
+        printf("str, \"%s\"\n", t->str_val);
         break;
       case TK_CHAR:
-        printf("chr, '%c'\n", t->cval);
+        printf("chr, '%c'\n", t->c_val);
         break;
       case TK_EOF:
         printf("EOF\n");

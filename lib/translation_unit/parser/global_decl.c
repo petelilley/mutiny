@@ -13,7 +13,7 @@
 
 mt_ast_node_t* mt_parse_global_decl(mt_token_t** toks, mt_error_reporter_t* err) {
   if ((*toks)->kind == TK_KEYWORD) {
-    switch ((mt_keyword_t)(*toks)->ival) {
+    switch ((*toks)->kw_val) {
       case KW_ENUM:
         // return mt_parse_enum_decl(toks);
         return NULL;

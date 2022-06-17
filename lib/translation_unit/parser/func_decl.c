@@ -21,28 +21,28 @@ mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks, mt_error_reporter_t* err) {
     tok = tok->next;
     
     if (!mt_tok_match(tok, TK_IDENTIFIER, err)) break;
-    const char* name = tok->strval;
+    const char* name = tok->str_val;
     tok = tok->next;
     
-    if (!mt_tok_punct_match(tok, ":", err)) break;
+    if (!mt_tok_punct_match(tok, PCT_COLON, err)) break;
     tok = tok->next;
     
-    if (!mt_tok_punct_match(tok, "(", err)) break;
+    if (!mt_tok_punct_match(tok, PCT_LPAREN, err)) break;
     tok = tok->next;
     
     param_list_nd = mt_parse_func_decl_param_list(&tok, err);
     
-    if (!mt_tok_punct_match(tok, ")", err)) break;
+    if (!mt_tok_punct_match(tok, PCT_RPAREN, err)) break;
     tok = tok->next;
     
     // Return type.
     const char* ret_type = "void";
     
-    if (mt_tok_punct_comp(tok, "->")) {
+    if (mt_tok_punct_comp(tok, PCT_ARROW)) {
       tok = tok->next;
       
       if (!mt_tok_match(tok, TK_IDENTIFIER, err)) break;
-      ret_type = tok->strval;
+      ret_type = tok->str_val;
       tok = tok->next;
     }
     
@@ -54,12 +54,12 @@ mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks, mt_error_reporter_t* err) {
       }
     }
 
-    if (mt_tok_punct_comp(tok, ";")) {
+    if (mt_tok_punct_comp(tok, PCT_SEMICOLON)) {
         tok = tok->next;
         break;
     }
 
-    if (!mt_tok_punct_match(tok, "{", err)) break;
+    if (!mt_tok_punct_match(tok, PCT_LBRACKET, err)) break;
     
     mt_ast_node_t* body = mt_parse_compound_stmt(&tok, err);
     if (body) {
@@ -75,23 +75,23 @@ mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks, mt_error_reporter_t* err) {
 static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_reporter_t* err) {
   mt_token_t* tok = *toks;
   
-  if (mt_tok_punct_comp(tok, ")")) return NULL;
+  if (mt_tok_punct_comp(tok, PCT_RPAREN)) return NULL;
   
   mt_ast_node_t* param_list_nd = NULL;
   mt_ast_node_t* param_nd, *name_nd, *type_nd;
   
   do {
     if (!mt_tok_match(tok, TK_IDENTIFIER, err)) break;
-    char* name = tok->strval;
+    char* name = tok->str_val;
     tok = tok->next;
     
-    if (!mt_tok_punct_match(tok, ":", err)) break;
+    if (!mt_tok_punct_match(tok, PCT_COLON, err)) break;
     tok = tok->next;
     
     // TODO: Dedicated type parser.
     
     if (!mt_tok_match(tok, TK_IDENTIFIER, err)) break;
-    char* type = tok->strval;
+    char* type = tok->str_val;
     tok = tok->next;
     
     if (!param_list_nd) {
@@ -109,9 +109,9 @@ static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_
     l_push(param_nd->sub, type_nd);
     l_push(param_list_nd->sub, param_nd);
     
-    if (mt_tok_punct_comp(tok, ")")) break;
+    if (mt_tok_punct_comp(tok, PCT_RPAREN)) break;
     
-    if (!mt_tok_punct_match(tok, ",", err)) break;
+    if (!mt_tok_punct_match(tok, PCT_COMMA, err)) break;
     tok = tok->next;
   } while (1);
   

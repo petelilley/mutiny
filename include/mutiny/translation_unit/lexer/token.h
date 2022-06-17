@@ -11,14 +11,14 @@ struct _mt_settings;
  */
 typedef enum _mt_token_kind {
   TK_UNKNOWN    = 0,
-  TK_IDENTIFIER = 1 << 0,
-  TK_KEYWORD    = 1 << 1,
-  TK_PUNCTUATOR = 1 << 2,
-  TK_INTEGER    = 1 << 3,
-  TK_FLOAT      = 1 << 4,
-  TK_STRING     = 1 << 5,
-  TK_CHAR       = 1 << 6,
-  TK_EOF        = 1 << 7,
+  TK_IDENTIFIER,
+  TK_KEYWORD,
+  TK_PUNCTUATOR,
+  TK_INTEGER,
+  TK_FLOAT,
+  TK_STRING,
+  TK_CHAR,
+  TK_EOF,
 } mt_token_kind_t;
 
 /**
@@ -40,6 +40,61 @@ typedef enum _mt_keyword {
 } mt_keyword_t;
 
 /**
+ * @brief A punctuator in the language.
+ */
+typedef enum _mt_punctuator {
+  PCT_UNKNOWN = 0,
+  PCT_LPAREN,     // (
+  PCT_RPAREN,     // )
+  PCT_LBRACE,     // {
+  PCT_RBRACE,     // }
+  PCT_LBRACKET,   // [
+  PCT_RBRACKET,   // ]
+  PCT_COMMA,      //,
+  PCT_SEMICOLON,  // ;
+  PCT_COLON,      // :
+  PCT_DOT,        // .
+  PCT_EQ,         // =
+  PCT_PLUS,       // +
+  PCT_MINUS,      // -
+  PCT_MUL,        // *
+  PCT_DIV,        // /
+  PCT_MOD,        // %
+  PCT_BIT_AND,    // &
+  PCT_BIT_OR,     // |
+  PCT_BIT_XOR,    // ^
+  PCT_BIT_NOT,    // ~
+  PCT_BIT_LSH,    // <<
+  PCT_BIT_RSH,    // >>
+  PCT_PLUS_EQ,    // +=
+  PCT_MINUS_EQ,   // -=
+  PCT_MUL_EQ,     // *=
+  PCT_DIV_EQ,     // /=
+  PCT_MOD_EQ,     // %=
+  PCT_BIT_AND_EQ, // &=
+  PCT_BIT_OR_EQ,  // |=
+  PCT_BIT_XOR_EQ, // ^=
+  PCT_LSH_EQ,     // <<=
+  PCT_RSH_EQ,     // >>=
+  PCT_EQ_EQ,      // ==
+  PCT_NOT_EQ,     // !=
+  PCT_LESS_EQ,    // <=
+  PCT_GREATER_EQ, // >=
+  PCT_LOG_OR,     // ||
+  PCT_LOG_AND,    // &&
+  PCT_INC,        // ++
+  PCT_DEC,        // --
+  PCT_ARROW,      // ->
+  PCT_GREATER,    // >
+  PCT_LESS,       // <
+  PCT_NOT,        // !
+  PCT_REF,        // @
+  PCT_COL_COL,    // ::
+  PCT_QUESTION,   // ?
+  PCT_COL_EQ,     // :=
+} mt_punctuator_t;
+
+/**
  * @brief Converts a keyword to a string.
  * @param keyword The keyword to convert.
  * @return The string representation of the keyword.
@@ -49,9 +104,10 @@ const char* mt_keyword_to_str(mt_keyword_t keyword);
 /**
  * @brief Converts a string to a keyword.
  * @param str The string to convert.
+ * @param len The length of the string.
  * @return The keyword representation of the string.
  */
-int mt_str_to_keyword(const char* str, size_t len);
+ssize_t mt_str_to_keyword(const char* str, size_t len);
 
 /**
  * @brief Converts a token kind to a string.
@@ -59,6 +115,21 @@ int mt_str_to_keyword(const char* str, size_t len);
  * @return The string representation of the token kind.
  */
 const char* mt_token_kind_to_str(mt_token_kind_t kind);
+
+/**
+ * @brief Converts a punctuator to a string.
+ * @param punctuator The punctuator to convert.
+ * @return The string representation of the punctuator.
+ */
+const char* mt_punct_to_str(mt_punctuator_t punct);
+
+/**
+ * @brief Converts a string to a punctuator.
+ * @param str The string to convert.
+ * @param len The length of the string.
+ * @return The punctuator representation of the string.
+ */
+ssize_t mt_str_to_punct(const char* str, size_t len);
 
 /**
  * @brief A token in the language.
@@ -71,10 +142,13 @@ typedef struct _mt_token {
   struct _mt_token* next;
   
   // The value of the token.
-  char cval;
-  long long int ival;
-  long double fval;
-  char* strval;
+  char c_val;
+  long long int i_val;
+  long double f_val;
+  char* str_val;
+
+  mt_keyword_t kw_val;
+  mt_punctuator_t punct_val;
   
   // The length of the token.
   size_t len;

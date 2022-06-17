@@ -23,12 +23,12 @@ mt_ast_node_t* mt_parse_compound_stmt(mt_token_t** toks, mt_error_reporter_t* er
   mt_ast_node_t* stmt_list_nd = NULL;
   
   do {
-    if (!mt_tok_punct_match(tok, "{", err)) break;
+    if (!mt_tok_punct_match(tok, PCT_LBRACKET, err)) break;
     tok = tok->next;
     
     stmt_list_nd = mt_parse_stmt_list(&tok, err);
     
-    if (!mt_tok_punct_match(tok, "}", err)) break;
+    if (!mt_tok_punct_match(tok, PCT_RBRACKET, err)) break;
     tok = tok->next;
   } while (0);
   
@@ -53,7 +53,7 @@ static mt_ast_node_t* mt_parse_stmt_list(mt_token_t** toks, mt_error_reporter_t*
       l_push(comp_stmt_nd->sub, stmt_nd);
     }
     
-    if (mt_tok_punct_comp(tok, "}")) break;
+    if (mt_tok_punct_comp(tok, PCT_RBRACKET)) break;
   } while (1);
   
   *toks = tok;

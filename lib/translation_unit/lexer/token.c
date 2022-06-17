@@ -45,7 +45,7 @@ const char* mt_keyword_to_str(mt_keyword_t k) {
   return kw_strs[k];
 }
 
-int mt_str_to_keyword(const char* s, size_t l) {
+ssize_t mt_str_to_keyword(const char* s, size_t l) {
   for (size_t i = 0; i < sizeof(kw_strs) / sizeof(char*); ++i) {
     if (!strncmp(s, kw_strs[i], l)) {
       return i;
@@ -54,27 +54,85 @@ int mt_str_to_keyword(const char* s, size_t l) {
   return -1;
 }
 
+static const char* kind_strs[] = {
+  [TK_UNKNOWN]    = "unknown",
+  [TK_IDENTIFIER] = "identifier",
+  [TK_KEYWORD]    = "keyword",
+  [TK_PUNCTUATOR] = "punctuator",
+  [TK_INTEGER]    = "integer",
+  [TK_FLOAT]      = "float",
+  [TK_STRING]     = "string",
+  [TK_CHAR]       = "char",
+  [TK_EOF]        = "EOF",
+};
+
 const char* mt_token_kind_to_str(mt_token_kind_t k) {
-  switch (k) {
-    case TK_IDENTIFIER:
-      return "identifier";
-    case TK_KEYWORD:
-      return "keyword";
-    case TK_PUNCTUATOR:
-      return "punctuator";
-    case TK_INTEGER:
-      return "integer";
-    case TK_FLOAT:
-      return "float";
-    case TK_STRING:
-      return "string";
-    case TK_CHAR:
-      return "char";
-    case TK_EOF:
-      return "EOF";
-    default:
-      return "unknown token";
+  return kind_strs[k];
+}
+
+static const char* punct_strs[] = {
+  [PCT_UNKNOWN]    = "unknown",
+  [PCT_LPAREN]     = "(",
+  [PCT_RPAREN]     = ")",
+  [PCT_LBRACE]     = "[",
+  [PCT_RBRACE]     = "]",
+  [PCT_LBRACKET]   = "{",
+  [PCT_RBRACKET]   = "}",
+  [PCT_COMMA]      = ",",
+  [PCT_SEMICOLON]  = ";",
+  [PCT_COLON]      = ":",
+  [PCT_DOT]        = ".",
+  [PCT_EQ]         = "=",
+  [PCT_PLUS]       = "+",
+  [PCT_MINUS]      = "-",
+  [PCT_MUL]        = "*",
+  [PCT_DIV]        = "/",
+  [PCT_MOD]        = "%",
+  [PCT_BIT_AND]    = "&",
+  [PCT_BIT_OR]     = "|",
+  [PCT_BIT_XOR]    = "^",
+  [PCT_BIT_NOT]    = "~",
+  [PCT_BIT_LSH]    = "<<",
+  [PCT_BIT_RSH]    = ">>",
+  [PCT_PLUS_EQ]    = "+=",
+  [PCT_MINUS_EQ]   = "-=",
+  [PCT_MUL_EQ]     = "*=",
+  [PCT_DIV_EQ]     = "/=",
+  [PCT_MOD_EQ]     = "%=",
+  [PCT_BIT_AND_EQ] = "&=",
+  [PCT_BIT_OR_EQ]  = "|=",
+  [PCT_BIT_XOR_EQ] = "^=",
+  [PCT_LSH_EQ]     = "<<=",
+  [PCT_RSH_EQ]     = ">>=",
+  [PCT_EQ_EQ]      = "==",
+  [PCT_NOT_EQ]     = "!=",
+  [PCT_LESS_EQ]    = "<=",
+  [PCT_GREATER_EQ] = ">=",
+  [PCT_LOG_OR]     = "||",
+  [PCT_LOG_AND]    = "&&",
+  [PCT_INC]        = "++",
+  [PCT_DEC]        = "--",
+  [PCT_ARROW]      = "->",
+  [PCT_GREATER]    = ">",
+  [PCT_LESS]       = "<",
+  [PCT_NOT]        = "!",
+  [PCT_REF]        = "@",
+  [PCT_COL_COL]    = "::",
+  [PCT_QUESTION]   = "?",
+  [PCT_COL_EQ]     = ":=",
+};
+
+const char* mt_punct_to_str(mt_punctuator_t p) {
+  return punct_strs[p];
+}
+
+ssize_t mt_str_to_punct(const char* s, size_t l) {
+  for (size_t i = 0; i < sizeof(punct_strs) / sizeof(char*); ++i) {
+    if (!strncmp(s, punct_strs[i], l)) {
+      return i;
+    }
   }
+  return -1;
 }
 
 mt_token_t* mt_token_init(struct _mt_file* f) {
@@ -96,8 +154,8 @@ void mt_token_deinit(mt_token_t* t) {
     tmp = t;
     t = t->next;
     
-    if (tmp->strval) {
-      free(tmp->strval);
+    if (tmp->str_val) {
+      free(tmp->str_val);
     }
     free(tmp);
   }

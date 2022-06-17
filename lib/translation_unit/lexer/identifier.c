@@ -8,11 +8,11 @@
 #include <mutiny/translation_unit/lexer/identifier.h>
 
 static void mt_tokenize_keyword(mt_token_t* t) {
-  int kw = mt_str_to_keyword(t->strval, t->len);
+  ssize_t kw = mt_str_to_keyword(t->str_val, t->len);
   if (kw != -1) {
       t->kind = TK_KEYWORD;
-      t->ival = kw;
-      free(t->strval);
+      t->kw_val = kw;
+      free(t->str_val);
       return;
   }
 }
@@ -28,7 +28,7 @@ mt_token_t* mt_tokenize_identifier(mt_file_t* f) {
     ++t->len;
   }
   
-  t->strval = strndup(first, t->len);
+  t->str_val = strndup(first, t->len);
   
   mt_tokenize_keyword(t);
   

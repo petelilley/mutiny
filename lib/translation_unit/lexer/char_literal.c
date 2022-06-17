@@ -39,7 +39,7 @@ mt_token_t* mt_tokenize_char_literal(mt_file_t* f, mt_error_reporter_t* e) {
     return t;
   }
   
-  t->cval = *first;
+  t->c_val = *first;
   
   return t;
 }

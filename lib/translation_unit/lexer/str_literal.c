@@ -29,7 +29,7 @@ mt_token_t* mt_tokenize_string_literal(mt_file_t* f, mt_error_reporter_t* e) {
   }
   mt_file_getc(f);
   
-  t->strval = strndup(first, t->len);
+  t->str_val = strndup(first, t->len);
   
   return t; 
 }
