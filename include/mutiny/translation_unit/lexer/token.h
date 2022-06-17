@@ -25,7 +25,8 @@ typedef enum _mt_token_kind {
  * @brief A keyword in the language.
  */
 typedef enum _mt_keyword {
-  KW_IMPORT = 0,
+  KW_UNKNOWN = 0,
+  KW_IMPORT,
   KW_NOT, KW_AND, KW_OR,
   KW_ENUM, KW_STRUCT, KW_FUNC, KW_VAR,
   KW_IF, KW_ELIF, KW_ELSE, KW_WHILE, KW_FOR, KW_SWITCH, KW_GOTO, // Statements.

@@ -23,12 +23,12 @@ mt_ast_node_t* mt_parse_compound_stmt(mt_token_t** toks, mt_error_reporter_t* er
   mt_ast_node_t* stmt_list_nd = NULL;
   
   do {
-    if (!mt_tok_punct_match(tok, PCT_LBRACKET, err)) break;
+    if (!mt_tok_punct_match(err, tok, 1, PCT_LBRACKET)) break;
     tok = tok->next;
     
     stmt_list_nd = mt_parse_stmt_list(&tok, err);
     
-    if (!mt_tok_punct_match(tok, PCT_RBRACKET, err)) break;
+    if (!mt_tok_punct_match(err, tok, 1, PCT_RBRACKET)) break;
     tok = tok->next;
   } while (0);
   

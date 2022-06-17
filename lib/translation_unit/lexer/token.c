@@ -46,7 +46,7 @@ const char* mt_keyword_to_str(mt_keyword_t k) {
 }
 
 ssize_t mt_str_to_keyword(const char* s, size_t l) {
-  for (size_t i = 0; i < sizeof(kw_strs) / sizeof(char*); ++i) {
+  for (size_t i = 1; i < sizeof(kw_strs) / sizeof(char*); ++i) {
     if (!strncmp(s, kw_strs[i], l)) {
       return i;
     }
@@ -55,7 +55,6 @@ ssize_t mt_str_to_keyword(const char* s, size_t l) {
 }
 
 static const char* kind_strs[] = {
-  [TK_UNKNOWN]    = "unknown",
   [TK_IDENTIFIER] = "identifier",
   [TK_KEYWORD]    = "keyword",
   [TK_PUNCTUATOR] = "punctuator",
@@ -71,7 +70,6 @@ const char* mt_token_kind_to_str(mt_token_kind_t k) {
 }
 
 static const char* punct_strs[] = {
-  [PCT_UNKNOWN]    = "unknown",
   [PCT_LPAREN]     = "(",
   [PCT_RPAREN]     = ")",
   [PCT_LBRACE]     = "[",
@@ -127,7 +125,7 @@ const char* mt_punct_to_str(mt_punctuator_t p) {
 }
 
 ssize_t mt_str_to_punct(const char* s, size_t l) {
-  for (size_t i = 0; i < sizeof(punct_strs) / sizeof(char*); ++i) {
+  for (size_t i = 1; i < sizeof(punct_strs) / sizeof(char*); ++i) {
     if (!strncmp(s, punct_strs[i], l)) {
       return i;
     }

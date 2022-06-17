@@ -57,10 +57,10 @@ typedef enum _mt_ast_node_type {
 typedef struct _mt_ast_node {
   mt_ast_type_t type;
   
-  char cval;
-  long long int ival;
-  long double fval;
-  char* strval;
+  char c_val;
+  long long int i_val;
+  long double f_val;
+  char* str_val;
   
   list_t(struct _mt_ast_node*) sub;
 } mt_ast_node_t;
