@@ -38,6 +38,8 @@ typedef enum _mt_ast_node_type {
   ND_STMT_WHILE,            // While statement.
   ND_STMT_FOR,              // For statement.
   ND_STMT_RETURN,           // Return statement.
+  ND_STMT_BREAK,            // Break statement.
+  ND_STMT_CONTINUE,         // Continue statement.
   ND_STMT_GOTO,             // Goto statement.
   ND_STMT_LABEL,            // Label statement.
   ND_STMT_ASSIGN,           // Variable assignment statement.
@@ -49,6 +51,8 @@ typedef enum _mt_ast_node_type {
   ND_OP_COMP,               // Comparison operator.
   ND_OP_ARITH,              // Arithmetic operator.
   ND_OP_BIT,                // Bitwise operator.
+  
+  ND_LABEL,                 // Label.
 } mt_ast_type_t;
 
 /**
