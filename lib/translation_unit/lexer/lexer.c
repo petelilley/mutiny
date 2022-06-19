@@ -20,11 +20,13 @@
 static mt_token_t* next_token(mt_file_t* file, mt_error_reporter_t* error_reporter);
 
 void mt_translation_unit_tokenize(mt_translation_unit_t* t_unit) {
+  mt_error_reporter_t* err = &t_unit->error_reporter;
+  
   mt_token_t* first = NULL;
   mt_token_t* head = NULL;
   
   mt_token_t* t = NULL;
-  while ((t = next_token(t_unit->file, &t_unit->error_reporter))) {
+  while ((t = next_token(t_unit->file, err))) {
     if (!first) {
       first = t;
       head = t;
@@ -97,7 +99,7 @@ static mt_token_t* next_token(mt_file_t* f, mt_error_reporter_t* e) {
     }
   }
   
-#if 1
+#if 0
   if (t) {
     printf("[%ld-%ld_%ld][%ld] tok: ", t->line, t->col, t->len, t->fpos);
     switch (t->kind) {

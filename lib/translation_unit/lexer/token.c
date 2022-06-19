@@ -70,12 +70,13 @@ const char* mt_token_kind_to_str(mt_token_kind_t k) {
 }
 
 static const char* punct_strs[] = {
+  [PCT_UNKNOWN]    = 0,
   [PCT_LPAREN]     = "(",
   [PCT_RPAREN]     = ")",
-  [PCT_LBRACE]     = "[",
-  [PCT_RBRACE]     = "]",
-  [PCT_LBRACKET]   = "{",
-  [PCT_RBRACKET]   = "}",
+  [PCT_LBRACE]     = "{",
+  [PCT_RBRACE]     = "}",
+  [PCT_LBRACKET]   = "[",
+  [PCT_RBRACKET]   = "]",
   [PCT_COMMA]      = ",",
   [PCT_SEMICOLON]  = ";",
   [PCT_COLON]      = ":",
@@ -90,6 +91,11 @@ static const char* punct_strs[] = {
   [PCT_BIT_OR]     = "|",
   [PCT_BIT_XOR]    = "^",
   [PCT_BIT_NOT]    = "~",
+  [PCT_GREATER]    = ">",
+  [PCT_LESS]       = "<",
+  [PCT_NOT]        = "!",
+  [PCT_REF]        = "@",
+  [PCT_QUESTION]   = "?",
   [PCT_BIT_LSH]    = "<<",
   [PCT_BIT_RSH]    = ">>",
   [PCT_PLUS_EQ]    = "+=",
@@ -111,12 +117,7 @@ static const char* punct_strs[] = {
   [PCT_INC]        = "++",
   [PCT_DEC]        = "--",
   [PCT_ARROW]      = "->",
-  [PCT_GREATER]    = ">",
-  [PCT_LESS]       = "<",
-  [PCT_NOT]        = "!",
-  [PCT_REF]        = "@",
   [PCT_COL_COL]    = "::",
-  [PCT_QUESTION]   = "?",
   [PCT_COL_EQ]     = ":=",
 };
 
@@ -125,7 +126,11 @@ const char* mt_punct_to_str(mt_punctuator_t p) {
 }
 
 ssize_t mt_str_to_punct(const char* s, size_t l) {
-  for (size_t i = 1; i < sizeof(punct_strs) / sizeof(char*); ++i) {
+  if (!l) return -1;
+  
+  if (l == 1) return *s;
+  
+  for (size_t i = 256; i < sizeof(punct_strs) / sizeof(char*); ++i) {
     if (!strncmp(s, punct_strs[i], l)) {
       return i;
     }

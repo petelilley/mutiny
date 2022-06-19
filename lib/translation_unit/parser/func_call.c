@@ -23,14 +23,14 @@ mt_ast_node_t* mt_parse_func_call(mt_token_t** toks, mt_error_reporter_t* err) {
     tok = tok->next;
     
     // (
-    if (!mt_token_match_punct(err, tok, 1, PCT_LPAREN)) break;
+    if (!mt_token_match_punct(err, tok, 1, '(')) break;
     tok = tok->next;
 
     // Function parameters.
     param_list_nd = mt_parse_func_call_param_list(&tok, err);
 
     // )
-    if (!mt_token_match_punct(err, tok, 1, PCT_RPAREN)) break;
+    if (!mt_token_match_punct(err, tok, 1, ')')) break;
     tok = tok->next;
 
     func_call_nd = mt_ast_node_init(ND_FUNC_CALL);
@@ -68,7 +68,7 @@ static mt_ast_node_t* mt_parse_func_call_param_list(mt_token_t** toks, mt_error_
     l_push(param_list_nd->sub, expr_nd);
     
     // , or )
-    mt_punctuator_t p = mt_token_match_punct(err, tok, 2, PCT_COMMA, PCT_RPAREN);
+    mt_punctuator_t p = mt_token_match_punct(err, tok, 2, ',', ')');
     if (!p || p == PCT_RPAREN) break;
     tok = tok->next;
   } while (1);

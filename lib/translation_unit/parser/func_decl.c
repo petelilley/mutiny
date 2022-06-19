@@ -27,30 +27,30 @@ mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks, mt_error_reporter_t* err) {
     tok = tok->next;
     
     // :
-    if (!mt_token_match_punct(err, tok, 1, PCT_COLON)) break;
+    if (!mt_token_match_punct(err, tok, 1, ':')) break;
     tok = tok->next;
     
     // (
-    if (!mt_token_match_punct(err, tok, 1, PCT_LPAREN)) break;
+    if (!mt_token_match_punct(err, tok, 1, '(')) break;
     tok = tok->next;
     
     // Function parameters.
     param_list_nd = mt_parse_func_decl_param_list(&tok, err);
     
     // )
-    if (!mt_token_match_punct(err, tok, 1, PCT_RPAREN)) break;
+    if (!mt_token_match_punct(err, tok, 1, ')')) break;
     tok = tok->next;
     
     const char* ret_type = "void";
     
     // ; or -> or {
-    mt_punctuator_t p = mt_token_match_punct(err, tok, 3, PCT_SEMICOLON, PCT_ARROW, PCT_LBRACKET);
+    mt_punctuator_t p = mt_token_match_punct(err, tok, 3, ';', PCT_ARROW, '{');
 
 END_DECL:
     if (!p) break;
     
     // ;
-    if (p == PCT_SEMICOLON) {
+    if (p == ';') {
       // No definition.
       tok = tok->next;
       break;
@@ -64,12 +64,12 @@ END_DECL:
       tok = tok->next;
     
       // ; or {
-      p = mt_token_match_punct(err, tok, 2, PCT_SEMICOLON, PCT_LBRACKET);
+      p = mt_token_match_punct(err, tok, 2, ';', '{');
       
       goto END_DECL;
     }
     // {
-    else if (p == PCT_LBRACKET) {
+    else if (p == '{') {
       // Definition.
       mt_ast_node_t* body = mt_parse_compound_stmt(&tok, err);
       if (body) {
@@ -102,7 +102,8 @@ END_DECL:
 static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_reporter_t* err) {
   mt_token_t* tok = *toks;
   
-  if (MT_TOK_COMP_PUNCT(tok, PCT_RPAREN)) return NULL;
+  // )
+  if (MT_TOK_COMP_PUNCT(tok, ')')) return NULL;
   
   mt_ast_node_t* param_list_nd = NULL;
   mt_ast_node_t* param_nd, *name_nd, *type_nd;
@@ -115,7 +116,7 @@ static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_
     tok = tok->next;
     
     // :
-    if (!MT_TOK_COMP_PUNCT(tok, PCT_COLON)) {
+    if (!MT_TOK_COMP_PUNCT(tok, ':')) {
       // No colon, so unnamed parameter, therefore the first identifier is the type.
       type = name;
       name = NULL;
@@ -149,8 +150,8 @@ static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_
     l_push(param_list_nd->sub, param_nd);
     
     // , or )
-    mt_punctuator_t p = mt_token_match_punct(err, tok, 2, PCT_COMMA, PCT_RPAREN);
-    if (!p || p == PCT_RPAREN) break;
+    mt_punctuator_t p = mt_token_match_punct(err, tok, 2, ',', ')');
+    if (!p || p == ')') break;
     tok = tok->next;
   } while (1);
   
