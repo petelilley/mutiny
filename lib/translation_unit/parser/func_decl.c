@@ -18,33 +18,33 @@ mt_ast_node_t* mt_parse_func_decl(mt_token_t** toks, mt_error_reporter_t* err) {
   
   do {
     // func
-    if (!mt_tok_kw_match(err, tok, 1, KW_FUNC)) break;
+    if (!mt_token_match_kw(err, tok, 1, KW_FUNC)) break;
     tok = tok->next;
     
     // Function name.
-    if (!mt_tok_match(err, tok, 1, TK_IDENTIFIER)) break;
+    if (!mt_token_match(err, tok, 1, TK_IDENTIFIER)) break;
     const char* name = tok->str_val;
     tok = tok->next;
     
     // :
-    if (!mt_tok_punct_match(err, tok, 1, PCT_COLON)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_COLON)) break;
     tok = tok->next;
     
     // (
-    if (!mt_tok_punct_match(err, tok, 1, PCT_LPAREN)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_LPAREN)) break;
     tok = tok->next;
     
     // Function parameters.
     param_list_nd = mt_parse_func_decl_param_list(&tok, err);
     
     // )
-    if (!mt_tok_punct_match(err, tok, 1, PCT_RPAREN)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_RPAREN)) break;
     tok = tok->next;
     
     const char* ret_type = "void";
     
     // ; or -> or {
-    mt_punctuator_t p = mt_tok_punct_match(err, tok, 3, PCT_SEMICOLON, PCT_ARROW, PCT_LBRACKET);
+    mt_punctuator_t p = mt_token_match_punct(err, tok, 3, PCT_SEMICOLON, PCT_ARROW, PCT_LBRACKET);
 
 END_DECL:
     if (!p) break;
@@ -59,12 +59,12 @@ END_DECL:
     else if (p == PCT_ARROW) {
       tok = tok->next;
       // Return type.
-      if (!mt_tok_match(err, tok, 1, TK_IDENTIFIER)) break;
+      if (!mt_token_match(err, tok, 1, TK_IDENTIFIER)) break;
       ret_type = tok->str_val;
       tok = tok->next;
     
       // ; or {
-      p = mt_tok_punct_match(err, tok, 2, PCT_SEMICOLON, PCT_LBRACKET);
+      p = mt_token_match_punct(err, tok, 2, PCT_SEMICOLON, PCT_LBRACKET);
       
       goto END_DECL;
     }
@@ -102,7 +102,7 @@ END_DECL:
 static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_reporter_t* err) {
   mt_token_t* tok = *toks;
   
-  if (mt_tok_punct_comp(tok, PCT_RPAREN)) return NULL;
+  if (MT_TOK_COMP_PUNCT(tok, PCT_RPAREN)) return NULL;
   
   mt_ast_node_t* param_list_nd = NULL;
   mt_ast_node_t* param_nd, *name_nd, *type_nd;
@@ -110,12 +110,12 @@ static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_
   char* name, *type;
   do {
     // Param Name
-    if (!mt_tok_match(err, tok, 1, TK_IDENTIFIER)) break;
+    if (!mt_token_match(err, tok, 1, TK_IDENTIFIER)) break;
     name = tok->str_val;
     tok = tok->next;
     
     // :
-    if (!mt_tok_punct_comp(tok, PCT_COLON)) {
+    if (!MT_TOK_COMP_PUNCT(tok, PCT_COLON)) {
       // No colon, so unnamed parameter, therefore the first identifier is the type.
       type = name;
       name = NULL;
@@ -124,7 +124,7 @@ static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_
       // Param Type.
       tok = tok->next;
       // TODO: Dedicated type parser.
-      if (!mt_tok_match(err, tok, 1, TK_IDENTIFIER)) break;
+      if (!mt_token_match(err, tok, 1, TK_IDENTIFIER)) break;
       type = tok->str_val;
       tok = tok->next;
     }
@@ -149,7 +149,7 @@ static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_
     l_push(param_list_nd->sub, param_nd);
     
     // , or )
-    mt_punctuator_t p = mt_tok_punct_match(err, tok, 2, PCT_COMMA, PCT_RPAREN);
+    mt_punctuator_t p = mt_token_match_punct(err, tok, 2, PCT_COMMA, PCT_RPAREN);
     if (!p || p == PCT_RPAREN) break;
     tok = tok->next;
   } while (1);

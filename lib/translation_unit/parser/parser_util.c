@@ -4,7 +4,9 @@
 #include <mutiny/error/syntax_error.h>
 #include <mutiny/mutiny.h>
 
-mt_token_kind_t mt_tok_match(mt_error_reporter_t* e, mt_token_t* t, size_t n, ...) {
+#define MAX_EXPECTED_TOKENS 3
+
+mt_token_kind_t mt_token_match(mt_error_reporter_t* e, mt_token_t* t, size_t n, ...) {
   if (!n) return TK_UNKNOWN;
   va_list args;
   va_start(args, n);
@@ -18,14 +20,14 @@ mt_token_kind_t mt_tok_match(mt_error_reporter_t* e, mt_token_t* t, size_t n, ..
   
   for (size_t i = 0; i < n; i++) {
     mt_token_kind_t k = kinds[i];
-    if (mt_tok_comp(t, k)) {
+    if (MT_TOK_COMP(t, k)) {
       return k;
     }
   }
   
   char expected[256] = "";
   
-  if (n < 4) {
+  if (n <= MAX_EXPECTED_TOKENS) {
     strcat(expected, ", expected ");
     
     for (size_t i = 0; i < n; i++) {
@@ -40,7 +42,7 @@ mt_token_kind_t mt_tok_match(mt_error_reporter_t* e, mt_token_t* t, size_t n, ..
   return TK_UNKNOWN;
 }
 
-mt_keyword_t mt_tok_kw_match(mt_error_reporter_t* e, mt_token_t* t, size_t n, ...) {
+mt_keyword_t mt_token_match_kw(mt_error_reporter_t* e, mt_token_t* t, size_t n, ...) {
   if (!n) return KW_UNKNOWN;
   va_list args;
   va_start(args, n);
@@ -54,15 +56,15 @@ mt_keyword_t mt_tok_kw_match(mt_error_reporter_t* e, mt_token_t* t, size_t n, ..
   
   for (size_t i = 0; i < n; i++) {
     mt_keyword_t k = kws[i];
-    if (mt_tok_kw_comp(t, k)) {
+    if (MT_TOK_COMP_KW(t, k)) {
       return k;
     }
   }
   
-  if (mt_tok_comp(t, TK_KEYWORD)) {
+  if (MT_TOK_COMP(t, TK_KEYWORD)) {
     char expected[256] = "";
     
-    if (n < 4) {
+    if (n <= MAX_EXPECTED_TOKENS) {
       strcat(expected, ", expected ");
       
       for (size_t i = 0; i < n; i++) {
@@ -72,7 +74,7 @@ mt_keyword_t mt_tok_kw_match(mt_error_reporter_t* e, mt_token_t* t, size_t n, ..
       }
     }
     
-    mt_report_syntax_error(e, t->file, t->line, t->col, t->len, "Unexpected %s%s", mt_token_kind_to_str(t->kind), expected);
+    mt_report_syntax_error(e, t->file, t->line, t->col, t->len, "Unexpected %s%s", mt_keyword_to_str(t->kw_val), expected);
   }
   else {
     mt_report_syntax_error(e, t->file, t->line, t->col, t->len, "Unexpected %s, expected keyword", mt_token_kind_to_str(t->kind));
@@ -81,7 +83,7 @@ mt_keyword_t mt_tok_kw_match(mt_error_reporter_t* e, mt_token_t* t, size_t n, ..
   return KW_UNKNOWN;
 }
 
-mt_punctuator_t mt_tok_punct_match(mt_error_reporter_t* e, mt_token_t* t, size_t n, ...) {
+mt_punctuator_t mt_token_match_punct(mt_error_reporter_t* e, mt_token_t* t, size_t n, ...) {
   if (!n) return PCT_UNKNOWN;
   va_list args;
   va_start(args, n);
@@ -95,15 +97,15 @@ mt_punctuator_t mt_tok_punct_match(mt_error_reporter_t* e, mt_token_t* t, size_t
   
   for (size_t i = 0; i < n; i++) {
     mt_punctuator_t p = puncts[i];
-    if (mt_tok_punct_comp(t, p)) {
+    if (MT_TOK_COMP_PUNCT(t, p)) {
       return p;
     }
   }
   
-  if (mt_tok_comp(t, TK_PUNCTUATOR)) {
+  if (MT_TOK_COMP(t, TK_PUNCTUATOR)) {
     char expected[256] = "";
     
-    if (n < 4) {
+    if (n <= MAX_EXPECTED_TOKENS) {
       strcat(expected, ", expected ");
       
       for (size_t i = 0; i < n; i++) {

@@ -4,48 +4,50 @@
 #include <mutiny/mutiny.h>
 
 /**
- * @brief Compares the start of a string to another string.
+ * @brief Checks if a string begins with another string.
+ * @param s1 The string to compare.
+ * @param s2 The prefix to check for.
  */
-#define MT_STR_START(x, y) (strncmp((x), (y), strlen(y)) == 0)
+#define MT_STR_START(s1, s2) \
+  (strncmp((s1), (s2), strlen(s2)) == 0)
 
 /**
- * @brief Compares the end of a string to another string.
+ * @brief Checks if a string ends with another string.
+ * @param s1 The string to compare.
+ * @param s2 The suffix to check for.
  */
-#define MT_STR_END(x, y)   ((strlen(x) >= strlen(y)) && (strncmp((x) + strlen(x) - strlen(y), (y), strlen(y)) == 0))
+#define MT_STR_END(s1, s2) \
+  ((strlen(s1) >= strlen(s2)) && (strncmp((s1) + strlen(s1) - strlen(s2), (s2), strlen(s2)) == 0))
 
 #include <mutiny/translation_unit/lexer/token.h>
 
+/**
+ * @brief Compares a token's kind.
+ * @param t The token to compare.
+ * @param k The kind to compare.
+ */
+#define MT_TOK_COMP(t, k) \
+  (t->kind == k)
+
+/**
+ * @brief Checks is the token is a keyword and compares its keyword value.
+ * @param t The token to compare.
+ * @param k The keyword to compare.
+ * @return True if the token is a keyword and its keyword value matches the given keyword, false otherwise.
+ */
+#define MT_TOK_COMP_KW(t, k) \
+  (MT_TOK_COMP(t, TK_KEYWORD) && t->kw_val == k)
+
+/**
+ * @brief Checks if the token is a punctuator and compares its punctuator value.
+ * @param t The token to compare.
+ * @param p The punctuator to compare.
+ * @return True if the token is a punctuator and its punctuator value matches the given punctuator, false otherwise.
+ */
+#define MT_TOK_COMP_PUNCT(t, p) \
+  (MT_TOK_COMP(t, TK_PUNCTUATOR) && t->punct_val == p)
+
 struct _mt_error_reporter;
-
-/**
-  * @brief Compares a token's kind.
-  * @param token The token to compare.
-  * @param kind The kind to compare.
-  * @return True if the token's kind matches the given kind, false otherwise.
-  */
-static inline bool mt_tok_comp(mt_token_t* token, mt_token_kind_t kind) {
-  return token->kind == kind;
-}
-
-/**
-  * @brief Checks if the token is a keyword and compares its keyword value.
-  * @param token The token to compare.
-  * @param keyword The keyword to compare.
-  * @return True if the token is a keyword and its keyword value matches the given keyword, false otherwise.
-  */
-static inline bool mt_tok_kw_comp(mt_token_t* token, mt_keyword_t keyword) {
-  return mt_tok_comp(token, TK_KEYWORD) && token->kw_val == keyword;
-}
-
-/**
-  * @brief Checks if the token is a punctuator and compares its punctuator value.
-  * @param token The token to compare.
-  * @param punct The punctuator to compare.
-  * @return True if the token is a punctuator and its punctuator value matches the given punctuator, false otherwise.
-  */
-static inline bool mt_tok_punct_comp(mt_token_t* token, mt_punctuator_t punct) {
-  return mt_tok_comp(token, TK_PUNCTUATOR) && token->punct_val == punct;
-}
 
 /**
  * @brief Compares a token's kind. Logs a syntax error upon failure.
@@ -55,7 +57,7 @@ static inline bool mt_tok_punct_comp(mt_token_t* token, mt_punctuator_t punct) {
  * @param ... The kinds to compare.
  * @return The matching kind, or TK_UNKNOWN if no match was found.
  */
-mt_token_kind_t mt_tok_match(struct _mt_error_reporter* error_reporter, mt_token_t* token, size_t kind_num, ...);
+mt_token_kind_t mt_token_match(struct _mt_error_reporter* error_reporter, mt_token_t* token, size_t kind_num, ...);
 
 /**
   * @brief Checks if the token is a keyword and compares its keyword value. Logs a syntax error upon failure.
@@ -65,7 +67,7 @@ mt_token_kind_t mt_tok_match(struct _mt_error_reporter* error_reporter, mt_token
   * @param ... The keywords to compare.
   * @return The matching keyword, or KW_UNKNOWN if no match was found.
   */
-mt_keyword_t mt_tok_kw_match(struct _mt_error_reporter* error_reporter, mt_token_t* token, size_t kw_num, ...);
+mt_keyword_t mt_token_match_kw(struct _mt_error_reporter* error_reporter, mt_token_t* token, size_t kw_num, ...);
 
 /**
   * @brief Checks if the token is a punctuator and compares its punctuator value. Logs a syntax error upon failure.
@@ -74,6 +76,6 @@ mt_keyword_t mt_tok_kw_match(struct _mt_error_reporter* error_reporter, mt_token
   * @param punct_num The number of punctuators to compare.
   * @return The matching punctuator, or PCT_UNKNOWN if no match was found.
   */
-mt_punctuator_t mt_tok_punct_match(struct _mt_error_reporter* error_reporter, mt_token_t* token, size_t punct_num, ...);
+mt_punctuator_t mt_token_match_punct(struct _mt_error_reporter* error_reporter, mt_token_t* token, size_t punct_num, ...);
 
 #endif // __MT_PARSER_UTIL_H__

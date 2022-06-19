@@ -7,7 +7,7 @@
 struct _mt_settings;
 struct _mt_file;
 struct _mt_translation_unit;
-struct _mt_ast;
+struct _mt_ast_node;
 
 /**
  * @brief Data structure representing a compiler.
@@ -16,7 +16,7 @@ typedef struct _mt_compiler {
   struct _mt_settings* settings;
   list_t(struct _mt_file*) files;
   list_t(struct _mt_translation_unit*) t_unit;
-  struct _mt_ast* ast;
+  struct _mt_ast_node* ast;
 } mt_compiler_t;
 
 /**

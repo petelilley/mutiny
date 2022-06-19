@@ -23,24 +23,21 @@ void mt_translation_unit_deinit(mt_translation_unit_t* tu) {
   if (!tu) return;
   
   if (tu->tokens) {
-    // TODO Deinit tokens.
-  }
-  if (tu->ast) {
-    // TODO Deinit ast.
+    mt_token_deinit(tu->tokens);
   }
   free(tu);
 }
 
 bool mt_translation_unit_parse_exec(mt_translation_unit_t* tu) {
-  bool tok_res = mt_translation_unit_tokenize(tu);
-  mt_log_dump(&tu->error_reporter.err_log);
-  if (!tok_res) {
+  mt_translation_unit_tokenize(tu);
+  if (tu->error_reporter.err_num > 0) {
+    mt_log_dump(&tu->error_reporter.err_log);
     return false;
   }
   
-  bool parse_res = mt_translation_unit_parse_tokens(tu);
-  mt_log_dump(&tu->error_reporter.err_log);
-  if (!parse_res) {
+  mt_translation_unit_parse_tokens(tu);
+  if (tu->error_reporter.err_num > 0) {
+    mt_log_dump(&tu->error_reporter.err_log);
     return false;
   }
   

@@ -24,7 +24,7 @@ static mt_ast_node_t* mt_parse_continue_stmt(mt_token_t** toks, mt_error_reporte
 mt_ast_node_t* mt_parse_stmt(mt_token_t** toks, mt_error_reporter_t* err) {
   mt_token_t* tok = *toks;
   
-  mt_token_kind_t kind = mt_tok_match(err, tok, 7, TK_IDENTIFIER, TK_KEYWORD, TK_PUNCTUATOR, TK_INTEGER, TK_FLOAT, TK_STRING, TK_CHAR);
+  mt_token_kind_t kind = mt_token_match(err, tok, 7, TK_IDENTIFIER, TK_KEYWORD, TK_PUNCTUATOR, TK_INTEGER, TK_FLOAT, TK_STRING, TK_CHAR);
   if (!kind) return NULL;
 
   mt_ast_node_t* stmt = NULL;
@@ -32,7 +32,7 @@ mt_ast_node_t* mt_parse_stmt(mt_token_t** toks, mt_error_reporter_t* err) {
   do {
     if (kind == TK_IDENTIFIER) {
         // :
-        if (mt_tok_punct_comp(tok->next, PCT_COLON)) {
+        if (MT_TOK_COMP_PUNCT(tok->next, PCT_COLON)) {
           // Label
           stmt = mt_parse_label(&tok, err);
           puts("label");
@@ -44,7 +44,7 @@ mt_ast_node_t* mt_parse_stmt(mt_token_t** toks, mt_error_reporter_t* err) {
         }
     }
     else if (kind == TK_KEYWORD) {
-      mt_keyword_t kw = mt_tok_kw_match(err, tok, 9, KW_VAR, KW_IF, KW_WHILE, KW_FOR, KW_SWITCH, KW_GOTO, KW_RETURN, KW_BREAK, KW_CONTINUE);
+      mt_keyword_t kw = mt_token_match_kw(err, tok, 9, KW_VAR, KW_IF, KW_WHILE, KW_FOR, KW_SWITCH, KW_GOTO, KW_RETURN, KW_BREAK, KW_CONTINUE);
       if (!kw) break;
       
       // var
@@ -94,7 +94,7 @@ mt_ast_node_t* mt_parse_stmt(mt_token_t** toks, mt_error_reporter_t* err) {
       }
     }
     else {
-      if (kind == TK_PUNCTUATOR && mt_tok_punct_comp(tok, PCT_SEMICOLON)) {
+      if (kind == TK_PUNCTUATOR && MT_TOK_COMP_PUNCT(tok, PCT_SEMICOLON)) {
         stmt = NULL;
         tok = tok->next;
         break;
@@ -116,14 +116,14 @@ mt_ast_node_t* mt_parse_compound_stmt(mt_token_t** toks, mt_error_reporter_t* er
   
   do {
     // {
-    if (!mt_tok_punct_match(err, tok, 1, PCT_LBRACKET)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_LBRACKET)) break;
     tok = tok->next;
     
     // Statements.
     stmt_list_nd = mt_parse_stmt_list(&tok, err);
     
     // }
-    if (!mt_tok_punct_match(err, tok, 1, PCT_RBRACKET)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_RBRACKET)) break;
     tok = tok->next;
   } while (0);
   
@@ -134,7 +134,7 @@ mt_ast_node_t* mt_parse_compound_stmt(mt_token_t** toks, mt_error_reporter_t* er
 static mt_ast_node_t* mt_parse_stmt_list(mt_token_t** toks, mt_error_reporter_t* err) {
   mt_token_t* tok = *toks;
   
-  if (mt_tok_punct_comp(tok, PCT_RBRACKET)) return NULL;
+  if (MT_TOK_COMP_PUNCT(tok, PCT_RBRACKET)) return NULL;
   
   mt_ast_node_t* comp_stmt_nd = NULL;
   mt_ast_node_t* stmt_nd;
@@ -152,7 +152,7 @@ static mt_ast_node_t* mt_parse_stmt_list(mt_token_t** toks, mt_error_reporter_t*
     }
     
     // }
-    if (mt_tok_punct_comp(tok, PCT_RBRACKET)) break;
+    if (MT_TOK_COMP_PUNCT(tok, PCT_RBRACKET)) break;
   } while (1);
   
   *toks = tok;
@@ -168,12 +168,12 @@ static mt_ast_node_t* mt_parse_label(mt_token_t** toks, mt_error_reporter_t* err
 
   do {
     // Name.
-    if (!mt_tok_match(err, tok, 1, TK_IDENTIFIER)) break;
+    if (!mt_token_match(err, tok, 1, TK_IDENTIFIER)) break;
     name = tok->str_val;
     tok = tok->next;
     
     // :
-    if (!mt_tok_punct_match(err, tok, 1, PCT_COLON)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_COLON)) break;
     tok = tok->next;
     
     label_nd = mt_ast_node_init(ND_LABEL);
@@ -191,17 +191,17 @@ static mt_ast_node_t* mt_parse_if_stmt(mt_token_t** toks, mt_error_reporter_t* e
 
   do {
     // if
-    if (!mt_tok_kw_match(err, tok, 1, KW_IF)) break;
+    if (!mt_token_match_kw(err, tok, 1, KW_IF)) break;
     tok = tok->next;
     
-    if (!mt_tok_punct_match(err, tok, 1, PCT_LPAREN)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_LPAREN)) break;
     tok = tok->next;
     
     // Expression.
     expr_nd = mt_parse_expr(&tok, err);
     if (!expr_nd) break;
     
-    if (!mt_tok_punct_match(err, tok, 1, PCT_LPAREN)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_LPAREN)) break;
     tok = tok->next;
     
     stmt_nd = mt_parse_stmt(&tok, err);
@@ -229,17 +229,17 @@ static mt_ast_node_t* mt_parse_while_stmt(mt_token_t** toks, mt_error_reporter_t
 
   do {
     // while
-    if (!mt_tok_kw_match(err, tok, 1, KW_WHILE)) break;
+    if (!mt_token_match_kw(err, tok, 1, KW_WHILE)) break;
     tok = tok->next;
     
-    if (!mt_tok_punct_match(err, tok, 1, PCT_LPAREN)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_LPAREN)) break;
     tok = tok->next;
     
     // Expression.
     expr_nd = mt_parse_expr(&tok, err);
     if (!expr_nd) break;
     
-    if (!mt_tok_punct_match(err, tok, 1, PCT_LPAREN)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_LPAREN)) break;
     tok = tok->next;
     
     stmt_nd = mt_parse_stmt(&tok, err);
@@ -286,14 +286,14 @@ static mt_ast_node_t* mt_parse_goto_stmt(mt_token_t** toks, mt_error_reporter_t*
   char* name;
 
   do {
-    if (!mt_tok_kw_match(err, tok, 1, KW_GOTO)) break;
+    if (!mt_token_match_kw(err, tok, 1, KW_GOTO)) break;
     tok = tok->next;
 
-    if (!mt_tok_match(err, tok, 1, TK_IDENTIFIER)) break;
+    if (!mt_token_match(err, tok, 1, TK_IDENTIFIER)) break;
     name = tok->str_val;
     tok = tok->next;
 
-    if (!mt_tok_punct_match(err, tok, 1, PCT_SEMICOLON)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_SEMICOLON)) break;
     tok = tok->next;
 
     goto_nd = mt_ast_node_init(ND_STMT_GOTO);
@@ -311,18 +311,18 @@ static mt_ast_node_t* mt_parse_return_stmt(mt_token_t** toks, mt_error_reporter_
 
   do {
     // return
-    if (!mt_tok_kw_match(err, tok, 1, KW_RETURN)) break;
+    if (!mt_token_match_kw(err, tok, 1, KW_RETURN)) break;
     tok = tok->next;
 
     // ;
-    if (mt_tok_punct_comp(tok, PCT_SEMICOLON)) {
+    if (MT_TOK_COMP_PUNCT(tok, PCT_SEMICOLON)) {
       tok = tok->next;
     }
     // Expression.
     else {
       expr_nd = mt_parse_expr(&tok, err);
       if (!expr_nd) break;
-      if (!mt_tok_punct_match(err, tok, 1, PCT_SEMICOLON)) break;
+      if (!mt_token_match_punct(err, tok, 1, PCT_SEMICOLON)) break;
       tok = tok->next;
     }
     
@@ -342,11 +342,11 @@ static mt_ast_node_t* mt_parse_break_stmt(mt_token_t** toks, mt_error_reporter_t
 
   do {
     // break
-    if (!mt_tok_kw_match(err, tok, 1, KW_BREAK)) break;
+    if (!mt_token_match_kw(err, tok, 1, KW_BREAK)) break;
     tok = tok->next;
 
     // ;
-    if (!mt_tok_punct_match(err, tok, 1, PCT_SEMICOLON)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_SEMICOLON)) break;
     tok = tok->next;
     
     break_nd = mt_ast_node_init(ND_STMT_BREAK);
@@ -362,11 +362,11 @@ static mt_ast_node_t* mt_parse_continue_stmt(mt_token_t** toks, mt_error_reporte
 
   do {
     // continue
-    if (!mt_tok_kw_match(err, tok, 1, KW_CONTINUE)) break;
+    if (!mt_token_match_kw(err, tok, 1, KW_CONTINUE)) break;
     tok = tok->next;
 
     // ;
-    if (!mt_tok_punct_match(err, tok, 1, PCT_SEMICOLON)) break;
+    if (!mt_token_match_punct(err, tok, 1, PCT_SEMICOLON)) break;
     tok = tok->next;
     
     continue_nd = mt_ast_node_init(ND_STMT_CONTINUE);

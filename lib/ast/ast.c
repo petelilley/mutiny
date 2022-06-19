@@ -15,10 +15,6 @@ mt_ast_node_t* mt_ast_node_init(mt_ast_type_t type) {
 void mt_ast_node_deinit(mt_ast_node_t* ast) {
   if (!ast) return;
   
-  if (ast->str_val) {
-    free(ast->str_val);
-  }
-  
   for (size_t i = 0; i < l_size(ast->sub); i++) {
     mt_ast_node_deinit(l_at(ast->sub, i));
   }

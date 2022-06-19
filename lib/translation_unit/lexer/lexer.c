@@ -18,7 +18,7 @@
 // Reads the next token in the file.
 static mt_token_t* next_token(mt_file_t* file, mt_error_reporter_t* error_reporter);
 
-bool mt_translation_unit_tokenize(mt_translation_unit_t* t_unit) {
+void mt_translation_unit_tokenize(mt_translation_unit_t* t_unit) {
   mt_token_t* first = NULL;
   mt_token_t* head = NULL;
   
@@ -39,10 +39,9 @@ bool mt_translation_unit_tokenize(mt_translation_unit_t* t_unit) {
     }
   }
   if (!first) {
-    // TODO Warning. "empty file"
+    mt_report_syntax_error(&t_unit->error_reporter, t_unit->file, 0, 0, 0, "Translation Unit is Empty");
   }
   t_unit->tokens = first;
-  return true;
 }
 
 static mt_token_t* next_token(mt_file_t* f, mt_error_reporter_t* e) {
@@ -101,6 +100,9 @@ static mt_token_t* next_token(mt_file_t* f, mt_error_reporter_t* e) {
   if (t) {
     printf("[%ld-%ld_%ld][%ld] tok: ", t->line, t->col, t->len, t->fpos);
     switch (t->kind) {
+      case TK_UNKNOWN:
+        printf("UNKNOWN");
+        break;
       case TK_IDENTIFIER:
         printf("id, \"%s\"\n", t->str_val);
         break;

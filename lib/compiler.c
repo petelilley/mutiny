@@ -75,7 +75,7 @@ void mt_compiler_deinit(mt_compiler_t* c) {
   l_deinit(c->t_unit);
   
   if (c->ast) {
-    // TODO Deinit ast.
+    mt_ast_node_deinit(c->ast);
   }
   
   free(c);

@@ -9,6 +9,6 @@ struct _mt_translation_unit;
  * @brief Tokenizes a translation unit.
  * @param translation_unit The translation unit to tokenize.
  */
-bool mt_translation_unit_tokenize(struct _mt_translation_unit* translation_unit);
+void mt_translation_unit_tokenize(struct _mt_translation_unit* translation_unit);
 
 #endif // __MT_LEXER_H__

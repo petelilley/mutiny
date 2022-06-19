@@ -20,7 +20,7 @@ enum {
 typedef unsigned mt_type_qual_t;
 */
 
-bool mt_translation_unit_parse_tokens(mt_translation_unit_t* t_unit) {
+void mt_translation_unit_parse_tokens(mt_translation_unit_t* t_unit) {
   t_unit->ast = mt_ast_node_init(ND_GLOBAL_SCOPE);
   
   mt_token_t* tok = t_unit->tokens;
@@ -34,6 +34,4 @@ bool mt_translation_unit_parse_tokens(mt_translation_unit_t* t_unit) {
   if (!l_size(t_unit->ast->sub)) {
     // TODO: Error: translation unit required to contain at least one declaration.
   }
-  
-  return true;
 }
