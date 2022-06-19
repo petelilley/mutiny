@@ -12,7 +12,7 @@ struct _mt_file;
  * @param file The file where the error occurred.
  * @param line The line where the error occurred.
  * @param column The column where the error occurred.
- * @param len The length of the unexpected token.
+ * @param len The length of the token concerned.
  * @param fmt The error message (Formatted string).
  */
 void mt_report_syntax_error(struct _mt_error_reporter* error_reporter, struct _mt_file* file, size_t line, size_t col, size_t len, const char* fmt, ...);

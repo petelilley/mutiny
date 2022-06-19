@@ -4,6 +4,7 @@
 #include <mutiny/translation_unit/translation_unit.h>
 #include <mutiny/translation_unit/parser/parser_util.h>
 #include <mutiny/error/syntax_error.h>
+#include <mutiny/error/syntax_warning.h>
 #include <mutiny/settings.h>
 #include <mutiny/util/filesystem.h>
 #include <mutiny/util/log.h>
@@ -38,8 +39,8 @@ void mt_translation_unit_tokenize(mt_translation_unit_t* t_unit) {
       break;
     }
   }
-  if (!first) {
-    mt_report_syntax_error(&t_unit->error_reporter, t_unit->file, 0, 0, 0, "Translation Unit is Empty");
+  if (!first || first->kind == TK_EOF) {
+    mt_report_syntax_warning(&t_unit->error_reporter, t_unit->file, 0, 0, 0, "Translation unit is empty");
   }
   t_unit->tokens = first;
 }
@@ -90,7 +91,7 @@ static mt_token_t* next_token(mt_file_t* f, mt_error_reporter_t* e) {
       break;
     }
     else {
-      mt_report_syntax_error(e, f, f->cur_line, f->cur_col, 1, "Invalid Token `%c'", c);
+      mt_report_syntax_error(e, f, f->cur_line, f->cur_col, 1, "Invalid token `%c'", c);
       mt_file_getc(f);
       continue;
     }

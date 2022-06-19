@@ -30,12 +30,18 @@ void mt_translation_unit_deinit(mt_translation_unit_t* tu) {
 
 bool mt_translation_unit_parse_exec(mt_translation_unit_t* tu) {
   mt_translation_unit_tokenize(tu);
+  if (tu->error_reporter.warn_num > 0) {
+    mt_log_dump(&tu->error_reporter.warn_log);
+  }
   if (tu->error_reporter.err_num > 0) {
     mt_log_dump(&tu->error_reporter.err_log);
     return false;
   }
   
   mt_translation_unit_parse_tokens(tu);
+  if (tu->error_reporter.warn_num > 0) {
+    mt_log_dump(&tu->error_reporter.warn_log);
+  }
   if (tu->error_reporter.err_num > 0) {
     mt_log_dump(&tu->error_reporter.err_log);
     return false;
