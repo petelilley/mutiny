@@ -45,8 +45,7 @@ typedef enum _mt_ast_node_type {
   ND_STMT_ASSIGN,           // Variable assignment statement.
   ND_STMT_MEMBER,           // Member access statement.
   
-  ND_EXPR_CONST,            // Constant expression.
-  ND_EXPR_EVAL,             // Evaluated expression.
+  ND_EXPR,                  // Expression.
 
   ND_ID,                    // Identifier.
   ND_INT_LITERAL,           // Integer literal.
@@ -57,7 +56,7 @@ typedef enum _mt_ast_node_type {
   ND_OP_ARITH,              // Arithmetic operator.
   ND_OP_ASSIGN,             // Assignment operator.
   ND_OP_LOG,                // Logical operator.
-  ND_OP_CMP,               // Comparison operator.
+  ND_OP_CMP,                // Comparison operator.
   
   ND_LABEL,                 // Label.
 } mt_ast_type_t;
@@ -113,6 +112,16 @@ typedef enum _mt_operator {
  * @return The operator, or OP_UNKNOWN if the punctuator is not an operator.
  */
 mt_operator_t mt_punct_to_operator(mt_punctuator_t punct);
+
+#define MT_OP_PREC_HIGHEST 0
+#define MT_OP_PREC_LOWEST 12
+
+/**
+ * @brief Returns an operator's precedence.
+ * @param op The operator.
+ * @return The operator's precedence.
+ */
+size_t mt_get_operator_precedence(mt_operator_t op);
 
 /**
  * @brief An AST node.

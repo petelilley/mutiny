@@ -40,6 +40,8 @@ mt_ast_node_t* mt_parse_stmt(mt_token_t** toks, mt_error_reporter_t* err) {
         else {
           // Expression.
           stmt = mt_parse_expr(&tok, err);
+          if (!mt_token_match_punct(err, tok, 1, ';')) break;
+          tok = tok->next;
           puts("expression");
         }
     }
@@ -94,14 +96,16 @@ mt_ast_node_t* mt_parse_stmt(mt_token_t** toks, mt_error_reporter_t* err) {
       }
     }
     else {
-      if (kind == TK_PUNCTUATOR && MT_TOK_COMP_PUNCT(tok, ';')) {
+      if (MT_TOK_COMP_PUNCT(tok, ';')) {
         stmt = NULL;
         tok = tok->next;
         break;
       }
       // Expression.
       stmt = mt_parse_expr(&tok, err);
-        puts("expression 2");
+      if (!mt_token_match_punct(err, tok, 1, ';')) break;
+      tok = tok->next;
+      puts("expression 2");
     }
   } while (0);
 

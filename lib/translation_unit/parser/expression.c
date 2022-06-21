@@ -25,6 +25,8 @@ typedef struct _mt_expr_fragment {
   } data;
 } mt_expr_fragment_t;
 
+static mt_ast_node_t* mt_fragments_to_expr(void* fragments, mt_error_reporter_t* error_reporter);
+
 static mt_ast_node_t* mt_parse_expr_unit(mt_token_t** toks, mt_error_reporter_t* err) {
   mt_token_t* tok = *toks;
 
@@ -142,10 +144,10 @@ static mt_ast_node_t* mt_parse_operator(mt_token_t** toks, mt_error_reporter_t* 
   return op_nd;
 }
 
+void print_node(mt_ast_node_t* nd, int n);
+
 mt_ast_node_t* mt_parse_expr(mt_token_t** toks, mt_error_reporter_t* err) {
   mt_token_t* tok = *toks;
-  
-  mt_ast_node_t* expr_nd = NULL;
 
   list_t(mt_expr_fragment_t) expr_frags;
   l_init(expr_frags, mt_expr_fragment_t);
@@ -183,8 +185,68 @@ mt_ast_node_t* mt_parse_expr(mt_token_t** toks, mt_error_reporter_t* err) {
     }
   }
 
-  // TODO: Generate AST node representing the expression from the fragments.
+  mt_ast_node_t* expr_nd = mt_fragments_to_expr(&expr_frags, err);
+
+  l_deinit(expr_frags);
+
+  print_node(expr_nd, 0);
 
   *toks = tok;
   return NULL;
+}
+
+void print_node(mt_ast_node_t* nd, int n) {
+  printf("%.*s%d\n", n, "                                                                                      ", nd->type);
+  for (size_t i = 0; i < l_size(nd->sub); i++) {
+    print_node(l_at(nd->sub, i), n + 4);
+  }
+}
+
+static mt_ast_node_t* mt_fragments_to_expr(void* _frags, mt_error_reporter_t* err) {
+  list_t(mt_expr_fragment_t)* frags = _frags;
+  
+  if (l_size(*frags) == 1) return l_at(*frags, 0).data.unit_nd;
+  
+  unsigned highest_prec = MT_OP_PREC_LOWEST;
+  size_t highest_prec_i = 0;
+
+  for (size_t i = 1; i < l_size(*frags); i += 2) {
+    mt_expr_fragment_t* f = &l_at(*frags, i);
+    unsigned prec = mt_get_operator_precedence((mt_operator_t)f->data.op_nd->i_val);
+    if (prec < highest_prec) {
+      highest_prec = prec;
+      highest_prec_i = i;
+    }
+  }
+  
+  mt_ast_node_t* lhs_nd = l_at(*frags, highest_prec_i - 1).data.unit_nd;
+  mt_ast_node_t* op_nd = l_at(*frags, highest_prec_i).data.op_nd;
+  mt_ast_node_t* rhs_nd = l_at(*frags, highest_prec_i + 1).data.unit_nd;
+  
+  mt_ast_node_t* unit_nd = mt_ast_node_init(ND_EXPR);
+  l_push(unit_nd->sub, lhs_nd);
+  l_push(unit_nd->sub, op_nd);
+  l_push(unit_nd->sub, rhs_nd);
+  
+  if (l_size(*frags) == 3) {
+    return unit_nd;
+  }
+  
+  list_t(mt_expr_fragment_t) new_frags;
+  l_init(new_frags, mt_expr_fragment_t);
+  
+  for (size_t i = 0; i < l_size(*frags); i++) {
+    if (i == highest_prec_i - 1) {
+      mt_expr_fragment_t f = { .type = EXPR_FRAG_UNIT, .data.unit_nd = unit_nd };
+      l_push(new_frags, f);
+      i += 2;
+    }
+    else {
+      l_push(new_frags, l_at(*frags, i));
+    }
+  }
+
+  mt_ast_node_t* expr_nd = mt_fragments_to_expr(&new_frags, err);
+  l_deinit(new_frags);
+  return expr_nd;
 }

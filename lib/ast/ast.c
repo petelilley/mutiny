@@ -44,6 +44,65 @@ mt_operator_t mt_punct_to_operator(mt_punctuator_t p) {
   }
 }
 
+size_t mt_get_operator_precedence(mt_operator_t op) {
+  switch (op) {
+    case OP_PRE_INC:
+    case OP_PRE_DEC:
+    case OP_MEMBER:
+    case OP_ARRAY:
+      return 0;
+    case OP_BIT_NOT:
+    case OP_LOG_NOT:
+    case OP_REF:
+    case OP_DEREF:
+    case OP_POST_INC:
+    case OP_POST_DEC:
+    case OP_POS:
+    case OP_NEG:
+      return 1;
+    case OP_MUL:
+    case OP_DIV:
+    case OP_MOD:
+      return 2;
+    case OP_ADD:
+    case OP_MIN:
+      return 3;
+    case OP_BIT_LSH:
+    case OP_BIT_RSH:
+      return 4;
+    case OP_CMP_GT:
+    case OP_CMP_GE:
+    case OP_CMP_LT:
+    case OP_CMP_LE:
+      return 5;
+    case OP_CMP_EQ:
+    case OP_CMP_NE:
+      return 6;
+    case OP_BIT_AND:
+      return 7;
+    case OP_BIT_XOR:
+      return 8;
+    case OP_BIT_OR:
+      return 9;
+    case OP_LOG_AND:
+      return 10;
+    case OP_LOG_OR:
+      return 11;
+    case OP_ASGN:
+    case OP_ASGN_ADD:
+    case OP_ASGN_MIN:
+    case OP_ASGN_MUL:
+    case OP_ASGN_DIV:
+    case OP_ASGN_MOD:
+    case OP_ASGN_BIT_AND:
+    case OP_ASGN_BIT_OR:
+    case OP_ASGN_BIT_XOR:
+    case OP_ASGN_BIT_LSH:
+    case OP_ASGN_BIT_RSH:
+      return 12;
+  }
+}
+
 mt_ast_node_t* mt_ast_node_init(mt_ast_type_t type) {
   mt_ast_node_t* ast = malloc(sizeof(mt_ast_node_t));
   memset(ast, 0, sizeof(mt_ast_node_t));
