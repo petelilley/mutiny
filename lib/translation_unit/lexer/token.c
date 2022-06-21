@@ -5,10 +5,6 @@
 static const char* kw_strs[] = {
   [KW_IMPORT]   = "import",
   
-  [KW_NOT]      = "not",
-  [KW_AND]      = "and",
-  [KW_OR]       = "or",
-  
   [KW_ENUM]     = "enum",
   [KW_STRUCT]   = "struct",
   [KW_FUNC]     = "func",
@@ -47,7 +43,8 @@ const char* mt_keyword_to_str(mt_keyword_t k) {
 
 ssize_t mt_str_to_keyword(const char* s, size_t l) {
   for (size_t i = 1; i < sizeof(kw_strs) / sizeof(char*); ++i) {
-    if (!strncmp(s, kw_strs[i], l)) {
+    const char* kw = kw_strs[i];
+    if (strlen(kw) == l && !strncmp(s, kw, l)) {
       return i;
     }
   }
@@ -65,7 +62,8 @@ static const char* kind_strs[] = {
 };
 
 const char* mt_token_kind_to_str(mt_token_kind_t k) {
-  return kind_strs[k];
+  const char* s = kind_strs[k];
+  return s;
 }
 
 static const char* punct_strs[] = {

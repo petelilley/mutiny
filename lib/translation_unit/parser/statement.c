@@ -40,8 +40,9 @@ mt_ast_node_t* mt_parse_stmt(mt_token_t** toks, mt_error_reporter_t* err) {
         else {
           // Expression.
           stmt = mt_parse_expr(&tok, err);
-          if (!mt_token_match_punct(err, tok, 1, ';')) break;
+          bool sc = mt_token_match_punct(err, tok, 1, ';');
           tok = tok->next;
+          if (!sc) break;
           puts("expression");
         }
     }
@@ -103,8 +104,10 @@ mt_ast_node_t* mt_parse_stmt(mt_token_t** toks, mt_error_reporter_t* err) {
       }
       // Expression.
       stmt = mt_parse_expr(&tok, err);
-      if (!mt_token_match_punct(err, tok, 1, ';')) break;
+      if (!stmt) break;
+      bool sc = mt_token_match_punct(err, tok, 1, ';');
       tok = tok->next;
+      if (!sc) break;
       puts("expression 2");
     }
   } while (0);
@@ -125,6 +128,7 @@ mt_ast_node_t* mt_parse_compound_stmt(mt_token_t** toks, mt_error_reporter_t* er
     
     // Statements.
     stmt_list_nd = mt_parse_stmt_list(&tok, err);
+    if (!stmt_list_nd) break;
     
     // }
     if (!mt_token_match_punct(err, tok, 1, '}')) break;
@@ -147,14 +151,13 @@ static mt_ast_node_t* mt_parse_stmt_list(mt_token_t** toks, mt_error_reporter_t*
   do {
     // Statement.
     stmt_nd = mt_parse_stmt(&tok, err);
+    if (!stmt_nd) break;
     
     if (!comp_stmt_nd) {
       comp_stmt_nd = mt_ast_node_init(ND_STMT_COMPOUND);
     }
     
-    if (stmt_nd) {
-      l_push(comp_stmt_nd->sub, stmt_nd);
-    }
+    l_push(comp_stmt_nd->sub, stmt_nd);
     
     // }
     if (MT_TOK_COMP_PUNCT(tok, '}')) break;

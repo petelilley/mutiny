@@ -130,21 +130,24 @@ static mt_ast_node_t* mt_parse_operator(mt_token_t** toks, mt_error_reporter_t* 
         op_nd = mt_ast_node_init(ND_OP_LOG);
         break;
       // --- Not an operator ---
-      default:
+      default: {
+        mt_operator_t op = mt_punct_to_operator(p);
+        if (op) {
+          mt_report_syntax_error(err, tok->file, tok->line, tok->col, tok->len, "Invalid operator `%s'", mt_punct_to_str(p));
+        }
         break;
+      }
+    }
+    
+    if (op_nd) {
+      op_nd->i_val = mt_punct_to_operator(tok->punct_val);
+      tok = tok->next;
     }
   } while (0);
-  
-  if (op_nd) {
-    op_nd->i_val = mt_punct_to_operator(tok->punct_val);
-    tok = tok->next;
-  }
   
   *toks = tok;
   return op_nd;
 }
-
-void print_node(mt_ast_node_t* nd, int n);
 
 mt_ast_node_t* mt_parse_expr(mt_token_t** toks, mt_error_reporter_t* err) {
   mt_token_t* tok = *toks;
@@ -165,6 +168,11 @@ mt_ast_node_t* mt_parse_expr(mt_token_t** toks, mt_error_reporter_t* err) {
       expect_unit = false;
     }
     else {
+      if (!mt_token_match(err, tok, 1, TK_PUNCTUATOR)) {
+        expect_unit = true;
+        break;
+      }
+      
       tmp_nd = mt_parse_operator(&tok, err);
       if (!tmp_nd) break;
       
@@ -174,32 +182,23 @@ mt_ast_node_t* mt_parse_expr(mt_token_t** toks, mt_error_reporter_t* err) {
     
     l_push(expr_frags, f);
   } while (1);
+
+  mt_ast_node_t* expr_nd = NULL;
+
+  if (!expect_unit) {
+    if (l_size(expr_frags)) {
+      expr_nd = mt_fragments_to_expr(&expr_frags, err);
+
+      l_deinit(expr_frags);
+
+      mt_log_t log = mt_log_init(stdout, "");
+      mt_ast_node_dump(&log, expr_nd, 0);
+      mt_log_dump(&log);
+    }
+  }
   
-  for (size_t i = 0; i < l_size(expr_frags); i++) {
-    mt_expr_fragment_t* x = &l_at(expr_frags, i);
-    if (x->type == EXPR_FRAG_UNIT) {
-      printf("unit: %d\n", x->data.unit_nd->type);
-    }
-    else {
-      printf("op: %lld\n", x->data.op_nd->i_val);
-    }
-  }
-
-  mt_ast_node_t* expr_nd = mt_fragments_to_expr(&expr_frags, err);
-
-  l_deinit(expr_frags);
-
-  print_node(expr_nd, 0);
-
   *toks = tok;
-  return NULL;
-}
-
-void print_node(mt_ast_node_t* nd, int n) {
-  printf("%.*s%d\n", n, "                                                                                      ", nd->type);
-  for (size_t i = 0; i < l_size(nd->sub); i++) {
-    print_node(l_at(nd->sub, i), n + 4);
-  }
+  return expr_nd;
 }
 
 static mt_ast_node_t* mt_fragments_to_expr(void* _frags, mt_error_reporter_t* err) {

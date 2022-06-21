@@ -57,6 +57,8 @@ typedef enum _mt_ast_node_type {
   ND_OP_ASSIGN,             // Assignment operator.
   ND_OP_LOG,                // Logical operator.
   ND_OP_CMP,                // Comparison operator.
+  ND_OP_PREFIX,             // Prefix operator.
+  ND_OP_SUFFIX,             // Suffix operator.
   
   ND_LABEL,                 // Label.
 } mt_ast_type_t;
@@ -149,5 +151,15 @@ mt_ast_node_t* mt_ast_node_init(mt_ast_type_t type);
  * @param node The node to destroy.
  */
 void mt_ast_node_deinit(mt_ast_node_t* ast);
+
+struct _mt_log;
+
+/**
+ * @brief Dumps an AST node to a log.
+ * @param log The log to dump to.
+ * @param node The node to dump.
+ * @param depth The depth to indent the node.
+ */
+void mt_ast_node_dump(struct _mt_log* log, mt_ast_node_t* node, size_t depth);
 
 #endif // __MT_AST_H__

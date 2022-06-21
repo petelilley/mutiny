@@ -37,6 +37,7 @@ mt_token_kind_t mt_token_match(mt_error_reporter_t* e, mt_token_t* t, size_t n, 
     }
   }
   
+  //  mt_token_kind_to_str(t->kind);
   mt_report_syntax_error(e, t->file, t->line, t->col, t->len, "Unexpected %s%s", mt_token_kind_to_str(t->kind), expected);
   
   return TK_UNKNOWN;

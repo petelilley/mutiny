@@ -59,7 +59,9 @@ static mt_ast_node_t* mt_parse_func_call_param_list(mt_token_t** toks, mt_error_
   do {
     // Expression.
     expr_nd = mt_parse_expr(&tok, err);
-    if (!expr_nd) break;
+    if (!expr_nd) {
+      break;
+    }
     
     if (!param_list_nd) {
       param_list_nd = mt_ast_node_init(ND_FUNC_CALL_PARAM_LIST);
