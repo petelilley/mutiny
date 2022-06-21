@@ -99,7 +99,7 @@ static mt_token_t* next_token(mt_file_t* f, mt_error_reporter_t* e) {
     }
   }
   
-#if 0
+#if 1
   if (t) {
     printf("[%ld-%ld_%ld][%ld] tok: ", t->line, t->col, t->len, t->fpos);
     switch (t->kind) {
@@ -115,11 +115,16 @@ static mt_token_t* next_token(mt_file_t* f, mt_error_reporter_t* e) {
       case TK_PUNCTUATOR:
         printf("pct, '%s'\n", mt_punct_to_str(t->punct_val));
         break;
-      case TK_INTEGER:
-        printf("int, %lld\n", t->i_val);
-        break;
-      case TK_FLOAT:
-        printf("fl, %Lf\n", t->f_val);
+      case TK_NUMBER:
+        if (t->i_val != MT_UNDEFINED) {
+          printf("int, %lld\n", t->i_val);
+        }
+        else if (t->f_val != MT_UNDEFINED) {
+          printf("float, %f\n", t->f_val);
+        }
+        else {
+          printf("number?");
+        }
         break;
       case TK_STRING:
         printf("str, \"%s\"\n", t->str_val);

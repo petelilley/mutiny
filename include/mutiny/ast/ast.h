@@ -3,6 +3,7 @@
 
 #include <mutiny/mutiny.h>
 #include <mutiny/util/list.h>
+#include <mutiny/translation_unit/lexer/token.h>
 
 /**
  * @brief The type of an AST node.
@@ -26,7 +27,6 @@ typedef enum _mt_ast_node_type {
   ND_FUNC_CALL_PARAM_LIST,  // Function call parameter list.
   
   ND_VAR_DECL,              // Variable declaration.
-  ND_VAR_NAME,              // Variable type.
   ND_VAR_TYPE,              // Variable type.
   ND_VAR_STORAGE_SPEC,      // Variable storage specifier.
   ND_VAR_TYPE_QUAL,         // Variable type qualifier.
@@ -47,13 +47,72 @@ typedef enum _mt_ast_node_type {
   
   ND_EXPR_CONST,            // Constant expression.
   ND_EXPR_EVAL,             // Evaluated expression.
-  
-  ND_OP_COMP,               // Comparison operator.
+
+  ND_ID,                    // Identifier.
+  ND_INT_LITERAL,           // Integer literal.
+  ND_FLOAT_LITERAL,         // Floating-point literal.
+  ND_STRING_LITERAL,        // String literal.
+  ND_CHAR_LITERAL,          // Character literal.
+
   ND_OP_ARITH,              // Arithmetic operator.
-  ND_OP_BIT,                // Bitwise operator.
+  ND_OP_ASSIGN,             // Assignment operator.
+  ND_OP_LOG,                // Logical operator.
+  ND_OP_CMP,               // Comparison operator.
   
   ND_LABEL,                 // Label.
 } mt_ast_type_t;
+
+typedef enum _mt_operator {
+  OP_UNKNOWN = 0,
+  OP_ADD,          // +
+  OP_MIN,          // -
+  OP_MUL,          // *
+  OP_DIV,          // /
+  OP_MOD,          // %
+  OP_BIT_AND,      // &
+  OP_BIT_OR,       // |
+  OP_BIT_XOR,      // ^
+  OP_BIT_NOT,      // ~
+  OP_BIT_LSH,      // <<
+  OP_BIT_RSH,      // >>
+  OP_ASGN,         // =
+  OP_ASGN_ADD,     // +=
+  OP_ASGN_MIN,     // -=
+  OP_ASGN_MUL,     // *=
+  OP_ASGN_DIV,     // /=
+  OP_ASGN_MOD,     // %=
+  OP_ASGN_BIT_AND, // &=
+  OP_ASGN_BIT_OR,  // |=
+  OP_ASGN_BIT_XOR, // ^=
+  OP_ASGN_BIT_LSH, // <<=
+  OP_ASGN_BIT_RSH, // >>=
+  OP_CMP_EQ,       // ==
+  OP_CMP_NE,       // !=
+  OP_CMP_GT,       // >
+  OP_CMP_GE,       // >=
+  OP_CMP_LT,       // <
+  OP_CMP_LE,       // <=
+  OP_LOG_AND,      // &&
+  OP_LOG_OR,       // ||
+  OP_LOG_NOT,      // !
+  OP_REF,          // @
+  OP_DEREF,        // *
+  OP_MEMBER,       // .
+  OP_ARRAY,        // []
+  OP_PRE_INC,      // ++ before
+  OP_PRE_DEC,      // -- before
+  OP_POST_INC,     // ++ after
+  OP_POST_DEC,     // -- after
+  OP_POS,          // + before
+  OP_NEG,          // - before
+} mt_operator_t;
+
+/**
+ * @brief Converts a punctuator to an operator.
+ * @param punct The punctuator to convert.
+ * @return The operator, or OP_UNKNOWN if the punctuator is not an operator.
+ */
+mt_operator_t mt_punct_to_operator(mt_punctuator_t punct);
 
 /**
  * @brief An AST node.

@@ -9,6 +9,7 @@
 
 mt_token_t* mt_tokenize_numeric_literal(mt_file_t* f, mt_error_reporter_t* e) {
   mt_token_t* t = mt_token_init(f);
+  t->kind = TK_NUMBER;
   t->len = 1;
   
   char c = *f->ptr;
@@ -32,11 +33,9 @@ mt_token_t* mt_tokenize_numeric_literal(mt_file_t* f, mt_error_reporter_t* e) {
     }
     val = strndup(first, t->len);
     if (fp) {
-      t->kind = TK_FLOAT;
       t->f_val = atof(val);
     }
     else {
-      t->kind = TK_INTEGER;
       t->i_val = atoll(val);
     }
     free(val);
@@ -59,7 +58,6 @@ mt_token_t* mt_tokenize_numeric_literal(mt_file_t* f, mt_error_reporter_t* e) {
       mt_report_syntax_error(e, f, f->cur_line, f->cur_col - 1, 1, "Invalid suffix 'x' on integer literal");
     }
     
-    t->kind = TK_INTEGER;
     val = strndup(first, t->len);
     t->i_val = strtoll(val, NULL, 16);
     free(val);
@@ -72,7 +70,6 @@ mt_token_t* mt_tokenize_numeric_literal(mt_file_t* f, mt_error_reporter_t* e) {
         mt_report_syntax_error(e, f, f->cur_line, f->cur_col, 1, "Invalid digit '%d' in octal numeric literal", c - '0');
       }
     }
-    t->kind = TK_INTEGER;
     val = strndup(first, t->len);
     t->i_val = strtoll(val, NULL, 8);
     free(val);

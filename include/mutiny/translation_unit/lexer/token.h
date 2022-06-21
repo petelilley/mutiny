@@ -3,6 +3,8 @@
 
 #include <mutiny/mutiny.h>
 
+#define MT_UNDEFINED -1
+
 struct _mt_file;
 struct _mt_settings;
 
@@ -14,8 +16,7 @@ typedef enum _mt_token_kind {
   TK_IDENTIFIER,
   TK_KEYWORD,
   TK_PUNCTUATOR,
-  TK_INTEGER,
-  TK_FLOAT,
+  TK_NUMBER,
   TK_STRING,
   TK_CHAR,
   TK_EOF,
@@ -45,19 +46,19 @@ typedef enum _mt_keyword {
  */
 typedef enum _mt_punctuator {
   PCT_UNKNOWN   = 0,
-  PCT_LPAREN    = '(',
-  PCT_RPAREN    = ')',
+  PCT_LPAR      = '(',
+  PCT_RPAR      = ')',
   PCT_LBRACE    = '{',
   PCT_RBRACE    = '}',
   PCT_LBRACKET  = '[',
   PCT_RBRACKET  = ']',
   PCT_COMMA     = ',',
-  PCT_SEMICOLON = ';',
-  PCT_COLON     = ':',
+  PCT_SC        = ';',
+  PCT_COL       = ':',
   PCT_DOT       = '.',
-  PCT_EQ        = '=',
-  PCT_PLUS      = '+',
-  PCT_MINUS     = '-',
+  PCT_ASGN      = '=',
+  PCT_ADD       = '+',
+  PCT_MIN       = '-',
   PCT_MUL       = '*',
   PCT_DIV       = '/',
   PCT_MOD       = '%',
@@ -65,34 +66,34 @@ typedef enum _mt_punctuator {
   PCT_BIT_OR    = '|',
   PCT_BIT_XOR   = '^',
   PCT_BIT_NOT   = '~',
-  PCT_GREATER   = '>',
-  PCT_LESS      = '<',
-  PCT_NOT       = '!',
+  PCT_CMP_GT    = '>',
+  PCT_CMP_LT    = '<',
+  PCT_LOG_NOT   = '!',
   PCT_REF       = '@',
-  PCT_QUESTION  = '?',
-  PCT_BIT_LSH   = 256, // <<
-  PCT_BIT_RSH,         // >>
-  PCT_PLUS_EQ,         // +=
-  PCT_MINUS_EQ,        // -=
-  PCT_MUL_EQ,          // *=
-  PCT_DIV_EQ,          // /=
-  PCT_MOD_EQ,          // %=
-  PCT_BIT_AND_EQ,      // &=
-  PCT_BIT_OR_EQ,       // |=
-  PCT_BIT_XOR_EQ,      // ^=
-  PCT_LSH_EQ,          // <<=
-  PCT_RSH_EQ,          // >>=
-  PCT_EQ_EQ,           // ==
-  PCT_NOT_EQ,          // !=
-  PCT_LESS_EQ,         // <=
-  PCT_GREATER_EQ,      // >=
-  PCT_LOG_OR,          // ||
-  PCT_LOG_AND,         // &&
-  PCT_INC,             // ++
-  PCT_DEC,             // --
-  PCT_ARROW,           // ->
-  PCT_COL_COL,         // ::
-  PCT_COL_EQ,          // :=
+  PCT_QUE       = '?',
+  PCT_BIT_LSH   = 256,   // <<
+  PCT_BIT_RSH,           // >>
+  PCT_ASGN_ADD,     // +=
+  PCT_ASGN_MIN,     // -=
+  PCT_ASGN_MUL,     // *=
+  PCT_ASGN_DIV,     // /=
+  PCT_ASGN_MOD,     // %=
+  PCT_ASGN_BIT_AND, // &=
+  PCT_ASGN_BIT_OR,  // |=
+  PCT_ASGN_BIT_XOR, // ^=
+  PCT_ASGN_BIT_LSH, // <<=
+  PCT_ASGN_BIT_RSH, // >>=
+  PCT_CMP_EQ,           // ==
+  PCT_CMP_NE,           // !=
+  PCT_CMP_LE,           // <=
+  PCT_CMP_GE,           // >=
+  PCT_LOG_OR,            // ||
+  PCT_LOG_AND,           // &&
+  PCT_INC,               // ++
+  PCT_DEC,               // --
+  PCT_ARROW,             // ->
+  PCT_COL_COL,           // ::
+  PCT_COL_EQ,            // :=
 } mt_punctuator_t;
 
 /**

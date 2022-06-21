@@ -135,7 +135,7 @@ static mt_ast_node_t* mt_parse_func_decl_param_list(mt_token_t** toks, mt_error_
     }
     
     if (name) {
-      name_nd = mt_ast_node_init(ND_VAR_NAME);
+      name_nd = mt_ast_node_init(ND_ID);
       name_nd->str_val = name;
     }
     

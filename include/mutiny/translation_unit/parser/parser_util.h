@@ -74,6 +74,7 @@ mt_keyword_t mt_token_match_kw(struct _mt_error_reporter* error_reporter, mt_tok
   * @param error_reporter The translator's error reporter.
   * @param token The token to check.
   * @param punct_num The number of punctuators to compare.
+  * @param ... The punctuators to compare.
   * @return The matching punctuator, or PCT_UNKNOWN if no match was found.
   */
 mt_punctuator_t mt_token_match_punct(struct _mt_error_reporter* error_reporter, mt_token_t* token, size_t punct_num, ...);

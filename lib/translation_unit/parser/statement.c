@@ -24,7 +24,7 @@ static mt_ast_node_t* mt_parse_continue_stmt(mt_token_t** toks, mt_error_reporte
 mt_ast_node_t* mt_parse_stmt(mt_token_t** toks, mt_error_reporter_t* err) {
   mt_token_t* tok = *toks;
   
-  mt_token_kind_t kind = mt_token_match(err, tok, 7, TK_IDENTIFIER, TK_KEYWORD, TK_PUNCTUATOR, TK_INTEGER, TK_FLOAT, TK_STRING, TK_CHAR);
+  mt_token_kind_t kind = mt_token_match(err, tok, 7, TK_IDENTIFIER, TK_KEYWORD, TK_PUNCTUATOR, TK_NUMBER, TK_STRING, TK_CHAR);
   if (!kind) return NULL;
 
   mt_ast_node_t* stmt = NULL;
