@@ -22,35 +22,33 @@ bool is_directory(const char* path) {
 
 mt_file_t* mt_file_init(const char* path) {
   mt_log_t err_log = mt_log_init(stderr, MT_ERROR);
-  
-  if (!is_file(path)) {
+
+  FILE* fp = fopen(path, "r");
+  if (!fp) {
     mt_log_add(&err_log, "No such file '%s'\n", path);
     mt_log_dump(&err_log);
     return NULL;
   }
-  int fd;
-  if ((fd = open(path, O_RDONLY)) == -1) {
-    mt_log_add(&err_log, "Failed to open file '%s': %s\n", path, strerror(errno));
-    mt_log_dump(&err_log);
-    return NULL;
-  }
-  
-  struct stat s;
-  stat(path, &s);
-  
-  size_t size = s.st_size;
   
   mt_file_t* f = malloc(sizeof(mt_file_t));
-  f->contents = malloc(size);
   
-  read(fd, f->contents, size);
+  fseek(fp, 0, SEEK_END);
+  size_t length = ftell(fp);
   
-  close(fd);
+  fseek(fp, 0, SEEK_SET);
+  
+  f->contents =  malloc(length + sizeof(char));
+  fread(f->contents, sizeof(char), length, fp);
+  f->contents[length] = 0;
+  
+  fclose(fp);
   
   f->path = strdup(path);
   f->ptr = f->contents;
   f->cur_line = f->cur_col = 1;
   f->cur_pos = 0;
+
+  printf("file: '%s'\n", f->contents);
   
   return f;
 }
@@ -94,7 +92,9 @@ char mt_file_getc(mt_file_t* f) {
 }
 
 char mt_file_skip(mt_file_t* f, size_t n) {
+  char last = 0;
   for (size_t i = 0; i < n; i++) {
-    mt_file_getc(f);
+    last = mt_file_getc(f);
   }
+  return last;
 }
