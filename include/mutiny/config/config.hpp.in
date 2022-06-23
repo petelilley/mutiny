@@ -1,5 +1,4 @@
-#ifndef __MT_CONFIG_H__
-#define __MT_CONFIG_H__
+#pragma once
 
 #define MT_VERSION          @MT_VERSION_MAJOR@.@MT_VERSION_MINOR@
 #define MT_VERSION_FULL_STR "@MT_VERSION@"
@@ -11,5 +10,3 @@
 #define MT_HOST_OS_STR      "@MT_OS@"
 #define MT_HOST_ARCH        @MT_ARCH@
 #define MT_HOST_ARCH_STR    "@MT_ARCH@"
-
-#endif // __MT_CONFIG_H__

@@ -86,4 +86,4 @@ _deps
 [Bb]uild/
 
 # Configuration file
-/include/mutiny/config/config.h
+/include/mutiny/config/config.hpp

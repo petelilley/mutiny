@@ -10,9 +10,9 @@ project(mutiny VERSION ${MT_VERSION})
 
 # --- Project config ---
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED YES)
-set(CMAKE_C_EXTENSIONS NO)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_CXX_EXTENSIONS NO)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release") # Default to release
@@ -79,12 +79,6 @@ add_executable(${PROJECT_NAME} ${MT_SRC})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${MT_INC_DIR})
 
-# --- Libraries ---
-
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
-
 # --- Definitions ---
 
 # Debug.
@@ -100,6 +94,6 @@ install(TARGETS ${PROJECT_NAME})
 # --- Configuration file ---
 
 configure_file(
-  "${MT_INC_DIR}/mutiny/config/config.h.in"
-  "${MT_INC_DIR}/mutiny/config/config.h"
+  "${MT_INC_DIR}/mutiny/config/config.hpp.in"
+  "${MT_INC_DIR}/mutiny/config/config.hpp"
 )
