@@ -6,7 +6,5 @@
 #define MT_VERSION_MINOR    @MT_VERSION_MINOR@
 #define MT_VERSION_PATCH    @MT_VERSION_PATCH@
 
-#define MT_HOST_OS          @MT_OS@
 #define MT_HOST_OS_STR      "@MT_OS@"
-#define MT_HOST_ARCH        @MT_ARCH@
 #define MT_HOST_ARCH_STR    "@MT_ARCH@"

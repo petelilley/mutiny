@@ -45,28 +45,24 @@ include("${MT_LIB_DIR}/CMakeLists.txt")
 
 # --- Operating system ---
 
-if(NOT UNIX)
-  message(FATAL_ERROR "Non-unix derived operating systems not supported") # TODO Add support?
-endif()
-
-string(TOLOWER ${CMAKE_SYSTEM_NAME} MT_OS)
+string(TOUPPER "${CMAKE_SYSTEM_NAME}" MT_OS)
 
 message(STATUS "Target operating system ${MT_OS}")
 
 # --- Architecture ---
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
-  set(MT_ARCH "x86_64")
+  set(MT_ARCH "X86_64")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86|i686")
-  set(MT_ARCH "i686")
+  set(MT_ARCH "I686")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
-  set(MT_ARCH "arm64")
+  set(MT_ARCH "ARM64")
 elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "armv6l")
-  set(MT_ARCH "armv6")
+  set(MT_ARCH "ARMV6")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "armv7l|armv7-a")
-  set(MT_ARCH "armv7")
+  set(MT_ARCH "ARMV7")
 else()
-  string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} MT_ARCH)
+  string(TOUPPER ${CMAKE_SYSTEM_PROCESSOR} MT_ARCH)
 endif()
 
 message(STATUS "Target architecture ${MT_ARCH}")
@@ -79,12 +75,20 @@ add_executable(${PROJECT_NAME} ${MT_SRC})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${MT_INC_DIR})
 
+# --- Libraries ---
+
+find_package(Threads REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
+
 # --- Definitions ---
 
 # Debug.
 if(MT_DEBUG)
   target_compile_definitions(${PROJECT_NAME} PRIVATE "MT_DEBUG")
 endif()
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE "MT_OS_${MT_OS}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE "MT_ARCH_${MT_ARCH}")
 
 # --- Install ---
 

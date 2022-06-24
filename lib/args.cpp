@@ -159,13 +159,13 @@ void Compiler::decode_args(std::vector<const char*>& args) {
   
   std::vector<InputOption> input_opts;
   
-  for (u32 arg_index = 1; arg_index < args.size(); arg_index++) {
+  for (u32 arg_index = 2; arg_index < args.size(); arg_index++) {
     std::string arg = args.at(arg_index);
     
     bool valid_opt = false;
     
     if (arg.at(0) != '-') {
-      src_dirs.push_back(arg);
+      src_paths.push_back(arg);
       continue;
     }
     

@@ -16,27 +16,21 @@ public:
     MANUAL = 1,
   };
 
-  /**
-   * @brief Construct a new Logger object.
-   * 
-   * @param stream The stream to write to.
-   * @param mode The output mode.
-   */
-  Logger(Stream stream, OutputMode mode = OutputMode::AUTO);
-
-  // Yea we're not gonna deal with copying...
-  Logger(const Logger& other) = delete;
+  Logger(Stream stream, OutputMode mode = OutputMode::AUTO) noexcept;
+  ~Logger() noexcept;
+  Logger(Logger&&) noexcept;
+  Logger(const Logger&) noexcept = delete;
 
   /**
    * @brief Manually dumps the output buffer to the stream.
    */
-  void dump_buffer();
+  void dump_buffer() noexcept;
 
 private:
   Stream stream;
   OutputMode output_mode;
 
-  s32 overflow(s32 c) override;
+  s32 overflow(s32 c) noexcept override;
 
   char buffer[1024] = "";
   u32 buf_len = 0;

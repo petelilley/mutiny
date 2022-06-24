@@ -3,5 +3,5 @@
 
 int main(int argc, const char** argv) {
   mt::Compiler::get().setup(argc, argv);
-  return mt::Compiler::get().run();
+  return mt::Compiler::get().exec();
 }

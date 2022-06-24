@@ -21,11 +21,11 @@ public:
   void setup(u32 argc, const char** argv);
 
   /**
-   * @brief Runs the compiler.
+   * @brief Executes the compiler.
    * 
    * @return The program's exit code.
    */
-  s32 run();
+  s32 exec();
   
 private:
   Compiler();
@@ -40,13 +40,15 @@ private:
 
 private:
   enum class ExitCode {
-    SUCCESS = 0,
-    INTERNAL_ERR    = 1,
-    INVALID_ARGS    = 1,
-    INVALID_FILE    = 2,
-    INVALID_SYNTAX  = 3,
-    INVALID_OS      = 4,
-    INVALID_ARCH    = 5,
+    SUCCESS           = 0,
+    INTERNAL_ERR      = 1,
+    INVALID_ARGS      = 2,
+    INVALID_FILE      = 3,
+    INVALID_TOKENS    = 4,
+    INVALID_SYNTAX    = 5,
+    INVALID_SEMANTICS = 6,
+    INVALID_OS        = 7,
+    INVALID_ARCH      = 8,
   };
   
   // The exit code of the program.
@@ -129,14 +131,19 @@ private:
   u32 job_num       = 0;
 
   // The path to the output file.
-  std::string output_path = "";
+  std::filesystem::path output_path = std::filesystem::current_path() /
+#ifdef MT_OS_WINDOWS
+  "a.exe";
+#else
+  "a.out";
+#endif
 
   // Search paths for libraries.
-  std::vector<std::string> lib_paths;
+  std::vector<std::filesystem::path> lib_paths;
   // Libraries to link.
-  std::vector<std::string> link_libs;
+  std::vector<std::filesystem::path> link_libs;
   // The source files.
-  std::vector<std::string> src_dirs;
+  std::vector<std::filesystem::path> src_paths;
 };
 
 } // namespace mt
