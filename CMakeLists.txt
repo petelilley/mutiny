@@ -35,6 +35,7 @@ endif()
 
 set(MT_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set(MT_INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set(MT_THIRDPARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
 
 function(add_mutiny_sources)
   set(MT_SRC ${MT_SRC} ${ARGV} PARENT_SCOPE)
@@ -77,8 +78,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${MT_INC_DIR})
 
 # --- Libraries ---
 
+# Pthread and stuff.
 find_package(Threads REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
+
+# FMT
+add_subdirectory("${MT_THIRDPARTY_DIR}/fmt")
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
 
 # --- Definitions ---
 

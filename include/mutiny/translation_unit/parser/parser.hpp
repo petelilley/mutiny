@@ -11,14 +11,12 @@ class ASTNode;
 
 class Parser {
 public:
-  Parser(Token& token, Logger& log_out, Logger& log_err, Logger& log_warn);
+  Parser(Logger& log_out, Logger& log_err, Logger& log_warn);
   ~Parser();
 
-  void exec() noexcept;
+  b8 exec();
 
 private:
-  Token& tokens;
-  
   Logger& log_out;
   Logger& log_err;
   Logger& log_warn;

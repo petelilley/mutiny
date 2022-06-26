@@ -4,13 +4,13 @@
 
 using namespace mt;
 
-Parser::Parser(Token& _tokens, Logger& _log_out, Logger& _log_err, Logger& _log_warn)
-: tokens(_tokens), log_out(_log_out), log_err(_log_err), log_warn(_log_warn) { }
+Parser::Parser(Logger& log_out, Logger& log_err, Logger& log_warn)
+: log_out(log_out), log_err(log_err), log_warn(log_warn) { }
 
 Parser::~Parser() {
 
 }
 
-void Parser::exec() noexcept {
+b8 Parser::exec() {
 
 }

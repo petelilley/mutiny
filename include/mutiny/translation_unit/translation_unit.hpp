@@ -10,20 +10,20 @@ namespace mt {
 
 class TranslationUnit {
 public:
-  TranslationUnit(std::filesystem::path path) noexcept;
-  ~TranslationUnit() noexcept;
-  TranslationUnit(TranslationUnit&&) noexcept;
-  TranslationUnit(const TranslationUnit&) noexcept = delete;
+  TranslationUnit(std::filesystem::path path);
+  ~TranslationUnit();
+  TranslationUnit(TranslationUnit&&);
+  TranslationUnit(const TranslationUnit&) = delete;
 
   /**
    * @brief Executes the lexical analysis stage of the translation unit.
    */
-  void exec_lexer() noexcept;
+  void exec_lexer();
 
   /**
    * @brief Executes the parsing stage of the translation unit.
    */
-  void exec_parser() noexcept;
+  void exec_parser();
 
   enum class Status {
     SUCCESS = 0,
@@ -36,12 +36,12 @@ public:
    * 
    * @return The status of the translation unit.
    */
-  constexpr Status get_status() const noexcept { return status; }
+  constexpr Status get_status() const { return status; }
 
   /**
    * @brief Dumps all the message logs to the console.
    */
-  void dump_logs() noexcept;
+  void dump_logs();
 
 private:
   Status status = Status::SUCCESS;

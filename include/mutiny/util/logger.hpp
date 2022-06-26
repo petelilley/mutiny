@@ -16,21 +16,21 @@ public:
     MANUAL = 1,
   };
 
-  Logger(Stream stream, OutputMode mode = OutputMode::AUTO) noexcept;
-  ~Logger() noexcept;
-  Logger(Logger&&) noexcept;
-  Logger(const Logger&) noexcept = delete;
+  Logger(Stream stream, OutputMode mode = OutputMode::AUTO);
+  ~Logger();
+  Logger(Logger&&);
+  Logger(const Logger&) = delete;
 
   /**
    * @brief Manually dumps the output buffer to the stream.
    */
-  void dump_buffer() noexcept;
+  void dump_buffer();
 
 private:
   Stream stream;
   OutputMode output_mode;
 
-  s32 overflow(s32 c) noexcept override;
+  s32 overflow(s32 c) override;
 
   char buffer[1024] = "";
   u32 buf_len = 0;

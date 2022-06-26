@@ -2,15 +2,15 @@
 
 using namespace mt;
 
-Logger::Logger(Stream stream, OutputMode mode) noexcept
+Logger::Logger(Stream stream, OutputMode mode)
 : std::ostream(this), stream(stream), output_mode(mode) { }
 
-Logger::~Logger() noexcept = default;
+Logger::~Logger() = default;
 
-Logger::Logger(Logger&& other) noexcept
+Logger::Logger(Logger&& other)
 : std::ostream(this), stream(other.stream), output_mode(other.output_mode) { }
 
-void Logger::dump_buffer() noexcept {
+void Logger::dump_buffer() {
   if (!buf_len) return;
   
   switch (stream) {
@@ -26,7 +26,7 @@ void Logger::dump_buffer() noexcept {
   buf_len = 0;
 }
 
-s32 Logger::overflow(s32 c) noexcept {
+s32 Logger::overflow(s32 c) {
   if (output_mode == OutputMode::AUTO) {
     switch (stream) {
       case Stream::STDOUT:

@@ -75,7 +75,7 @@ void Compiler::decode_args(std::vector<const char*>& args) {
         << LogStyle::BOLD << "  parse                       " << LogStyle::CLEAR << "Parse a Mutiny program.\n"
         << LogStyle::BOLD << "  version                     " << LogStyle::CLEAR << "Print the compiler version and exit.\n"
         << LogStyle::BOLD << "  help                        " << LogStyle::CLEAR << "Print this usage information and exit.\n"
-        "\nRun " << LogStyle::BOLD << "`mutiny help <command>'" << LogStyle::CLEAR << " for information about a specific command.\n";
+        "\nRun " << LogStyle::BOLD << "'mutiny help <command>'" << LogStyle::CLEAR << " for information about a specific command.\n";
       return;
     }
     
@@ -150,7 +150,7 @@ void Compiler::decode_args(std::vector<const char*>& args) {
       }
       return;
     default:
-      log_err << ARGS_ERR_TAG << LogStyle::BOLD << "Unknown command `" << args.at(1) << "'\n" << LogStyle::CLEAR;
+      log_err << ARGS_ERR_TAG << LogStyle::BOLD << "Unknown command '" << args.at(1) << "'\n" << LogStyle::CLEAR;
       show_usage(log_err, Command::UNKNOWN);
       should_exit = true;
       exit_code = ExitCode::INVALID_ARGS;
@@ -162,7 +162,7 @@ void Compiler::decode_args(std::vector<const char*>& args) {
   for (u32 arg_index = 2; arg_index < args.size(); arg_index++) {
     std::string arg = args.at(arg_index);
     
-    bool valid_opt = false;
+    b8 valid_opt = false;
     
     if (arg.at(0) != '-') {
       src_paths.push_back(arg);
@@ -214,7 +214,7 @@ void Compiler::decode_args(std::vector<const char*>& args) {
             input_opts.push_back({ opt, opt_arg });
           }
           else {
-            log_err << ARGS_ERR_TAG << LogStyle::BOLD << "Missing argument for option `" << "-" << opt.name << "'\n" << LogStyle::CLEAR;
+            log_err << ARGS_ERR_TAG << LogStyle::BOLD << "Missing argument for option '" << "-" << opt.name << "'\n" << LogStyle::CLEAR;
             should_exit = true;
             exit_code = ExitCode::INVALID_ARGS;
             return;
@@ -231,7 +231,7 @@ void Compiler::decode_args(std::vector<const char*>& args) {
       }
     }
     if (!valid_opt) {
-      log_err << ARGS_ERR_TAG << LogStyle::BOLD << "Invalid option `" << "-" << arg << "'\n" << LogStyle::CLEAR;
+      log_err << ARGS_ERR_TAG << LogStyle::BOLD << "Invalid option '" << "-" << arg << "'\n" << LogStyle::CLEAR;
       should_exit = true;
       exit_code = ExitCode::INVALID_ARGS;
       return;
@@ -239,7 +239,7 @@ void Compiler::decode_args(std::vector<const char*>& args) {
   }
 
   auto invalid_arg = [&](Logger& log, const InputOption& opt) {
-    log << ARGS_ERR_TAG << LogStyle::BOLD << "Invalid argument `" << opt.arg << "' for option `-" << opt.option.name << "'\n" << LogStyle::CLEAR;
+    log << ARGS_ERR_TAG << LogStyle::BOLD << "Invalid argument '" << opt.arg << "' for option '-" << opt.option.name << "'\n" << LogStyle::CLEAR;
     exit_code = ExitCode::INVALID_ARGS;
   };
 

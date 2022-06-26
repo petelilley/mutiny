@@ -3,6 +3,8 @@
 #include <mutiny/config/config.hpp>
 #include <mutiny/util/types.hpp>
 
+#include <fmt/core.h>
+
 #include <vector>
 #include <list>
 #include <array>
@@ -13,3 +15,5 @@
 #include <fstream>
 #include <filesystem>
 #include <thread>
+#include <variant>
+#include <optional>

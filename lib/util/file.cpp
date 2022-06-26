@@ -39,9 +39,11 @@ InputFile::InputFile(std::filesystem::path _path)
 
 InputFile::~InputFile() = default;
 
-char InputFile::next() noexcept {
-  if (is_open()) return 0;
+char InputFile::next() {
+  if (!is_open()) return 0;
   
+  if (pos >= content.size()) return 0;
+
   if (content.at(pos) == '\n') {
     line++;
     column = 1;
@@ -50,11 +52,14 @@ char InputFile::next() noexcept {
     column++;
   }
   pos++;
+
+  if (pos >= content.size()) return 0;
+  
   return content.at(pos);
 }
 
-char InputFile::next(u64 n) noexcept {
-  if (is_open()) return 0;
+char InputFile::next(u64 n) {
+  if (!is_open()) return 0;
   
   char c = 0;
   for (u64 i = 0; i < n; i++) {
@@ -63,24 +68,32 @@ char InputFile::next(u64 n) noexcept {
   return c;
 }
 
-char InputFile::peek_next() noexcept {
-  return is_open() ? content.at(pos + 1) : 0;
+char InputFile::peek_next() {
+  if (!is_open()) return 0;
+  if (pos + 1 >= content.size()) return 0;
+  return content.at(pos + 1);
 }
 
-char InputFile::peek_next(u64 n) noexcept {
-  return is_open() ? content.at(pos + n) : 0;
+char InputFile::peek_next(u64 n) {
+  if (!is_open()) return 0;
+  if (pos + n >= content.length()) return 0;
+  return content.at(pos + n);
 }
 
-char InputFile::peek_prev() noexcept {
-  return is_open() ? content.at(pos - 1) : 0;
+char InputFile::peek_prev() {
+  if (!is_open()) return 0;
+  return content.at(pos - 1);
 }
 
-char InputFile::peek_prev(u64 n) noexcept {
-  return is_open() ? content.at(pos - n) : 0;
+char InputFile::peek_prev(u64 n) {
+  if (!is_open()) return 0;
+  return content.at(pos - n);
 }
 
-char InputFile::prev() noexcept {
-  if (is_open()) return 0;
+char InputFile::prev() {
+  if (!is_open()) return 0;
+
+  if (!pos) return content.at(pos);
   
   if (column == 1) {
     line--;
@@ -90,11 +103,12 @@ char InputFile::prev() noexcept {
     column--;
   }
   pos--;
+  
   return content.at(pos);
 }
 
-char InputFile::prev(u64 n) noexcept {
-  if (is_open()) return 0;
+char InputFile::prev(u64 n) {
+  if (!is_open()) return 0;
   
   char c = 0;
   for (u64 i = 0; i < n; i++) {
@@ -103,11 +117,15 @@ char InputFile::prev(u64 n) noexcept {
   return c;
 }
 
-std::string InputFile::get_line(u64 line) noexcept {
+b8 InputFile::starts_with(std::string_view str) const {
+  return std::strncmp(str.data(), &content.at(pos), str.length()) == 0;
+}
+
+std::string InputFile::get_line(u64 line) {
   if (!is_open() || line >= line_locations.size()) return "";
   
   u64 start = line_locations.at(line - 1);
-  u64 end = line_locations.at(line);
+  u64 end = line_locations.at(line) - 1;
 
   return content.substr(start, end - start);
 }

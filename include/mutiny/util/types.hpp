@@ -12,5 +12,7 @@ using s64 = signed long long;
 
 using f32 = float;
 using f64 = double;
+using f128 = long double;
 
 using b8 = bool;
+using c8 = char;
