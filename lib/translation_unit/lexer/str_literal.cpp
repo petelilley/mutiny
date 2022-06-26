@@ -9,9 +9,8 @@ using namespace mt;
 
 Token Lexer::tokenize_string_literal() {
   SourceLoc loc = { src_file.get_line_num(), src_file.get_column_num(), 1 };
-  ++src_file;
 
-  std::string str(1, src_file.current());
+  std::string str;
   c8 c;
   for (c = ++src_file; c && (c != '"') && (c != '\n'); c = ++src_file) {
     str.push_back(c);
