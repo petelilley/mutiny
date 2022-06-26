@@ -37,8 +37,8 @@ static constexpr std::array<const char*, 45> punct_strs = {
   "&=",
   "|=",
   "^=",
-  "<<",
-  ">>",
+  "<<=",
+  ">>=",
   "==",
   "!=",
   "<",
@@ -61,4 +61,11 @@ Punct PunctUtil::to_punct(const char* str) {
     }
   }
   return Punct::UNKNOWN;
+}
+
+const char* PunctUtil::to_string(Punct punct) {
+  if (punct == Punct::UNKNOWN) {
+    return "UNKNOWN";
+  }
+  return punct_strs.at(static_cast<u16>(punct) - 1);
 }

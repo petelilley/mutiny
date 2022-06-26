@@ -57,6 +57,8 @@ class PunctUtil {
 public:
   static Punct to_punct(std::string_view str);
   static Punct to_punct(const char* str);
+
+  static const char* to_string(Punct punct);
 };
 
 } // namespace mt

@@ -25,6 +25,9 @@ b8 Lexer::exec() {
     if (t.value().get_kind() == Token::Kind::CHAR_LITERAL) {
       std::cout << "char " << t.value().get_value<char>() << '\n';
     }
+    if (t.value().get_kind() == Token::Kind::PUNCTUATOR) {
+      std::cout << "punc " << PunctUtil::to_string(t.value().get_value<Punct>()) << '\n';
+    }
   }
   if (tokens.empty() || tokens.front().get_kind() != Token::Kind::END_OF_FILE) {
     SyntaxReporter::report_syntax(SyntaxReporter::Context::WARNING, log_err, src_file, {1, 1, 0}, "Translation unit is empty.");
