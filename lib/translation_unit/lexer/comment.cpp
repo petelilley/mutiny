@@ -30,6 +30,6 @@ void Lexer::skip_block_comment() {
       break;
     }
     
-    c = src_file++;
+    c = ++src_file;
   }
 }
