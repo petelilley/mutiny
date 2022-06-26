@@ -1,7 +1,6 @@
 #include <mutiny/mutiny.hpp>
 #include <mutiny/translation_unit/lexer/lexer.hpp>
 #include <mutiny/translation_unit/lexer/token.hpp>
-#include <mutiny/syntax/syntax_reporter.hpp>
 #include <mutiny/util/file.hpp>
 #include <mutiny/util/logger.hpp>
 
@@ -19,7 +18,7 @@ Token Lexer::tokenize_string_literal() {
   loc.len = str.length() + 1;
 
   if (!c || c == '\n') {
-    SyntaxReporter::report_syntax(SyntaxReporter::Context::ERROR, log_err, src_file, loc, "Unterminated string literal");
+    status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Unterminated string literal");
     has_error = true;
     return Token(Token::Kind::END_OF_FILE, loc);
   }

@@ -43,15 +43,15 @@ s32 Compiler::exec() {
     }
 
     // Translation units must be stored in a std::list instead of a std::vector because std::vectors may reallocate memory for the entire vector when adding new elements, making whatever elements that have been passed to threads become invalidated.
-    translation_units.emplace_back(path);
+    translation_units.emplace_back(path, error_warnings);
     
     // Start a thread for the translation unit.
     translation_unit_threads.emplace_back([](TranslationUnit* tu) {
       tu->exec_lexer();
-      if (tu->get_status() != TranslationUnit::Status::SUCCESS) return;
+      if (tu->get_result() != TranslationUnit::Result::SUCCESS) return;
 
       tu->exec_parser();
-      if (tu->get_status() != TranslationUnit::Status::SUCCESS) return;
+      if (tu->get_result() != TranslationUnit::Result::SUCCESS) return;
     }, &translation_units.back());
   }
 
@@ -66,15 +66,15 @@ s32 Compiler::exec() {
     // Show all the messages from the translation units.
     tu.dump_logs();
     
-    switch (tu.get_status()) {
-      case TranslationUnit::Status::SUCCESS:
+    switch (tu.get_result()) {
+      case TranslationUnit::Result::SUCCESS:
         break;
-      case TranslationUnit::Status::INVALID_TOKENS:
+      case TranslationUnit::Result::INVALID_TOKENS:
         log_err << "Lexical analysis failed. Exiting now.\n";
         should_exit = true;
         exit_code = ExitCode::INVALID_TOKENS;
         break;
-      case TranslationUnit::Status::INVALID_SYNTAX:
+      case TranslationUnit::Result::INVALID_SYNTAX:
         log_err << "Syntax analysis failed. Exiting now.\n";
         should_exit = true;
         exit_code = ExitCode::INVALID_SYNTAX;

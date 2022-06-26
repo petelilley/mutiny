@@ -4,8 +4,8 @@
 
 using namespace mt;
 
-Parser::Parser(Logger& log_out, Logger& log_err, Logger& log_warn)
-: log_out(log_out), log_err(log_err), log_warn(log_warn) { }
+Parser::Parser(Status& status)
+: status(status) { }
 
 Parser::~Parser() {
 

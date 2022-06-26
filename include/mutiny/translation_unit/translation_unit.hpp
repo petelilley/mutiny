@@ -3,6 +3,7 @@
 #include <mutiny/mutiny.hpp>
 #include <mutiny/translation_unit/lexer/lexer.hpp>
 #include <mutiny/translation_unit/parser/parser.hpp>
+#include <mutiny/basic/status.hpp>
 #include <mutiny/util/logger.hpp>
 #include <mutiny/util/file.hpp>
 
@@ -10,7 +11,7 @@ namespace mt {
 
 class TranslationUnit {
 public:
-  TranslationUnit(std::filesystem::path path);
+  TranslationUnit(std::filesystem::path path, b8 warning_as_error);
   ~TranslationUnit();
   TranslationUnit(TranslationUnit&&);
   TranslationUnit(const TranslationUnit&) = delete;
@@ -25,32 +26,37 @@ public:
    */
   void exec_parser();
 
-  enum class Status {
+  enum class Result {
     SUCCESS = 0,
     INVALID_TOKENS,
     INVALID_SYNTAX,
   };
 
   /**
-   * @brief Returns the status of the translation unit.
+   * @brief Returns the result of the translation unit.
    * 
-   * @return The status of the translation unit.
+   * @return The result of the translation unit.
    */
-  constexpr Status get_status() const { return status; }
+  constexpr Result get_result() const { return result; }
 
   /**
    * @brief Dumps all the message logs to the console.
    */
   void dump_logs();
 
+  /**
+   * @brief Returns the status object of the translation unit.
+   * 
+   * @return The status object of the translation unit.
+   */
+  const Status& get_status() const { return status; }
+
 private:
-  Status status = Status::SUCCESS;
+  Result result = Result::SUCCESS;
 
   InputFile src_file;
   
-  Logger log_out,
-         log_err,
-         log_warn;
+  Status status;
 
   Lexer lexer;
   Parser parser;

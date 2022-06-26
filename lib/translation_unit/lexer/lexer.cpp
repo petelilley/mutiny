@@ -1,12 +1,12 @@
 #include <mutiny/mutiny.hpp>
 #include <mutiny/translation_unit/lexer/lexer.hpp>
 #include <mutiny/translation_unit/lexer/token.hpp>
-#include <mutiny/syntax/syntax_reporter.hpp>
+#include <mutiny/basic/status.hpp>
 
 using namespace mt;
 
-Lexer::Lexer(InputFile& src_file, Logger& log_out, Logger& log_err, Logger& log_warn)
-: src_file(src_file), log_out(log_out), log_err(log_err), log_warn(log_warn) { }
+Lexer::Lexer(InputFile& src_file, Status& status)
+: src_file(src_file), status(status) { }
 
 Lexer::~Lexer() = default;
 
@@ -30,7 +30,7 @@ b8 Lexer::exec() {
     }
   }
   if (tokens.empty() || tokens.front().get_kind() != Token::Kind::END_OF_FILE) {
-    SyntaxReporter::report_syntax(SyntaxReporter::Context::WARNING, log_err, src_file, {1, 1, 0}, "Translation unit is empty.");
+    status.report(Status::ReportContext::WARNING, src_file, "Translation unit is empty.");
   }
 
   return has_error;
@@ -71,7 +71,7 @@ std::optional<Token> Lexer::next_token() {
       return Token(Token::Kind::END_OF_FILE, { src_file.get_line_num(), src_file.get_column_num(), 0 });
     }
     else {
-      SyntaxReporter::report_syntax(SyntaxReporter::Context::ERROR, log_err, src_file, {src_file.get_line_num(), src_file.get_column_num(), 1}, fmt::format("Invalid token '{}'", c));
+      status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_line_num(), src_file.get_column_num(), 1}, fmt::format("Invalid token '{}'", c));
       has_error = true;
       src_file++;
       continue;

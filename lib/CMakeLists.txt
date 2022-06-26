@@ -5,6 +5,6 @@ add_mutiny_sources(
 )
 
 include("${MT_LIB_DIR}/translation_unit/CMakeLists.txt")
-# include("${MT_LIB_DIR}/ast/CMakeLists.txt")
 include("${MT_LIB_DIR}/util/CMakeLists.txt")
+include("${MT_LIB_DIR}/basic/CMakeLists.txt")
 include("${MT_LIB_DIR}/syntax/CMakeLists.txt")

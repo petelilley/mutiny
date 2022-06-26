@@ -1,7 +1,6 @@
 #include <mutiny/mutiny.hpp>
 #include <mutiny/translation_unit/lexer/lexer.hpp>
 #include <mutiny/translation_unit/lexer/token.hpp>
-#include <mutiny/syntax/syntax_reporter.hpp>
 #include <mutiny/util/file.hpp>
 #include <mutiny/util/logger.hpp>
 
@@ -17,7 +16,7 @@ void Lexer::skip_block_comment() {
 
   while (true) {
     if (!c) {
-      SyntaxReporter::report_syntax(SyntaxReporter::Context::ERROR, log_err, src_file, {src_file.get_line_num(), src_file.get_column_num(), 0}, "Unterminated /* comment.");
+      status.report_syntax(Status::ReportContext::ERROR, src_file, { src_file.get_line_num(), src_file.get_column_num(), 1 }, "Unterminated /* comment");
       has_error = true;
       break;
     }
