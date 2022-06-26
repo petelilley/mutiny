@@ -12,7 +12,6 @@ enum class Keyword : u16 {
 
 class KeywordUtil {
 public:
-  static Keyword to_keyword(std::string str);
   static Keyword to_keyword(std::string_view str);
   static Keyword to_keyword(const char* str);
 };

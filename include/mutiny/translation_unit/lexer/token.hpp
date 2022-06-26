@@ -2,8 +2,8 @@
 
 #include <mutiny/mutiny.hpp>
 #include <mutiny/basic/source_loc.hpp>
-#include <mutiny/translation_unit/lexer/keyword.hpp>
-#include <mutiny/translation_unit/lexer/punct.hpp>
+#include <mutiny/syntax/keyword.hpp>
+#include <mutiny/syntax/punctuator.hpp>
 
 namespace mt {
 

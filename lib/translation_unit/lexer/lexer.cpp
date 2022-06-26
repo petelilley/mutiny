@@ -18,6 +18,10 @@ b8 Lexer::exec() {
     if (tokens.back().get_kind() == Token::Kind::END_OF_FILE || has_error) {
       break;
     }
+
+    if (t.value().get_kind() == Token::Kind::STRING_LITERAL) {
+      std::cout << "str " << t.value().get_value<std::string>() << '\n';
+    }
   }
   if (tokens.empty() || tokens.front().get_kind() != Token::Kind::END_OF_FILE) {
     SyntaxReporter::report_syntax(SyntaxReporter::Context::WARNING, log_err, src_file, {1, 1, 0}, "Translation unit is empty.");

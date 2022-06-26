@@ -125,7 +125,11 @@ std::string InputFile::get_line(u64 line) {
   if (!is_open() || line >= line_locations.size()) return "";
   
   u64 start = line_locations.at(line - 1);
-  u64 end = line_locations.at(line) - 1;
+  u64 end = line_locations.at(line);
+  
+  if (line != line_locations.size() - 1) {
+    end--;
+  }
 
   return content.substr(start, end - start);
 }
