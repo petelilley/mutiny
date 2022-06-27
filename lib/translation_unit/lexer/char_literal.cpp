@@ -19,7 +19,6 @@ Token Lexer::tokenize_char_literal() {
 
   if (!c || c == '\n') {
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Unterminated character literal");
-    has_error = true;
     return Token(Token::Kind::END_OF_FILE, loc);
   }
   
@@ -28,12 +27,10 @@ Token Lexer::tokenize_char_literal() {
 
   if (loc.len > 3) {
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Character literal is too long");
-    has_error = true;
     return Token(Token::Kind::CHAR_LITERAL, loc);
   }
   else if (loc.len == 2) {
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Character literal is empty");
-    has_error = true;
     return Token(Token::Kind::CHAR_LITERAL, loc);
   }
   

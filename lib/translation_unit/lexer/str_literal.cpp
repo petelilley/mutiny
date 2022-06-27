@@ -17,7 +17,6 @@ Token Lexer::tokenize_string_literal() {
 
   if (!c || c == '\n') {
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Unterminated string literal");
-    has_error = true;
     return Token(Token::Kind::END_OF_FILE, loc);
   }
   

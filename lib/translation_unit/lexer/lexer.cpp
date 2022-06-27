@@ -10,50 +10,47 @@ Lexer::Lexer(InputFile& src_file, Status& status)
 
 Lexer::~Lexer() = default;
 
-b8 Lexer::exec() {
+void Lexer::exec() {
   std::optional<Token> t;
 
   while (t = next_token()) {
     tokens.push_back(std::move(t.value()));
-    if (tokens.back().get_kind() == Token::Kind::END_OF_FILE || has_error) {
+    if (tokens.back().get_kind() == Token::Kind::END_OF_FILE || status.get_error_num() > 0) {
       break;
-    }
-    
-    switch (t.value().get_kind()) {
-      case Token::Kind::IDENTIFIER:
-        std::cout << "IDENTIFIER: " << t.value().get_value<std::string>() << std::endl;
-        break;
-      case Token::Kind::KEYWORD:
-        std::cout << "KEYWORD: " << KeywordUtil::to_string(t.value().get_value<Keyword>()) << std::endl;
-        break;
-      case Token::Kind::PUNCTUATOR:
-        std::cout << "PUNCTUATOR: " << PunctUtil::to_string(t.value().get_value<Punct>()) << std::endl;
-        break;
-      case Token::Kind::CHAR_LITERAL:
-        std::cout << "CHAR_LITERAL: " << t.value().get_value<char>() << std::endl;
-        break;
-      case Token::Kind::STRING_LITERAL:
-        std::cout << "STRING_LITERAL: " << t.value().get_value<std::string>() << std::endl;
-        break;
-      case Token::Kind::INT_LITERAL:
-        std::cout << "INT_LITERAL: " << t.value().get_value<u64>() << std::endl;
-        break;
-      case Token::Kind::FLOAT_LITERAL:
-        std::cout << "FLOAT_LITERAL: " << t.value().get_value<f128>() << std::endl;
-        break;
-      case Token::Kind::END_OF_FILE:
-        std::cout << "END_OF_FILE" << std::endl;
-        break;
-      default:
-        std::cout << "UNKNOWN" << std::endl;
-        break;
     }
   }
   if (tokens.empty() || tokens.front().get_kind() == Token::Kind::END_OF_FILE) {
     status.report(Status::ReportContext::WARNING, src_file, "Translation unit is empty.");
   }
 
-  return has_error;
+  for (const Token& tok : tokens) {
+    switch (tok.get_kind()) {
+      case Token::Kind::IDENTIFIER:
+        std::cout << "Identifier: " << tok.get_value<std::string>() << std::endl;
+        break;
+      case Token::Kind::KEYWORD:
+        std::cout << "Keyword: " << KeywordUtil::to_string(tok.get_value<Keyword>()) << std::endl;
+        break;
+      case Token::Kind::PUNCTUATOR:
+        std::cout << "Punctuator: " << PunctUtil::to_string(tok.get_value<Punct>()) << std::endl;
+        break;
+      case Token::Kind::INT_LITERAL:
+        std::cout << "Integer literal: " << tok.get_value<u64>() << std::endl;
+        break;
+      case Token::Kind::FLOAT_LITERAL:
+        std::cout << "Float literal: " << tok.get_value<f128>() << std::endl;
+        break;
+      case Token::Kind::STRING_LITERAL:
+        std::cout << "String literal: " << tok.get_value<std::string>() << std::endl;
+        break;
+      case Token::Kind::CHAR_LITERAL:
+        std::cout << "Character literal: " << tok.get_value<c8>() << std::endl;
+        break;
+      case Token::Kind::END_OF_FILE:
+        std::cout << "EOF" << std::endl;
+        break;
+    }
+  }
 }
 
 std::optional<Token> Lexer::next_token() {
@@ -92,7 +89,6 @@ std::optional<Token> Lexer::next_token() {
     }
     else {
       status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_line_num(), src_file.get_column_num(), 1}, fmt::format("Invalid token '{}'", c));
-      has_error = true;
       src_file++;
       continue;
     }

@@ -15,7 +15,7 @@ public:
   Parser(Status& status);
   ~Parser();
 
-  b8 exec();
+  void exec();
 
 private:
   Status& status;

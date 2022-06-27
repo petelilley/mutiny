@@ -11,6 +11,6 @@ Parser::~Parser() {
 
 }
 
-b8 Parser::exec() {
+void Parser::exec() {
 
 }

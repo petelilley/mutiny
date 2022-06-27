@@ -13,7 +13,7 @@ public:
   Lexer(InputFile& src_file, Status& status);
   ~Lexer();
 
-  b8 exec();
+  void exec();
 
   inline std::vector<Token> get_tokens() const;
 
@@ -22,8 +22,6 @@ private:
   std::vector<Token> tokens;
   
   Status& status;
-
-  b8 has_error = false;
 
   std::optional<Token> next_token();
 
