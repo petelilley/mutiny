@@ -78,13 +78,8 @@ Token Lexer::tokenize_punctuator() {
       break;
   }
 
-  std::string str(1, src_file++);
-  if (loc.len > 1) {
-    str.push_back(src_file++);
-    if (loc.len == 3) {
-      str.push_back(src_file++);
-    }
-  }
+  const c8* first = &src_file.current();
+  src_file += loc.len;
 
-  return Token(Token::Kind::PUNCTUATOR, loc, PunctUtil::to_punct(str));
+  return Token(Token::Kind::PUNCTUATOR, loc, PunctUtil::to_punct(first, loc.len));
 }

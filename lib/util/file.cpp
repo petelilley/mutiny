@@ -3,7 +3,7 @@
 
 using namespace mt;
 
-using ifstream_it = std::istreambuf_iterator<char>;
+using ifstream_it = std::istreambuf_iterator<c8>;
 
 InputFile::InputFile(std::filesystem::path _path)
 : path(_path), line_locations({0}) {
@@ -39,10 +39,10 @@ InputFile::InputFile(std::filesystem::path _path)
 
 InputFile::~InputFile() = default;
 
-char InputFile::next() {
-  if (!is_open()) return 0;
+const c8& InputFile::next() {
+  if (!is_open()) return npos;
   
-  if (pos >= content.size()) return 0;
+  if (pos >= content.size()) return npos;
 
   if (content.at(pos) == '\n') {
     line++;
@@ -53,45 +53,45 @@ char InputFile::next() {
   }
   pos++;
 
-  if (pos >= content.size()) return 0;
+  if (pos >= content.size()) return npos;
   
   return content.at(pos);
 }
 
-char InputFile::next(u64 n) {
-  if (!is_open()) return 0;
+const c8& InputFile::next(u64 n) {
+  if (!is_open()) return npos;
   
-  char c = 0;
+  const c8* c = &npos;
   for (u64 i = 0; i < n; i++) {
-    c = next();
+    c = &next();
   }
-  return c;
+  return *c;
 }
 
-char InputFile::peek_next() {
-  if (!is_open()) return 0;
-  if (pos + 1 >= content.size()) return 0;
+const c8& InputFile::peek_next() {
+  if (!is_open()) return npos;
+  if (pos + 1 >= content.size()) return npos;
   return content.at(pos + 1);
 }
 
-char InputFile::peek_next(u64 n) {
-  if (!is_open()) return 0;
-  if (pos + n >= content.length()) return 0;
+const c8& InputFile::peek_next(u64 n) {
+  if (!is_open()) return npos;
+  if (pos + n >= content.length()) return npos;
   return content.at(pos + n);
 }
 
-char InputFile::peek_prev() {
-  if (!is_open()) return 0;
+const c8& InputFile::peek_prev() {
+  if (!is_open()) return npos;
   return content.at(pos - 1);
 }
 
-char InputFile::peek_prev(u64 n) {
-  if (!is_open()) return 0;
+const c8& InputFile::peek_prev(u64 n) {
+  if (!is_open()) return npos;
   return content.at(pos - n);
 }
 
-char InputFile::prev() {
-  if (!is_open()) return 0;
+const c8& InputFile::prev() {
+  if (!is_open()) return npos;
 
   if (!pos) return content.at(pos);
   
@@ -107,14 +107,14 @@ char InputFile::prev() {
   return content.at(pos);
 }
 
-char InputFile::prev(u64 n) {
-  if (!is_open()) return 0;
+const c8& InputFile::prev(u64 n) {
+  if (!is_open()) return npos;
   
-  char c = 0;
+  const c8* c = &npos;
   for (u64 i = 0; i < n; i++) {
-    c = prev();
+    c = &prev();
   }
-  return c;
+  return *c;
 }
 
 b8 InputFile::starts_with(std::string_view str) const {

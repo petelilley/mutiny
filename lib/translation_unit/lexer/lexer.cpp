@@ -19,14 +19,32 @@ b8 Lexer::exec() {
       break;
     }
 
-    if (t.value().get_kind() == Token::Kind::STRING_LITERAL) {
-      std::cout << "str " << t.value().get_value<std::string>() << '\n';
-    }
-    if (t.value().get_kind() == Token::Kind::CHAR_LITERAL) {
-      std::cout << "char " << t.value().get_value<char>() << '\n';
-    }
-    if (t.value().get_kind() == Token::Kind::PUNCTUATOR) {
-      std::cout << "punc " << PunctUtil::to_string(t.value().get_value<Punct>()) << '\n';
+    
+    switch (t.value().get_kind()) {
+      case Token::Kind::IDENTIFIER:
+        std::cout << "IDENTIFIER: " << t.value().get_value<std::string>() << std::endl;
+        break;
+      case Token::Kind::KEYWORD:
+        std::cout << "KEYWORD: " << KeywordUtil::to_string(t.value().get_value<Keyword>()) << std::endl;
+        break;
+      case Token::Kind::PUNCTUATOR:
+        std::cout << "PUNCTUATOR: " << PunctUtil::to_string(t.value().get_value<Punct>()) << std::endl;
+        break;
+      case Token::Kind::CHAR_LITERAL:
+        std::cout << "CHAR_LITERAL: " << t.value().get_value<char>() << std::endl;
+        break;
+      case Token::Kind::STRING_LITERAL:
+        std::cout << "STRING_LITERAL: " << t.value().get_value<std::string>() << std::endl;
+        break;
+      case Token::Kind::NUMERIC_LITERAL:
+        std::cout << "NUMERIC_LITERAL: " << std::endl;
+        break;
+      case Token::Kind::END_OF_FILE:
+        std::cout << "END_OF_FILE" << std::endl;
+        break;
+      default:
+        std::cout << "UNKNOWN" << std::endl;
+        break;
     }
   }
   if (tokens.empty() || tokens.front().get_kind() != Token::Kind::END_OF_FILE) {
@@ -45,12 +63,12 @@ std::optional<Token> Lexer::next_token() {
     }
     else if (src_file.starts_with("//")) {
       skip_line_comment();
-      break;
+      continue;
     }
     else if (src_file.starts_with("/*")) {
       src_file += 2;
       skip_block_comment();
-      break;
+      continue;
     }
     else if (std::isalpha(c) || c == '_') {
       return tokenize_identifier();

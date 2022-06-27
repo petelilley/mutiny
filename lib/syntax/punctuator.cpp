@@ -3,7 +3,7 @@
 using namespace mt;
 
 Punct PunctUtil::to_punct(std::string_view str) {
-  return to_punct(str.data());
+  return to_punct(str.data(), str.length());
 }
 
 static constexpr std::array<const char*, 45> punct_strs = {
@@ -54,9 +54,9 @@ static constexpr std::array<const char*, 45> punct_strs = {
   "::",
 };
 
-Punct PunctUtil::to_punct(const char* str) {
+Punct PunctUtil::to_punct(const char* str, u32 len) {
   for (u16 i = 0; i < punct_strs.size(); i++) {
-    if (std::strcmp(str, punct_strs.at(i)) == 0) {
+    if (std::strncmp(str, punct_strs.at(i), len) == 0) {
       return static_cast<Punct>(i + 1);
     }
   }

@@ -9,22 +9,18 @@ using namespace mt;
 Token Lexer::tokenize_string_literal() {
   SourceLoc loc = { src_file.get_line_num(), src_file.get_column_num(), 1 };
 
-  std::string str;
+  const c8* first = &src_file.current();
   c8 c;
   for (c = ++src_file; c && (c != '"') && (c != '\n'); c = ++src_file) {
-    str.push_back(c);
+    loc.len++;
   }
-
-  loc.len = str.length() + 1;
 
   if (!c || c == '\n') {
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Unterminated string literal");
     has_error = true;
     return Token(Token::Kind::END_OF_FILE, loc);
   }
-
-  loc.len++;
   
   ++src_file;
-  return Token(Token::Kind::STRING_LITERAL, loc, std::move(str));
+  return Token(Token::Kind::STRING_LITERAL, loc, std::string(first + 1, loc.len - 1));
 }

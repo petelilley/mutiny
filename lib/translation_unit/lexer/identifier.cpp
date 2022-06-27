@@ -11,16 +11,14 @@ using namespace mt;
 Token Lexer::tokenize_identifier() {
   SourceLoc loc = { src_file.get_line_num(), src_file.get_column_num(), 1 };
 
-  std::string str(1, src_file.current());
+  const c8* first = &src_file.current();
   for (c8 c = ++src_file; c && (std::isalpha(c) || c == '_' || std::isdigit(c)); c = ++src_file) {
-    str.push_back(c);
+    loc.len++;
   }
-
-  loc.len = str.length();
   
-  Keyword kw = KeywordUtil::to_keyword(str);
+  Keyword kw = KeywordUtil::to_keyword(first, loc.len);
   if (kw == Keyword::UNKNOWN) {
-    return Token(Token::Kind::IDENTIFIER, loc, std::move(str));
+    return Token(Token::Kind::IDENTIFIER, loc, std::string(first, loc.len));
   }
   else {
     return Token(Token::Kind::KEYWORD, loc, kw);

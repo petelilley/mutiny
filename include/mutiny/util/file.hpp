@@ -9,6 +9,8 @@ public:
   explicit InputFile(std::filesystem::path);
   ~InputFile();
 
+  static inline const c8 npos = 0;
+
   /**
    * @brief Returns whether the file is open.
    * 
@@ -21,7 +23,7 @@ public:
    * 
    * @return The path to the file.
    */
-  inline const char* get_path() const { return path.c_str(); }
+  inline const c8* get_path() const { return path.c_str(); }
 
   /**
    * @brief Returns whether the file is open.
@@ -49,7 +51,7 @@ public:
    * 
    * @return The character extracted.
    */
-  char next();
+  const c8& next();
   
   /**
    * @brief Extracts n characters from the file.
@@ -57,14 +59,14 @@ public:
    * @param n The number of characters to extract.
    * @return The final character extracted.
    */
-  char next(u64 n);
+  const c8& next(u64 n);
 
   /**
    * @brief Returns the next character in the file without extracting it.
    * 
    * @return The next character in the file.
    */
-  char peek_next();
+  const c8& peek_next();
   
   /**
    * @brief Returns the next nth character in the file without extracting it.
@@ -72,21 +74,21 @@ public:
    * @param n The number of characters to peek ahead in the file.
    * @return The next nth character in the file.
    */
-  char peek_next(u64 n);
+  const c8& peek_next(u64 n);
 
   /**
    * @brief Returns the current character in the file.
    * 
    * @return The current character in the file.
    */
-  inline char current() const { return (is_open() && pos < content.length()) ? content.at(pos) : 0; }
+  inline const c8& current() const { return (is_open() && pos < content.length()) ? content.at(pos) : npos; }
 
   /**
    * @brief Returns the previous character in the file without rewinding it.
    * 
    * @return The previous character in the file.
    */
-  char peek_prev();
+  const c8& peek_prev();
 
   /**
    * @brief Returns the previous nth character in the file without rewinding it.
@@ -94,14 +96,14 @@ public:
    * @param n The number of characters to peek back in the file.
    * @return The previous nth character in the file.
    */
-  char peek_prev(u64 n);
+  const c8& peek_prev(u64 n);
   
   /**
    * @brief Rewinds the file by one character.
    * 
    * @return The previous character in the file.
    */
-  char prev();
+  const c8& prev();
 
   /**
    * @brief Rewinds the file by n characters.
@@ -109,7 +111,7 @@ public:
    * @param n The number of characters to rewind the file.
    * @return The previous nth character in the file.
    */
-  char prev(u64 n);
+  const c8& prev(u64 n);
 
   /**
    * @brief Checks whether the next set of characters in the file match the given string.
@@ -124,35 +126,28 @@ public:
    * 
    * @return The character extracted.
    */
-  inline char operator++() { return is_open() ? next() : 0; }
+  inline const c8& operator++() { return is_open() ? next() : npos; }
 
   /**
    * @brief Rewinds the file by one character.
    * 
    * @return The previous character in the file.
    */
-  inline char operator--() { return is_open() ? prev() : 0; }
+  inline const c8& operator--() { return is_open() ? prev() : npos; }
 
   /**
    * @brief Extracts a single character from the file.
    * 
    * @return The current character.
    */
-  inline char operator++(s32) { operator++(); return is_open() ? peek_prev() : 0; }
+  inline const c8& operator++(s32) { operator++(); return is_open() ? peek_prev() : npos; }
 
   /**
    * @brief Rewinds the file by one character.
    * 
    * @return The current character.
    */
-  inline char operator--(s32) { operator--(); return is_open() ? peek_next() : 0; }
-
-  /**
-   * @brief Returns the next character in the file without extracting it.
-   * 
-   * @return The next character in the file.
-   */
-  inline explicit operator char() { return is_open() ? current() : 0; }
+  inline const c8& operator--(s32) { operator--(); return is_open() ? peek_next() : npos; }
 
   /**
    * @brief Returns the next nth character in the file without extracting it.
@@ -160,7 +155,7 @@ public:
    * @param n The number of characters to peek ahead in the file.
    * @return The next nth character in the file.
    */
-  inline char operator+(u64 n) { return is_open() ? peek_next(n) : 0; }
+  inline const c8& operator+(u64 n) { return is_open() ? peek_next(n) : npos; }
   
   /**
    * @brief Returns the previous nth character in the file without rewinding it.
@@ -168,7 +163,7 @@ public:
    * @param n The number of characters to peek back in the file.
    * @return The previous nth character in the file.
    */
-  inline char operator-(u64 n) { return is_open() ? peek_prev(n) : 0; }
+  inline const c8& operator-(u64 n) { return is_open() ? peek_prev(n) : npos; }
 
   /**
    * @brief Extracts n characters from the file.
@@ -176,7 +171,7 @@ public:
    * @param n The number of characters to extract.
    * @return The final character extracted.
    */
-  inline char operator+=(u64 n) { return is_open() ? next(n) : 0; }
+  inline const c8& operator+=(u64 n) { return is_open() ? next(n) : npos; }
 
   /**
    * @brief Rewinds the file by n characters.
@@ -184,7 +179,7 @@ public:
    * @param n The number of characters to rewind the file.
    * @return The previous nth character in the file.
    */
-  inline char operator-=(u64 n) { return is_open() ? prev(n) : 0; }
+  inline const c8& operator-=(u64 n) { return is_open() ? prev(n) : npos; }
 
   /**
    * @brief Finds a line in the file and returns it.
