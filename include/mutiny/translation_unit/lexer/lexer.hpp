@@ -23,7 +23,7 @@ private:
   
   Status& status;
 
-  std::optional<Token> next_token();
+  Token next_token();
 
   Token tokenize_identifier();
   b8 is_punctuator();

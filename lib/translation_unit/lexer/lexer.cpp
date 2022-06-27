@@ -11,10 +11,8 @@ Lexer::Lexer(InputFile& src_file, Status& status)
 Lexer::~Lexer() = default;
 
 void Lexer::exec() {
-  std::optional<Token> t;
-
-  while (t = next_token()) {
-    tokens.push_back(std::move(t.value()));
+  while (true) {
+    tokens.push_back(std::move(next_token()));
     if (tokens.back().get_kind() == Token::Kind::END_OF_FILE || status.get_error_num() > 0) {
       break;
     }
@@ -23,6 +21,7 @@ void Lexer::exec() {
     status.report(Status::ReportContext::WARNING, src_file, "Translation unit is empty.");
   }
 
+#if 1
   for (const Token& tok : tokens) {
     switch (tok.get_kind()) {
       case Token::Kind::IDENTIFIER:
@@ -51,9 +50,10 @@ void Lexer::exec() {
         break;
     }
   }
+#endif
 }
 
-std::optional<Token> Lexer::next_token() {
+Token Lexer::next_token() {
   c8 c;
   while ((c = src_file.current())) {
     if (std::isspace(c)) {
@@ -84,14 +84,12 @@ std::optional<Token> Lexer::next_token() {
     else if (is_punctuator()) {
       return tokenize_punctuator();
     }
-    else if (!c) {
-      return Token(Token::Kind::END_OF_FILE, { src_file.get_line_num(), src_file.get_column_num(), 0 });
-    }
     else {
       status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_line_num(), src_file.get_column_num(), 1}, fmt::format("Invalid token '{}'", c));
       src_file++;
       continue;
     }
   }
-  return std::nullopt;
+  
+  return Token(Token::Kind::END_OF_FILE, { src_file.get_line_num(), src_file.get_column_num(), 0 });
 }
