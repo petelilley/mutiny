@@ -12,10 +12,12 @@ enum class Keyword : u16 {
 
 class KeywordUtil {
 public:
-  static Keyword to_keyword(std::string_view str);
+  inline static Keyword to_keyword(std::string_view str);
   static Keyword to_keyword(const char* str, u32 len);
 
   static const char* to_string(Keyword keyword);
 };
 
 } // namespace mt
+
+#include <mutiny/syntax/keyword.ipp>

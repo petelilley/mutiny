@@ -18,7 +18,6 @@ b8 Lexer::exec() {
     if (tokens.back().get_kind() == Token::Kind::END_OF_FILE || has_error) {
       break;
     }
-
     
     switch (t.value().get_kind()) {
       case Token::Kind::IDENTIFIER:
@@ -47,7 +46,7 @@ b8 Lexer::exec() {
         break;
     }
   }
-  if (tokens.empty() || tokens.front().get_kind() != Token::Kind::END_OF_FILE) {
+  if (tokens.empty() || tokens.front().get_kind() == Token::Kind::END_OF_FILE) {
     status.report(Status::ReportContext::WARNING, src_file, "Translation unit is empty.");
   }
 

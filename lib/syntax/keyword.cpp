@@ -2,10 +2,6 @@
 
 using namespace mt;
 
-Keyword KeywordUtil::to_keyword(std::string_view str) {
-  return to_keyword(str.data(), str.length());
-}
-
 static constexpr std::array<const char*, 7> kw_strs = {
   "func",
   "var",

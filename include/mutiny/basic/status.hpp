@@ -51,14 +51,14 @@ public:
    * 
    * @return The number of errors encountered.
    */
-  constexpr u32 get_error_num() const { return err_num; }
+  constexpr u32 get_error_num() const;
 
   /**
    * @brief Returns the number of warnings encountered.
    * 
    * @return The number of warnings encountered.
    */
-  constexpr u32 get_warning_num() const { return warn_num; }
+  constexpr u32 get_warning_num() const;
 
 private:
   mutable Logger log_out,
@@ -71,3 +71,5 @@ private:
 };
 
 } // namespace mt
+
+#include <mutiny/basic/static.ipp>

@@ -15,7 +15,7 @@ public:
 
   b8 exec();
 
-  inline std::vector<Token> get_tokens() const { return tokens; }
+  inline std::vector<Token> get_tokens() const;
 
 private:
   InputFile& src_file;
@@ -39,3 +39,5 @@ private:
 };
 
 } // namespace mt
+
+#include <mutiny/translation_unit/lexer/lexer.ipp>

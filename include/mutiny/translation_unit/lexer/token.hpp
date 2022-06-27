@@ -22,15 +22,15 @@ public:
   // The union of possible token value types.
   using ValueType = std::variant<c8, std::string, Keyword, Punct, u64, f128>;
 
-  inline Token(Kind kind, SourceLoc location, ValueType value = static_cast<c8>(0)) : kind(kind), location(location), value(value) { }
-  ~Token() = default;
+  inline Token(Kind kind, SourceLoc location, ValueType value = static_cast<c8>(0));
+  inline ~Token();
 
   /**
    * @brief Returns the kind of the token.
    *
    * @return The kind of the token.
    */
-  constexpr Kind get_kind() const { return kind; }
+  constexpr Kind get_kind() const;
 
   /**
    * @brief Returns the value of the token.
@@ -39,7 +39,7 @@ public:
    * @return The value of the token.
    */
   template<typename T>
-  constexpr T get_value() const { return std::get<T>(value); }
+  constexpr T get_value() const;
 
 private:
   Kind kind;
@@ -48,3 +48,6 @@ private:
 };
 
 } // namespace mt
+
+#include <mutiny/translation_unit/lexer/token.ipp>
+#include <mutiny/translation_unit/lexer/token.tpp>

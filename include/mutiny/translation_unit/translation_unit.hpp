@@ -37,7 +37,7 @@ public:
    * 
    * @return The result of the translation unit.
    */
-  constexpr Result get_result() const { return result; }
+  constexpr Result get_result() const;
 
   /**
    * @brief Dumps all the message logs to the console.
@@ -49,7 +49,7 @@ public:
    * 
    * @return The status object of the translation unit.
    */
-  const Status& get_status() const { return status; }
+  constexpr const Status& get_status() const;
 
 private:
   Result result = Result::SUCCESS;
@@ -63,3 +63,5 @@ private:
 };
 
 } // namespace mt
+
+#include <mutiny/translation_unit/translation_unit.ipp>

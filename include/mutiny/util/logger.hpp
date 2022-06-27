@@ -47,10 +47,9 @@ enum class LogStyle {
   CYAN    = 36,
   WHITE   = 37,
 };
-  
-static inline std::ostream& operator<<(std::ostream& os, const LogStyle& style) {
-  os << "\033[" << static_cast<u32>(style) << "m";
-  return os;
-}
+
+static inline std::ostream& operator<<(std::ostream& os, const LogStyle& style);
 
 } // namespace mt
+
+#include <mutiny/util/logger.ipp>

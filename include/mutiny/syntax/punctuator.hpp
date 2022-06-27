@@ -55,10 +55,12 @@ enum class Punct : u16 {
 
 class PunctUtil {
 public:
-  static Punct to_punct(std::string_view str);
+  static inline Punct to_punct(std::string_view str);
   static Punct to_punct(const char* str, u32 len);
 
   static const char* to_string(Punct punct);
 };
 
 } // namespace mt
+
+#include <mutiny/syntax/punctuator.ipp>

@@ -2,10 +2,6 @@
 
 using namespace mt;
 
-Punct PunctUtil::to_punct(std::string_view str) {
-  return to_punct(str.data(), str.length());
-}
-
 static constexpr std::array<const char*, 45> punct_strs = {
   "(",
   ")",
