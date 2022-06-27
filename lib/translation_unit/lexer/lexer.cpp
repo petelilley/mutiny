@@ -35,8 +35,11 @@ b8 Lexer::exec() {
       case Token::Kind::STRING_LITERAL:
         std::cout << "STRING_LITERAL: " << t.value().get_value<std::string>() << std::endl;
         break;
-      case Token::Kind::NUMERIC_LITERAL:
-        std::cout << "NUMERIC_LITERAL: " << std::endl;
+      case Token::Kind::INT_LITERAL:
+        std::cout << "INT_LITERAL: " << t.value().get_value<u64>() << std::endl;
+        break;
+      case Token::Kind::FLOAT_LITERAL:
+        std::cout << "FLOAT_LITERAL: " << t.value().get_value<f128>() << std::endl;
         break;
       case Token::Kind::END_OF_FILE:
         std::cout << "END_OF_FILE" << std::endl;
