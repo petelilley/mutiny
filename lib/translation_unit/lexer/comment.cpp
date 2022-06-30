@@ -23,6 +23,9 @@ void Lexer::skip_block_comment() {
       src_file += 2;
       skip_block_comment();
       if (!src_file.current()) break;
+      
+      c = src_file.current();
+      continue;
     }
     if (c == '*' && (src_file + 1) == '/') {
       src_file += 2;
