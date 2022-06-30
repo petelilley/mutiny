@@ -1,6 +1,6 @@
 namespace mt {
 
-inline std::vector<Token> Lexer::get_tokens() const {
+inline std::vector<Token>& Lexer::get_tokens() {
   return tokens;
 }
 

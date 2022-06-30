@@ -22,7 +22,7 @@ void TranslationUnit::exec_lexer() {
 }
 
 void TranslationUnit::exec_parser() {
-  parser.exec();
+  parser.exec(&lexer.get_tokens());
   if (status.get_error_num() > 0) {
     result = Result::INVALID_SYNTAX;
   }

@@ -24,6 +24,9 @@ void Lexer::exec() {
 #if 1
   for (const Token& tok : tokens) {
     switch (tok.get_kind()) {
+      case Token::Kind::UNKNOWN:
+        std::cout << "unknown\n";
+        break;
       case Token::Kind::IDENTIFIER:
         std::cout << "Identifier: " << tok.get_value<std::string>() << std::endl;
         break;

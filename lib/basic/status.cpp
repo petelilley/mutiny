@@ -89,6 +89,8 @@ void Status::report_syntax(ReportContext ctx, InputFile& file, SourceLoc loc, st
     loc.len = line_str.length() - loc.col + 1;
   }
 
+std::cout << "len " << loc.len << '\n';
+
   u32 padding = 6;
 
   const std::string line_num_str = std::to_string(loc.line);
@@ -107,7 +109,7 @@ void Status::report_syntax(ReportContext ctx, InputFile& file, SourceLoc loc, st
   *log << line_start << LogStyle::BOLD << LogStyle::GREEN << '^';
 
   // Show the length of the error text.
-  if (loc.len - 1 > 0) {
+  if (loc.len > 1) {
     *log << std::string(loc.len - 1, '~');
   }
   *log << LogStyle::CLEAR << '\n';

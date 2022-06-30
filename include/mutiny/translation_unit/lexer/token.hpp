@@ -10,6 +10,7 @@ namespace mt {
 class Token {
 public:
   enum class Kind {
+    UNKNOWN,
     IDENTIFIER,
     KEYWORD,
     PUNCTUATOR,

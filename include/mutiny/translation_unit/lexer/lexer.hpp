@@ -15,7 +15,7 @@ public:
 
   void exec();
 
-  inline std::vector<Token> get_tokens() const;
+  inline std::vector<Token>& get_tokens();
 
 private:
   InputFile& src_file;

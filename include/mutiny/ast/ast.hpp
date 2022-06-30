@@ -41,10 +41,14 @@ public:
   template<typename T>
   constexpr T get_value() const;
 
+  inline void add_child(ASTNode child);
+
 private:
   Kind kind;
   SourceLoc location;
   ValueType value;
+
+  std::vector<ASTNode> children;
 };
 
 } // namespace mt
