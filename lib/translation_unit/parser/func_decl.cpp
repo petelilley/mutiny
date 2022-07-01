@@ -16,7 +16,7 @@ std::optional<ASTNode> Parser::parse_func_decl() {
   do {
     // func
     start_loc = tok_iter->get_location();
-    tok_iter++;
+    ++tok_iter;
 
     // Function name.
     if (comp_token(Token::Kind::IDENTIFIER) == Token::Kind::UNKNOWN) {
@@ -24,27 +24,27 @@ std::optional<ASTNode> Parser::parse_func_decl() {
       break;
     }
     name = tok_iter->get_value<std::string>();
-    tok_iter++;
+    ++tok_iter;
 
     // :
     if (comp_token(Punct::COLON) == Punct::UNKNOWN) {
       status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected ':' following function name", unexpected_token(Token::Kind::PUNCTUATOR)));
       break;
     }
-    tok_iter++;
+    ++tok_iter;
 
     // (
     if (comp_token(Punct::LPAREN) == Punct::UNKNOWN) {
       status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected function parameter list following ':'", unexpected_token(Token::Kind::PUNCTUATOR)));
       break;
     }
-    tok_iter++;
+    ++tok_iter;
 
     // Function parameters.
     param_list_nd = parse_func_decl_param_list();
 
     if (!param_list_nd && status.get_error_num() > 0) break;
-    tok_iter++;
+    ++tok_iter;
 
     // ; or -> or {
     Punct p = comp_token(Punct::SEMICOLON, Punct::ARROW, Punct::LBRACE);
@@ -62,11 +62,11 @@ END_DECL:
     // ;
     if (p == Punct::SEMICOLON) {
       // No definition.
-      tok_iter++;
+      ++tok_iter;
     }
     // ->
     else if (p == Punct::ARROW) {
-      tok_iter++;
+      ++tok_iter;
       // Return type.
       if (comp_token(Token::Kind::IDENTIFIER) == Token::Kind::UNKNOWN) {
         status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected return type following '->'", unexpected_token()));
@@ -75,7 +75,7 @@ END_DECL:
       
       return_type = tok_iter->get_value<std::string>();
       ret_type_loc = tok_iter->get_location();
-      tok_iter++;
+      ++tok_iter;
 
       // ; or {
       p = comp_token(Punct::SEMICOLON, Punct::LBRACE);
@@ -85,12 +85,9 @@ END_DECL:
     // {
     else if (p == Punct::LBRACE) {
       // Function body.
-      /*
-      std::optional<ASTNode> body = parse_stmt_compound();
-      if (body) {
-        // TODO: Add body to func ast node.
-      }
-      */
+      body_nd = parse_stmt_list();
+      
+      if (!body_nd && status.get_error_num() > 0) break;
     }
 
     func_nd = ASTNode(ASTNode::Kind::FUNC_DECL, start_loc, name);
@@ -108,7 +105,7 @@ END_DECL:
       func_nd->add_child(std::move(body_nd.value()));
     }
 
-  } while (0);
+  } while (false);
   
   return func_nd;
 }
@@ -134,7 +131,7 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
     }
     name = tok_iter->get_value<std::string>();
     name_loc = tok_iter->get_location();
-    tok_iter++;
+    ++tok_iter;
 
     // :
     if (comp_token(Punct::COLON) == Punct::UNKNOWN) {
@@ -145,7 +142,7 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
     }
     else {
       // Parameter type.
-      tok_iter++;
+      ++tok_iter;
 
       // TODO: Dedicated type parser function.
       if (comp_token(Token::Kind::IDENTIFIER) == Token::Kind::UNKNOWN) {
@@ -154,7 +151,7 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
       }
       type = tok_iter->get_value<std::string>();
       type_loc = tok_iter->get_location();
-      tok_iter++;
+      ++tok_iter;
     }
 
     if (!param_list_nd) {
@@ -186,7 +183,7 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
     else if (p == Punct::RPAREN) {
       break;
     }
-    tok_iter++;
+    ++tok_iter;
   } while (true);
 
   return param_list_nd;

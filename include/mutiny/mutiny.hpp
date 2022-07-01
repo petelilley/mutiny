@@ -17,5 +17,4 @@
 #include <thread>
 #include <variant>
 #include <optional>
-#include <initializer_list>
 #include <chrono>

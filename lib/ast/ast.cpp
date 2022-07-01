@@ -8,10 +8,13 @@ void ASTNode::dump(Logger& log, u32 indent) const {
   }
 
   log << '<' << LogStyle::CLEAR << LogStyle::BOLD;
-
+  
   switch (kind) {
     case Kind::GLOBAL_SCOPE:
       log << "GlobalScope";
+      break;
+    case Kind::LOCAL_SCOPE:
+      log << "LocalScope";
       break;
     case Kind::FUNC_DECL:
       log << "FuncDecl";
@@ -21,9 +24,6 @@ void ASTNode::dump(Logger& log, u32 indent) const {
       break;
     case Kind::FUNC_DECL_PARAM:
       log << "FuncDeclParam";
-      break;
-    case Kind::STMT_COMPOUND:
-      log << "CompoundStmt";
       break;
     case Kind::TYPE:
       log << "Type";

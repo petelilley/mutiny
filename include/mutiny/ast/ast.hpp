@@ -16,8 +16,6 @@ public:
       FUNC_DECL_PARAM_LIST,   // Function declaration parameter list.
       FUNC_DECL_PARAM,        // Function declaration parameter.
 
-      STMT_COMPOUND,          // Compound statement.
-
       TYPE,                   // Type.
 
       IDENTIFIER,             // Identifier.

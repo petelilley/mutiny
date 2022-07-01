@@ -39,6 +39,8 @@ private:
   std::optional<ASTNode> parse_global_decl();
   std::optional<ASTNode> parse_func_decl();
   std::optional<ASTNode> parse_func_decl_param_list();
+  std::optional<ASTNode> parse_stmt_list();
+  std::optional<ASTNode> parse_stmt();
   std::optional<ASTNode> parse_var_decl();
 
   std::string unexpected_token(Token::Kind kind = Token::Kind::UNKNOWN);
