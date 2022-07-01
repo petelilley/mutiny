@@ -23,6 +23,8 @@ void Compiler::setup(u32 argc, const char** argv) {
 s32 Compiler::exec() {
   std::list<TranslationUnit> translation_units;
   std::vector<std::thread> translation_unit_threads;
+
+  std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now(), end;
   
   if (should_exit) goto EXIT;
 
@@ -85,5 +87,15 @@ s32 Compiler::exec() {
   if (should_exit) goto EXIT;
 
 EXIT:
-  return static_cast<u32>(exit_code);
+  end = std::chrono::high_resolution_clock::now();
+
+  u32 result = static_cast<u32>(exit_code);
+
+  LogStyle color;
+  if (result) color = LogStyle::RED;
+  else color = LogStyle::GREEN;
+
+  log_out << LogStyle::BOLD << color << "\nCompiler finished in " << static_cast<f64>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()) / 1e9 << "s with exit code " << result << '\n' << LogStyle::CLEAR;
+
+  return result;
 }
