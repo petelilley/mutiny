@@ -5,7 +5,7 @@
 using namespace mt;
 
 Parser::Parser(InputFile& src_file, Status& status)
-: src_file(src_file), status(status), ast(ASTNode::Kind::GLOBAL_SCOPE, {1, 1, 0}) { }
+: src_file(src_file), status(status), ast(ASTNode::Kind::GLOBAL_SCOPE, {src_file.get_path(), 1, 1, 0}) { }
 
 Parser::~Parser() = default;
 

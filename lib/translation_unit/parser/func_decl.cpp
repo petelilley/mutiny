@@ -11,7 +11,7 @@ std::optional<ASTNode> Parser::parse_func_decl() {
   SourceLoc start_loc;
   SourceLoc ret_type_loc;
 
-  std::string_view name, return_type = "";
+  std::string name, return_type = "";
 
   do {
     // func
@@ -123,7 +123,7 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
   std::optional<ASTNode> param_list_nd = std::nullopt,
                          param_nd, name_nd, type_nd;
 
-  std::string_view name, type;
+  std::string name, type;
   do {
     param_nd = name_nd = type_nd = std::nullopt;
     

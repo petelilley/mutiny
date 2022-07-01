@@ -7,7 +7,7 @@
 using namespace mt;
 
 Token Lexer::tokenize_string_literal() {
-  SourceLoc loc = { src_file.get_line_num(), src_file.get_column_num(), 1 };
+  SourceLoc loc = { src_file.get_path(), src_file.get_line_num(), src_file.get_column_num(), 1 };
 
   const c8* first = &src_file.current();
   c8 c;

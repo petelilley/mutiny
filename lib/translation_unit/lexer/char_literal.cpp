@@ -8,7 +8,7 @@
 using namespace mt;
 
 Token Lexer::tokenize_char_literal() {
-  SourceLoc loc = { src_file.get_line_num(), src_file.get_column_num(), 1 };
+  SourceLoc loc = { src_file.get_path(), src_file.get_line_num(), src_file.get_column_num(), 1 };
 
   c8 value = *(&src_file.current() + 1);
   

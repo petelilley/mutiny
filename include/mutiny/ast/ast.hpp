@@ -24,7 +24,7 @@ public:
   };
   
   // The union of possible AST node value types.
-  using ValueType = std::variant<c8, std::string_view, u64, f128>;
+  using ValueType = std::variant<c8, std::string, u64, f128>;
 
   inline ASTNode(Kind kind, SourceLoc location, ValueType value = static_cast<c8>(0));
 

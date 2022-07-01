@@ -43,7 +43,7 @@ s32 Compiler::exec() {
     }
 
     // Translation units must be stored in a std::list instead of a std::vector because std::vectors may reallocate memory for the entire vector when adding new elements, making whatever elements that have been passed to threads become invalidated.
-    translation_units.emplace_back(path, error_warnings);
+    translation_units.emplace_back(path, error_warnings, print_ast);
     
     // Start a thread for the translation unit.
     translation_unit_threads.emplace_back([](TranslationUnit* tu) {

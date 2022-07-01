@@ -2,11 +2,10 @@
 
 using namespace mt;
 
-TranslationUnit::TranslationUnit(std::filesystem::path path, b8 warning_as_error)
+TranslationUnit::TranslationUnit(std::filesystem::path path, b8 warning_as_error, b8 dump_ast)
 : src_file(path), status(warning_as_error),
-  lexer(src_file, status), parser(src_file, status) {
-
-}
+  lexer(src_file, status), parser(src_file, status),
+  dump_ast(dump_ast) { }
 
 TranslationUnit::~TranslationUnit() = default;
 
@@ -26,8 +25,10 @@ void TranslationUnit::exec_parser() {
   if (status.get_error_num() > 0) {
     result = Result::INVALID_SYNTAX;
   }
-  
-  parser.get_ast().dump(status.get_log_out());
+
+  if (dump_ast) {
+    parser.get_ast().dump(status.get_log_out());
+  }
 }
 
 void TranslationUnit::dump_logs() {

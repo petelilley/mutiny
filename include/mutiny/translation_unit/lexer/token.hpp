@@ -39,7 +39,7 @@ public:
    * 
    * @return The location of the token in the source file.
    */
-  constexpr SourceLoc get_location() const;
+  inline SourceLoc get_location() const;
 
   /**
    * @brief Returns the value of the token.

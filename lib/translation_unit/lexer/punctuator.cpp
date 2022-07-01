@@ -32,7 +32,7 @@ Token Lexer::tokenize_punctuator() {
   c8 c = src_file.current();
   c8 c1 = src_file + 1;
 
-  SourceLoc loc = { src_file.get_line_num(), src_file.get_column_num(), 1 };
+  SourceLoc loc = { src_file.get_path(), src_file.get_line_num(), src_file.get_column_num(), 1 };
 
   switch (c) {
     case ':':

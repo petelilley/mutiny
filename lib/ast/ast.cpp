@@ -4,35 +4,50 @@ using namespace mt;
 
 void ASTNode::dump(Logger& log, u32 indent) const {
   for (u32 i = 0; i < indent; i++) {
-    log << ' ';
+    log << "|  ";
   }
+
+  log << '<' << LogStyle::CLEAR << LogStyle::BOLD;
 
   switch (kind) {
     case Kind::GLOBAL_SCOPE:
-      log << "GLOBAL_SCOPE\n";
+      log << "GlobalScope";
       break;
     case Kind::FUNC_DECL:
-      log << "FUNC_DECL\n";
+      log << "FuncDecl";
       break;
     case Kind::FUNC_DECL_PARAM_LIST:
-      log << "FUNC_DECL_PARAM_LIST\n";
+      log << "FuncDeclParamList";
       break;
     case Kind::FUNC_DECL_PARAM:
-      log << "FUNC_DECL_PARAM\n";
+      log << "FuncDeclParam";
       break;
     case Kind::STMT_COMPOUND:
-      log << "STMT_COMPOUND\n";
+      log << "CompoundStmt";
       break;
     case Kind::TYPE:
-      log << "TYPE\n";
+      log << "Type";
       break;
     case Kind::IDENTIFIER:
-      log << "IDENTIFIER\n";
+      log << "Identifier";
       break;
     default:
-      log << "UNKNOWN\n";
+      log << LogStyle::RED << "Unknown";
       break;
   }
+
+  log << LogStyle::CLEAR;
+
+  if (kind == Kind::GLOBAL_SCOPE) {
+    log << LogStyle::MAGENTA << " '" << location.path.c_str() << "'";
+  }
+  else if (kind == Kind::FUNC_DECL || kind == Kind::TYPE || kind == Kind::IDENTIFIER) {
+    log << LogStyle::YELLOW << " '" << get_value<std::string>() << '\'';
+  }
+
+  log << LogStyle::CLEAR << " location=(" << location.line << ", " << location.col << ") range=(" << location.len << ')';
+  
+  log << ">\n" << LogStyle::CLEAR;
 
   for (const auto& child : children) {
     child.dump(log, indent + 1);

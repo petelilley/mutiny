@@ -11,7 +11,7 @@ namespace mt {
 
 class TranslationUnit {
 public:
-  TranslationUnit(std::filesystem::path path, b8 warning_as_error);
+  TranslationUnit(std::filesystem::path path, b8 warning_as_error, b8 dump_ast);
   ~TranslationUnit();
   TranslationUnit(TranslationUnit&&);
   TranslationUnit(const TranslationUnit&) = delete;
@@ -60,6 +60,8 @@ private:
 
   Lexer lexer;
   Parser parser;
+
+  b8 dump_ast;
 };
 
 } // namespace mt
