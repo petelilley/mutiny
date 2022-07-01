@@ -35,6 +35,13 @@ public:
   constexpr Kind get_kind() const;
 
   /**
+   * @brief Returns the location of the token in the source file.
+   * 
+   * @return The location of the token in the source file.
+   */
+  constexpr SourceLoc get_location() const;
+
+  /**
    * @brief Returns the value of the token.
    * 
    * @tparam T The type of the value to retrieve.
@@ -47,6 +54,11 @@ private:
   Kind kind;
   SourceLoc location;
   ValueType value;
+};
+
+class TokenUtil {
+public:
+  static const c8* to_string(Token::Kind kind);
 };
 
 } // namespace mt

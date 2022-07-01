@@ -60,6 +60,9 @@ public:
    */
   constexpr u32 get_warning_num() const;
 
+  constexpr Logger& get_log_out();
+  constexpr Logger& get_log_err();
+
 private:
   mutable Logger log_out,
                  log_err;
@@ -72,4 +75,4 @@ private:
 
 } // namespace mt
 
-#include <mutiny/basic/static.ipp>
+#include <mutiny/basic/status.ipp>

@@ -4,7 +4,7 @@ using namespace mt;
 
 TranslationUnit::TranslationUnit(std::filesystem::path path, b8 warning_as_error)
 : src_file(path), status(warning_as_error),
-  lexer(src_file, status), parser(status) {
+  lexer(src_file, status), parser(src_file, status) {
 
 }
 
@@ -26,6 +26,8 @@ void TranslationUnit::exec_parser() {
   if (status.get_error_num() > 0) {
     result = Result::INVALID_SYNTAX;
   }
+  
+  parser.get_ast().dump(status.get_log_out());
 }
 
 void TranslationUnit::dump_logs() {

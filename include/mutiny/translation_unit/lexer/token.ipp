@@ -9,4 +9,8 @@ constexpr Token::Kind Token::get_kind() const {
   return kind;
 }
 
+constexpr SourceLoc Token::get_location() const {
+  return location;
+}
+
 } // namespace mt

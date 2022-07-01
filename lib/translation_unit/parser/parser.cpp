@@ -4,58 +4,62 @@
 
 using namespace mt;
 
-Parser::Parser(Status& status)
-: status(status), ast(ASTNode::Kind::GLOBAL_SCOPE, {1, 1, 0}) { }
+Parser::Parser(InputFile& src_file, Status& status)
+: src_file(src_file), status(status), ast(ASTNode::Kind::GLOBAL_SCOPE, {1, 1, 0}) { }
 
-Parser::~Parser() {
-
-}
+Parser::~Parser() = default;
 
 void Parser::exec(const std::vector<Token>* _tokens) {
   tokens = _tokens;
 
-  current_token = tokens->begin();
+  tok_iter = tokens->begin();
 
   std::optional<ASTNode> node;
-  while (current_token.base()->get_kind() != Token::Kind::END_OF_FILE) {
+  while (tok_iter->get_kind() != Token::Kind::END_OF_FILE) {
     node = parse_global_decl();
-    if (node) {
-      ast.add_child(std::move(node.value()));
-    }
-    else {
+    if (!node) {
       break;
     }
+    ast.add_child(std::move(node.value()));
   }
 }
 
-Token::Kind Parser::match_token(Token::Kind kind) {
-  if (current_token.base()->get_kind() == kind) {
-    ++current_token;
+Token::Kind Parser::comp_token(Token::Kind kind) {
+  if (tok_iter->get_kind() == kind) {
     return kind;
   }
-
-  std::cout << "expected token\n";
   return Token::Kind::UNKNOWN;
 }
 
-Punct Parser::match_token_punct(Punct punct) {
-  auto base = current_token.base();
-  if (base->get_kind() == Token::Kind::PUNCTUATOR && base->get_value<Punct>() == punct) {
-    ++current_token;
+Punct Parser::comp_token(Punct punct) {
+  if (tok_iter->get_kind() == Token::Kind::PUNCTUATOR && tok_iter->get_value<Punct>() == punct) {
     return punct;
   }
-
-  std::cout << "expected punct\n";
   return Punct::UNKNOWN;
 }
 
-Keyword Parser::match_token_keyword(Keyword keyword) {
-  auto base = current_token.base();
-  if (base->get_kind() == Token::Kind::KEYWORD && base->get_value<Keyword>() == keyword) {
-    ++current_token;
+Keyword Parser::comp_token(Keyword keyword) {
+  if (tok_iter->get_kind() == Token::Kind::KEYWORD && tok_iter->get_value<Keyword>() == keyword) {
     return keyword;
   }
-
-  std::cout << "expected keyword\n";
   return Keyword::UNKNOWN;
+}
+
+std::string Parser::unexpected_token(Token::Kind kind) {
+  if (tok_iter->get_kind() != kind || kind == Token::Kind::UNKNOWN) {
+  std::cout << "is a " << TokenUtil::to_string(tok_iter->get_kind()) << " when we want a " << TokenUtil::to_string(kind) << "\n";
+    auto x = fmt::format("unexpected {}", TokenUtil::to_string(tok_iter->get_kind()));
+    std::cout << "fomat: " << x << "\n";
+
+    return x;
+  }
+  else if (kind == Token::Kind::PUNCTUATOR) {
+    return fmt::format("unexpected '{}'", PunctUtil::to_string(tok_iter->get_value<Punct>()));
+  }
+  else if (kind == Token::Kind::KEYWORD) {
+    return fmt::format("unexpected '{}'", KeywordUtil::to_string(tok_iter->get_value<Keyword>()));
+  }
+  else {
+    return "unexpected token";
+  }
 }

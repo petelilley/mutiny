@@ -11,33 +11,37 @@ namespace mt {
 
 class Parser {
 public:
-  Parser(Status& status);
+  Parser(InputFile& src_file, Status& status);
   ~Parser();
 
   void exec(const std::vector<Token>* tokens);
 
+  inline ASTNode& get_ast();
+
 private:
+  InputFile& src_file;
   Status& status;
 
   const std::vector<Token>* tokens = nullptr;
-  std::vector<Token>::const_iterator current_token;
+  std::vector<Token>::const_iterator tok_iter;
 
-  inline b8 comp_token(Token::Kind kind);
-  inline b8 comp_token_punct(Punct punct);
-  inline b8 comp_token_keyword(Keyword keyword);
-
-  Token::Kind match_token(Token::Kind kind);
-  Punct match_token_punct(Punct punct);
-  Keyword match_token_keyword(Keyword keyword);
+  Token::Kind comp_token(Token::Kind kind);
+  Punct comp_token(Punct punct);
+  Keyword comp_token(Keyword keyword);
 
   template<typename... Args>
-  Token::Kind match_token(Token::Kind kind, Args... others);
+  Token::Kind comp_token(Token::Kind kind, Args... others);
   template<typename... Args>
-  Punct match_token_punct(Punct punct, Args... others);
+  Punct comp_token(Punct punct, Args... others);
   template<typename ... Args>
-  Keyword match_token_keyword(Keyword keyword, Args... others);
+  Keyword comp_token(Keyword keyword, Args... others);
 
   std::optional<ASTNode> parse_global_decl();
+  std::optional<ASTNode> parse_func_decl();
+  std::optional<ASTNode> parse_func_decl_param_list();
+  std::optional<ASTNode> parse_var_decl();
+
+  std::string unexpected_token(Token::Kind kind = Token::Kind::UNKNOWN);
 
   ASTNode ast;
 };

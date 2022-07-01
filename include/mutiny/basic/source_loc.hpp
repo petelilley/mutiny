@@ -5,9 +5,9 @@
 namespace mt {
 
 struct SourceLoc {
-  u64 line;
-  u64 col;
-  u64 len;
+  u64 line = 0;
+  u64 col = 0;
+  u64 len = 0;
 };
 
 } // namespace mt
