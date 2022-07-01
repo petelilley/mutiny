@@ -43,7 +43,7 @@ std::optional<ASTNode> Parser::parse_func_decl() {
     // Function parameters.
     param_list_nd = parse_func_decl_param_list();
 
-    if (!param_list_nd) break;
+    if (!param_list_nd && status.get_error_num() > 0) break;
     tok_iter++;
 
     // ; or -> or {
