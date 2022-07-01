@@ -6,7 +6,7 @@
 using namespace mt;
 
 Lexer::Lexer(InputFile& src_file, Status& status)
-: src_file(src_file), status(status) { }
+: src_file(src_file), file_iter(src_file.cbegin()), status(status) { }
 
 Lexer::~Lexer() = default;
 
@@ -58,24 +58,24 @@ void Lexer::exec() {
 
 Token Lexer::next_token() {
   c8 c;
-  while ((c = src_file.current())) {
+  while ((c = *file_iter)) {
     if (std::isspace(c)) {
-      src_file++;
+      ++file_iter;
       continue;
     }
-    else if (src_file.starts_with("//")) {
+    else if (file_iter.starts_with("//")) {
       skip_line_comment();
       continue;
     }
-    else if (src_file.starts_with("/*")) {
-      src_file += 2;
+    else if (file_iter.starts_with("/*")) {
+      file_iter += 2;
       skip_block_comment();
       continue;
     }
     else if (std::isalpha(c) || c == '_') {
       return tokenize_identifier();
     }
-    else if (std::isdigit(c) || (c == '.' && std::isdigit(src_file.peek_next()))) {
+    else if (std::isdigit(c) || (c == '.' && std::isdigit(*(file_iter + 1)))) {
       return tokenize_numeric_literal();
     }
     else if (c == '"') {
@@ -88,11 +88,11 @@ Token Lexer::next_token() {
       return tokenize_punctuator();
     }
     else {
-      status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_path(), src_file.get_line_num(), src_file.get_column_num(), 1}, fmt::format("Invalid token '{}'", c));
-      src_file++;
+      status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 1}, fmt::format("Invalid token '{}'", c));
+      ++file_iter;
       continue;
     }
   }
   
-  return Token(Token::Kind::END_OF_FILE, { src_file.get_path(), src_file.get_line_num(), src_file.get_column_num(), 0 });
+  return Token(Token::Kind::END_OF_FILE, { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 0 });
 }

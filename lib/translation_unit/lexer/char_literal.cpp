@@ -8,12 +8,12 @@
 using namespace mt;
 
 Token Lexer::tokenize_char_literal() {
-  SourceLoc loc = { src_file.get_path(), src_file.get_line_num(), src_file.get_column_num(), 1 };
+  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 1 };
 
-  c8 value = *(&src_file.current() + 1);
+  c8 value = *(&*file_iter + 1);
   
   c8 c;
-  for (c = ++src_file; c && (c != '\'') && (c != '\n'); c = ++src_file) {
+  for (c = *++file_iter; c && (c != '\'') && (c != '\n'); c = *++file_iter) {
     loc.len++;
   }
 
@@ -23,7 +23,7 @@ Token Lexer::tokenize_char_literal() {
   }
   
   loc.len++;
-  ++src_file;
+  ++file_iter;
 
   if (loc.len > 3) {
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Character literal is too long");

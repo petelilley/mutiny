@@ -41,7 +41,7 @@ void Status::report(ReportContext ctx, InputFile& file, std::string_view msg) {
       err_num++;
       break;
   }
-  *log << color << LogStyle::BOLD << file.get_path() << ": " << LogStyle::CLEAR << LogStyle::BOLD << title << msg << LogStyle::CLEAR << "\n";
+  *log << color << LogStyle::BOLD << file.get_path_str() << ": " << LogStyle::CLEAR << LogStyle::BOLD << title << msg << LogStyle::CLEAR << "\n";
 }
 
 void Status::report_syntax(ReportContext ctx, InputFile& file, SourceLoc loc, std::string_view msg, std::string_view note) {
@@ -71,7 +71,7 @@ void Status::report_syntax(ReportContext ctx, InputFile& file, SourceLoc loc, st
       err_num++;
       break;
   }
-  *log << color << LogStyle::BOLD << file.get_path() << ':' << loc.line << ',' << loc.col << ": " << LogStyle::CLEAR << LogStyle::BOLD << title << msg << LogStyle::CLEAR << "\n";
+  *log << color << LogStyle::BOLD << file.get_path_str() << ':' << loc.line << ',' << loc.col << ": " << LogStyle::CLEAR << LogStyle::BOLD << title << msg << LogStyle::CLEAR << "\n";
 
   if (!loc.len) return;
 

@@ -19,6 +19,8 @@ public:
 
 private:
   InputFile& src_file;
+  InputFile::const_iterator file_iter;
+  
   std::vector<Token> tokens;
   
   Status& status;

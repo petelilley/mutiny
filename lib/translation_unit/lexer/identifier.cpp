@@ -9,10 +9,10 @@
 using namespace mt;
 
 Token Lexer::tokenize_identifier() {
-  SourceLoc loc = { src_file.get_path(), src_file.get_line_num(), src_file.get_column_num(), 1 };
+  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 1 };
 
-  const c8* first = &src_file.current();
-  for (c8 c = ++src_file; c && (std::isalpha(c) || c == '_' || std::isdigit(c)); c = ++src_file) {
+  const c8* first = &*file_iter;
+  for (c8 c = *++file_iter; c && (std::isalpha(c) || c == '_' || std::isdigit(c)); c = *++file_iter) {
     loc.len++;
   }
   

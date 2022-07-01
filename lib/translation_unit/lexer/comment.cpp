@@ -8,30 +8,30 @@ using namespace mt;
 
 void Lexer::skip_line_comment() {
   c8 c;
-  while ((c = ++src_file) && (c != '\n'));
+  while ((c = *++file_iter) && (c != '\n'));
 }
 
 void Lexer::skip_block_comment() {
-  c8 c = src_file.current();
+  c8 c = *file_iter;
 
   while (true) {
     if (!c) {
-      status.report_syntax(Status::ReportContext::ERROR, src_file, { src_file.get_path(), src_file.get_line_num(), src_file.get_column_num(), 1 }, "Unterminated /* comment");
+      status.report_syntax(Status::ReportContext::ERROR, src_file, { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 1 }, "Unterminated /* comment");
       break;
     }
-    if (c == '/' && (src_file + 1) == '*') {
-      src_file += 2;
+    if (c == '/' && *(file_iter + 1) == '*') {
+      file_iter += 2;
       skip_block_comment();
-      if (!src_file.current()) break;
+      if (!*file_iter) break;
       
-      c = src_file.current();
+      c = *file_iter;
       continue;
     }
-    if (c == '*' && (src_file + 1) == '/') {
-      src_file += 2;
+    if (c == '*' && *(file_iter + 1) == '/') {
+      file_iter += 2;
       break;
     }
     
-    c = ++src_file;
+    c = *++file_iter;
   }
 }

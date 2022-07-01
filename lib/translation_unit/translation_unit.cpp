@@ -25,8 +25,7 @@ void TranslationUnit::exec_parser() {
   if (status.get_error_num() > 0) {
     result = Result::INVALID_SYNTAX;
   }
-
-  if (dump_ast) {
+  else if (dump_ast) {
     parser.get_ast().dump(status.get_log_out());
   }
 }

@@ -7,11 +7,11 @@
 using namespace mt;
 
 Token Lexer::tokenize_string_literal() {
-  SourceLoc loc = { src_file.get_path(), src_file.get_line_num(), src_file.get_column_num(), 1 };
+  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 1 };
 
-  const c8* first = &src_file.current();
+  const c8* first = &*file_iter;
   c8 c;
-  for (c = ++src_file; c && (c != '"') && (c != '\n'); c = ++src_file) {
+  for (c = *++file_iter; c && (c != '"') && (c != '\n'); c = *++file_iter) {
     loc.len++;
   }
 
@@ -20,6 +20,6 @@ Token Lexer::tokenize_string_literal() {
     return Token(Token::Kind::END_OF_FILE, loc);
   }
   
-  ++src_file;
+  ++file_iter;
   return Token(Token::Kind::STRING_LITERAL, loc, std::string(first + 1, loc.len - 1));
 }

@@ -8,7 +8,7 @@
 using namespace mt;
 
 b8 Lexer::is_punctuator() {
-  c8 c = src_file.current();
+  c8 c = *file_iter;
   switch (c) {
     case '(': case ')':
     case '{': case '}':
@@ -29,10 +29,10 @@ b8 Lexer::is_punctuator() {
 }
 
 Token Lexer::tokenize_punctuator() {
-  c8 c = src_file.current();
-  c8 c1 = src_file + 1;
+  c8 c = *file_iter;
+  c8 c1 = *(file_iter + 1);
 
-  SourceLoc loc = { src_file.get_path(), src_file.get_line_num(), src_file.get_column_num(), 1 };
+  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 1 };
 
   switch (c) {
     case ':':
@@ -58,7 +58,7 @@ Token Lexer::tokenize_punctuator() {
       break;
     case '<': case '>':
       if (c == c1) { // << or >>
-        c8 c2 = src_file + 2;
+        c8 c2 = *(file_iter + 2);
         loc.len = 2;
         if (c2 == '=') { // <<= or >>=
           loc.len = 3;
@@ -78,8 +78,8 @@ Token Lexer::tokenize_punctuator() {
       break;
   }
 
-  const c8* first = &src_file.current();
-  src_file += loc.len;
+  const c8* first = &*file_iter;
+  file_iter += loc.len;
 
   return Token(Token::Kind::PUNCTUATOR, loc, PunctUtil::to_punct(first, loc.len));
 }

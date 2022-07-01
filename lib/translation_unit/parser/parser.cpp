@@ -47,11 +47,7 @@ Keyword Parser::comp_token(Keyword keyword) {
 
 std::string Parser::unexpected_token(Token::Kind kind) {
   if (tok_iter->get_kind() != kind || kind == Token::Kind::UNKNOWN) {
-  std::cout << "is a " << TokenUtil::to_string(tok_iter->get_kind()) << " when we want a " << TokenUtil::to_string(kind) << "\n";
-    auto x = fmt::format("unexpected {}", TokenUtil::to_string(tok_iter->get_kind()));
-    std::cout << "fomat: " << x << "\n";
-
-    return x;
+    return fmt::format("unexpected {}", TokenUtil::to_string(tok_iter->get_kind()));
   }
   else if (kind == Token::Kind::PUNCTUATOR) {
     return fmt::format("unexpected '{}'", PunctUtil::to_string(tok_iter->get_value<Punct>()));
