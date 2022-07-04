@@ -16,7 +16,7 @@ void Lexer::skip_block_comment() {
 
   while (true) {
     if (!c) {
-      status.report_syntax(Status::ReportContext::ERROR, src_file, { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 1 }, "Unterminated /* comment");
+      status.report_syntax(Status::ReportContext::ERROR, src_file, { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num() }, "Unterminated /* comment");
       break;
     }
     if (c == '/' && *(file_iter + 1) == '*') {
