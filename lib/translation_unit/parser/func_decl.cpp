@@ -87,7 +87,7 @@ END_DECL:
       // Function body.
       body_nd = parse_stmt_list();
       
-      if (!body_nd && status.get_error_num() > 0) break;
+      if (status.get_error_num() > 0) break;
     }
 
     func_nd = ASTNode(ASTNode::Kind::FUNC_DECL, start_loc, name);

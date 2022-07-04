@@ -32,8 +32,7 @@ private:
 
   s32 overflow(s32 c) override;
 
-  char buffer[1024] = "";
-  u32 buf_len = 0;
+  std::string buffer;
 };
 
 enum class LogStyle {

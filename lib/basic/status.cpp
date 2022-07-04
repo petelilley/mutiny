@@ -54,6 +54,7 @@ void Status::report_syntax(ReportContext ctx, InputFile& file, SourceLoc loc, st
       break;
     case ReportContext::NOTE:
       title = "Note: ";
+      std::cout << "NOTE?????\n";
       color = LogStyle::CYAN;
       log = &log_out;
       break;

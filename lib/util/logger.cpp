@@ -11,8 +11,6 @@ Logger::Logger(Logger&& other)
 : std::ostream(this), stream(other.stream), output_mode(other.output_mode) { }
 
 void Logger::dump_buffer() {
-  if (!buf_len) return;
-  
   switch (stream) {
     case Stream::STDOUT:
       std::cout << buffer;
@@ -21,9 +19,8 @@ void Logger::dump_buffer() {
       std::cerr << buffer;
       break;
   }
-
-  *buffer = 0;
-  buf_len = 0;
+  
+  buffer.clear();
 }
 
 s32 Logger::overflow(s32 c) {
@@ -38,7 +35,7 @@ s32 Logger::overflow(s32 c) {
     }
   }
   else {
-    buffer[buf_len++] = c;
+    buffer.push_back(c);
   }
 
   return 0;

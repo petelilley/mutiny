@@ -15,7 +15,7 @@ void Parser::exec(const std::vector<Token>* _tokens) {
   tok_iter = tokens->begin();
 
   std::optional<ASTNode> node;
-  while (tok_iter->get_kind() != Token::Kind::END_OF_FILE) {
+  while (tok_iter->get_kind() != Token::Kind::END_OF_FILE && status.get_error_num() == 0) {
     node = parse_global_decl();
     if (!node) {
       break;

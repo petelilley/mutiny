@@ -8,6 +8,8 @@ void ASTNode::dump(Logger& log, u32 indent) const {
   }
 
   log << '<' << LogStyle::CLEAR << LogStyle::BOLD;
+
+  // --- Kind ---
   
   switch (kind) {
     case Kind::GLOBAL_SCOPE:
@@ -28,8 +30,35 @@ void ASTNode::dump(Logger& log, u32 indent) const {
     case Kind::TYPE:
       log << "Type";
       break;
+    case Kind::EXPR:
+      log << "Expr";
+      break;
     case Kind::IDENTIFIER:
       log << "Identifier";
+      break;
+    case Kind::INT_LITERAL:
+      log << "Int";
+      break;
+    case Kind::FLOAT_LITERAL:
+      log << "Float";
+      break;
+    case Kind::STRING_LITERAL:
+      log << "String";
+      break;
+    case Kind::CHAR_LITERAL:
+      log << "Char";
+      break;
+    case Kind::ARITH_OP:
+      log << "OpArith";
+      break;
+    case Kind::ASGN_OP:
+      log << "OpAsgn";
+      break;
+    case Kind::CMP_OP:
+      log << "OpCmp";
+      break;
+    case Kind::LOG_OP:
+      log << "OpLog";
       break;
     default:
       log << LogStyle::RED << "Unknown";
@@ -38,16 +67,41 @@ void ASTNode::dump(Logger& log, u32 indent) const {
 
   log << LogStyle::CLEAR;
 
-  if (kind == Kind::GLOBAL_SCOPE) {
-    log << LogStyle::MAGENTA << " '" << location.path.c_str() << "'";
-  }
-  else if (kind == Kind::FUNC_DECL || kind == Kind::TYPE || kind == Kind::IDENTIFIER) {
-    log << LogStyle::YELLOW << " '" << get_value<std::string>() << '\'';
+  // --- Value ---
+
+  switch (kind) {
+    case Kind::GLOBAL_SCOPE:
+      log << LogStyle::MAGENTA << " '" << location.path.c_str() << "'";
+      break;
+    case Kind::FUNC_DECL:
+    case Kind::TYPE:
+    case Kind::IDENTIFIER:
+    case Kind::STRING_LITERAL:
+      log << LogStyle::YELLOW << " '" << get_value<std::string>() << '\'';
+      break;
+    case Kind::INT_LITERAL:
+      log << LogStyle::CYAN << " '" << get_value<u64>() << '\'';
+      break;
+    case Kind::FLOAT_LITERAL:
+      log << LogStyle::CYAN << " '" << get_value<f128>() << '\'';
+      break;
+    case Kind::CHAR_LITERAL:
+      log << LogStyle::CYAN << " '" << get_value<c8>() << '\'';
+      break;
+    case Kind::ARITH_OP:
+    case Kind::ASGN_OP:
+    case Kind::CMP_OP:
+    case Kind::LOG_OP:
+      log << LogStyle::BLUE << " '" << OpUtil::to_string(get_value<Operator>()) << '\'';
+      break;
+    default:
+      break;
   }
 
-  log << LogStyle::CLEAR << " location=(" << location.line << ", " << location.col << ") range=(" << location.len << ')';
+  log << LogStyle::CLEAR << " location=(";
+  log << location.line << ", " << location.col << ") range=(" << location.len << ')';
   
-  log << ">\n" << LogStyle::CLEAR;
+  log << '\n';
 
   for (const auto& child : children) {
     child.dump(log, indent + 1);

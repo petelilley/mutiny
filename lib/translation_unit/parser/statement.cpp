@@ -39,16 +39,19 @@ std::optional<ASTNode> Parser::parse_stmt() {
       if (comp_token(Punct::COLON) != Punct::UNKNOWN) {
         // Label.
         // stmt_nd = parse_label();
-        ++tok_iter;
+        ++tok_iter; //
       }
       else {
         --tok_iter;
         // Expression.
-        // stmt_nd = parse_expr();
+        stmt_nd = parse_expr();
         if (!stmt_nd) break;
         b8 sc = comp_token(Punct::SEMICOLON) != Punct::UNKNOWN;
         if (!sc) {
-          status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected ';' following expression in statement list", unexpected_token(Token::Kind::PUNCTUATOR)));
+          SourceLoc sc_loc = (tok_iter - 1)->get_location();
+          sc_loc.col += sc_loc.len;
+          sc_loc.len = 1;
+          status.report_syntax(Status::ReportContext::ERROR, src_file, sc_loc, "expected ';' following expression in statement list", "insert ';' here");
           break;
         }
         ++tok_iter;
@@ -67,19 +70,19 @@ std::optional<ASTNode> Parser::parse_stmt() {
       }
       else if (kw == Keyword::IF) {
         // stmt_nd = parse_if_stmt();
-        ++tok_iter;
+        ++tok_iter; //
       }
       else if (kw == Keyword::WHILE) {
         // stmt_nd = parse_while_stmt();
-        ++tok_iter;
+        ++tok_iter; //
       }
       else if (kw == Keyword::RETURN) {
         // stmt_nd = parse_return_stmt();
-        ++tok_iter;
+        ++tok_iter; //
       }
       else if (kw == Keyword::GOTO) {
         // stmt_nd = parse_goto_stmt();
-        ++tok_iter;
+        ++tok_iter; //
       }
     }
     else {
@@ -88,11 +91,14 @@ std::optional<ASTNode> Parser::parse_stmt() {
         break;
       }
       // Expression.
-      // stmt_nd = parse_expr();
+      stmt_nd = parse_expr();
       if (!stmt_nd) break;
       b8 sc = comp_token(Punct::SEMICOLON) != Punct::UNKNOWN;
       if (!sc) {
-        status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected ';' following expression in statement list", unexpected_token(Token::Kind::PUNCTUATOR)));
+        SourceLoc sc_loc = (tok_iter - 1)->get_location();
+        sc_loc.col += sc_loc.len;
+        sc_loc.len = 1;
+        status.report_syntax(Status::ReportContext::ERROR, src_file, sc_loc, "expected ';' following expression in statement list", "insert ';' here");
         break;
       }
       ++tok_iter;

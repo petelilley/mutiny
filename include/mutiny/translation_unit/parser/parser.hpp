@@ -39,9 +39,26 @@ private:
   std::optional<ASTNode> parse_global_decl();
   std::optional<ASTNode> parse_func_decl();
   std::optional<ASTNode> parse_func_decl_param_list();
+  std::optional<ASTNode> parse_var_decl();
+
+  std::optional<ASTNode> parse_expr();
+
+  struct ExprFragment {
+    enum class Kind {
+      UNIT,
+      OPERATOR,
+    } kind;
+
+    ASTNode node;
+  };
+
+  std::optional<ASTNode> parse_expr_unit();
+  std::optional<ASTNode> parse_operator();
+
+  std::optional<ASTNode> fragments_to_expr(std::vector<ExprFragment>& fragments);
+
   std::optional<ASTNode> parse_stmt_list();
   std::optional<ASTNode> parse_stmt();
-  std::optional<ASTNode> parse_var_decl();
 
   std::string unexpected_token(Token::Kind kind = Token::Kind::UNKNOWN);
 

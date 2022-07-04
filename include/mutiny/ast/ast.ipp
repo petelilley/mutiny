@@ -9,6 +9,10 @@ constexpr ASTNode::Kind ASTNode::get_kind() const {
   return kind;
 }
 
+inline SourceLoc ASTNode::get_location() const {
+  return location;
+}
+
 inline void ASTNode::add_child(ASTNode child) {
   children.push_back(child);
 }

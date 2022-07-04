@@ -3,6 +3,7 @@
 #include <mutiny/mutiny.hpp>
 #include <mutiny/basic/source_loc.hpp>
 #include <mutiny/util/logger.hpp>
+#include <mutiny/syntax/operator.hpp>
 
 namespace mt {
 
@@ -18,11 +19,23 @@ public:
 
       TYPE,                   // Type.
 
+      EXPR,                   // Expression.
+
       IDENTIFIER,             // Identifier.
+      
+      INT_LITERAL,            // Integer literal.
+      FLOAT_LITERAL,          // Floating-point literal.
+      STRING_LITERAL,         // String literal.
+      CHAR_LITERAL,           // Character literal.
+
+      ARITH_OP,               // Arithmetic operator.
+      ASGN_OP,                // Assignment operator.
+      CMP_OP,                 // Comparison operator.
+      LOG_OP,                 // Logical operator.
   };
   
   // The union of possible AST node value types.
-  using ValueType = std::variant<c8, std::string, u64, f128>;
+  using ValueType = std::variant<c8, std::string, Operator, u64, f128>;
 
   inline ASTNode(Kind kind, SourceLoc location, ValueType value = static_cast<c8>(0));
 
@@ -36,6 +49,13 @@ public:
   constexpr Kind get_kind() const;
 
   /**
+   * @brief Returns the location of the node in the source file.
+   * 
+   * @return The location of the node in the source file.
+   */
+  inline SourceLoc get_location() const;
+
+  /**
    * @brief Returns the value of the node.
    * 
    * @tparam T The type of the value to retrieve.
@@ -43,6 +63,15 @@ public:
    */
   template<typename T>
   constexpr T get_value() const;
+
+  /**
+   * @brief Sets the value of the node.
+   * 
+   * @tparam T The type of the value to set.
+   * @param The value to set.
+   */
+  template<typename T>
+  constexpr void set_value(T value);
 
   /**
    * @brief Adds a child node to the node.
@@ -63,7 +92,7 @@ private:
   SourceLoc location;
   ValueType value;
 
-  std::vector<ASTNode> children;
+  std::vector<ASTNode> children {};
 };
 
 } // namespace mt
