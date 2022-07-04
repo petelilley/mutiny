@@ -40,7 +40,7 @@ public:
   /**
    * @brief Represents an iterator to the file.
    */
-  class const_iterator : public std::iterator<std::input_iterator_tag, std::string> {
+  class const_iterator {
   public:
     const_iterator(const InputFile& file);
     const_iterator(const InputFile& file, std::string::const_iterator iter);
