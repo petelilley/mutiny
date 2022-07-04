@@ -20,16 +20,9 @@ std::optional<ASTNode> Parser::parse_func_decl() {
     name = tok_iter->get_value<std::string>();
     ++tok_iter;
 
-    // :
-    if (comp_token(Punct::COLON) == Punct::UNKNOWN) {
-      status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected ':' following function name", unexpected_token(Token::Kind::PUNCTUATOR)));
-      break;
-    }
-    ++tok_iter;
-
     // (
     if (comp_token(Punct::LPAREN) == Punct::UNKNOWN) {
-      status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected function parameter list following ':'", unexpected_token(Token::Kind::PUNCTUATOR)));
+      status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected function parameter list following function name", unexpected_token(Token::Kind::PUNCTUATOR)));
       break;
     }
     ++tok_iter;
