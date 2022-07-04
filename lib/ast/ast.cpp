@@ -7,7 +7,7 @@ void ASTNode::dump(Logger& log, u32 indent) const {
     log << "|  ";
   }
 
-  log << '<' << LogStyle::CLEAR << LogStyle::BOLD;
+  log << "|<" << LogStyle::CLEAR << LogStyle::BOLD;
 
   // --- Kind ---
   
@@ -32,6 +32,12 @@ void ASTNode::dump(Logger& log, u32 indent) const {
       break;
     case Kind::EXPR:
       log << "Expr";
+      break;
+    case Kind::FUNC_CALL:
+      log << "FuncCall";
+      break;
+    case Kind::FUNC_CALL_PARAM_LIST:
+      log << "FuncCallParamList";
       break;
     case Kind::IDENTIFIER:
       log << "Identifier";
@@ -86,7 +92,7 @@ void ASTNode::dump(Logger& log, u32 indent) const {
       log << LogStyle::CYAN << " '" << get_value<f128>() << '\'';
       break;
     case Kind::CHAR_LITERAL:
-      log << LogStyle::CYAN << " '" << get_value<c8>() << '\'';
+      log << LogStyle::YELLOW << " '" << get_value<c8>() << '\'';
       break;
     case Kind::ARITH_OP:
     case Kind::ASGN_OP:

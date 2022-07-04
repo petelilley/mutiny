@@ -3,7 +3,7 @@
 using namespace mt;
 
 std::optional<ASTNode> Parser::parse_stmt_list() {
-  ASTNode stmt_list_nd = ASTNode(ASTNode::Kind::LOCAL_SCOPE, tok_iter->get_location());
+  ASTNode stmt_list_nd(ASTNode::Kind::LOCAL_SCOPE, tok_iter->get_location());
   ++tok_iter;
 
   std::optional<ASTNode> stmt_nd;
@@ -13,7 +13,7 @@ std::optional<ASTNode> Parser::parse_stmt_list() {
     
     // Statement.
     stmt_nd = parse_stmt();
-    if (!stmt_nd && status.get_error_num() > 0) break;
+    if (status.get_error_num() > 0) break;
 
     if (stmt_nd) {
       stmt_list_nd.add_child(std::move(stmt_nd.value()));
@@ -32,7 +32,7 @@ std::optional<ASTNode> Parser::parse_stmt_list() {
 std::optional<ASTNode> Parser::parse_stmt() {
   std::optional<ASTNode> stmt_nd;
 
-  Token::Kind kind = comp_token(Token::Kind::IDENTIFIER, Token::Kind::KEYWORD, Token::Kind::PUNCTUATOR, Token::Kind::INT_LITERAL, Token::Kind::FLOAT_LITERAL, Token::Kind::STRING_LITERAL, Token::Kind::CHAR_LITERAL);
+  Token::Kind kind(comp_token(Token::Kind::IDENTIFIER, Token::Kind::KEYWORD, Token::Kind::PUNCTUATOR, Token::Kind::INT_LITERAL, Token::Kind::FLOAT_LITERAL, Token::Kind::STRING_LITERAL, Token::Kind::CHAR_LITERAL));
 
   do {
     if (kind == Token::Kind::IDENTIFIER) {
@@ -60,7 +60,7 @@ std::optional<ASTNode> Parser::parse_stmt() {
       }
     }
     else if (kind == Token::Kind::KEYWORD) {
-      Keyword kw = comp_token(Keyword::VAR, Keyword::IF, Keyword::WHILE, Keyword::RETURN, Keyword::GOTO);
+      Keyword kw(comp_token(Keyword::VAR, Keyword::IF, Keyword::WHILE, Keyword::RETURN, Keyword::GOTO));
       
       if (kw == Keyword::UNKNOWN) {
         status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{} in statement list", unexpected_token(Token::Kind::KEYWORD)));

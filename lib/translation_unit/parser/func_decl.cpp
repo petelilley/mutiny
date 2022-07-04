@@ -3,15 +3,9 @@
 using namespace mt;
 
 std::optional<ASTNode> Parser::parse_func_decl() {
-  std::optional<ASTNode> func_nd = std::nullopt,
-                         param_list_nd = std::nullopt,
-                         body_nd = std::nullopt,
-                         ret_type_nd;
-
-  SourceLoc start_loc, end_loc;
-  SourceLoc ret_type_loc;
-
-  std::string name, return_type = "";
+  std::optional<ASTNode> func_nd, param_list_nd, body_nd, ret_type_nd;
+  SourceLoc start_loc, end_loc, ret_type_loc;
+  std::string name, return_type;
 
   do {
     // func
@@ -43,11 +37,11 @@ std::optional<ASTNode> Parser::parse_func_decl() {
     // Function parameters.
     param_list_nd = parse_func_decl_param_list();
 
-    if (!param_list_nd && status.get_error_num() > 0) break;
+    if (status.get_error_num() > 0) break;
     ++tok_iter;
 
     // ; or -> or {
-    Punct p = comp_token(Punct::SEMICOLON, Punct::ARROW, Punct::LBRACE);
+    Punct p(comp_token(Punct::SEMICOLON, Punct::ARROW, Punct::LBRACE));
 
 END_DECL:
     if (p == Punct::UNKNOWN) {
@@ -117,13 +111,10 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
   // )
   if (comp_token(Punct::RPAREN) != Punct::UNKNOWN) return std::nullopt;
 
-  SourceLoc start_loc = (tok_iter - 1)->get_location(), end_loc;
-  SourceLoc name_loc, type_loc;
-  
-  std::optional<ASTNode> param_list_nd = std::nullopt,
-                         param_nd, name_nd, type_nd;
-
+  SourceLoc start_loc = (tok_iter - 1)->get_location(), end_loc, name_loc, type_loc;
+  std::optional<ASTNode> param_list_nd, param_nd, name_nd, type_nd;
   std::string name, type;
+  
   do {
     param_nd = name_nd = type_nd = std::nullopt;
     
@@ -167,7 +158,6 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
   
     type_nd = ASTNode(ASTNode::Kind::TYPE, type_loc, type);
 
-
     if (name.empty()) {
       param_nd = ASTNode(ASTNode::Kind::FUNC_DECL_PARAM, type_loc);
     }
@@ -183,7 +173,7 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
     param_list_nd->add_child(std::move(param_nd.value()));
 
     // , or )
-    Punct p = comp_token(Punct::COMMA, Punct::RPAREN);
+    Punct p(comp_token(Punct::COMMA, Punct::RPAREN));
     if (p == Punct::UNKNOWN) {
       status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected ')' to close function parameter list, or ',' to separate parameters", unexpected_token(Token::Kind::PUNCTUATOR)));
       param_list_nd = std::nullopt;

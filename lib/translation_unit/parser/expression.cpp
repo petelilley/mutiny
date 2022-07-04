@@ -4,10 +4,8 @@ using namespace mt;
 
 std::optional<ASTNode> Parser::parse_expr() {
   std::vector<ExprFragment> frags;
-
-  std::optional<ASTNode> tmp_nd;
-
   std::optional<ExprFragment> frag;
+  std::optional<ASTNode> tmp_nd;
 
   b8 expect_unit = true;
   do {
@@ -35,7 +33,7 @@ std::optional<ASTNode> Parser::parse_expr() {
     frags.push_back(std::move(frag).value());
   } while (true);
 
-  std::optional<ASTNode> expr_nd = std::nullopt;
+  std::optional<ASTNode> expr_nd;
 
   if (!expect_unit) {
     if (!frags.empty()) {
@@ -46,15 +44,84 @@ std::optional<ASTNode> Parser::parse_expr() {
   return expr_nd;
 }
 
+std::optional<ASTNode> Parser::parse_func_call() {
+  std::optional<ASTNode> func_call_nd, param_list_nd;
+
+  SourceLoc start_loc(tok_iter->get_location());
+
+  std::string name(tok_iter->get_value<std::string>());
+
+  do {
+    // Identifier and (
+    tok_iter += 2;
+
+    // Parameter list.
+    param_list_nd = parse_func_call_param_list();
+
+    if (status.get_error_num() > 0) break;
+
+    func_call_nd = ASTNode(ASTNode::Kind::FUNC_CALL, SourceLoc::cat(start_loc, tok_iter->get_location()), name);
+
+    if (param_list_nd) {
+      func_call_nd->add_child(std::move(param_list_nd.value()));
+    }
+    
+    ++tok_iter;
+  } while (false);
+
+  return func_call_nd;
+}
+
+std::optional<ASTNode> Parser::parse_func_call_param_list() {
+  // )
+  if (comp_token(Punct::RPAREN) != Punct::UNKNOWN) return std::nullopt;
+
+  SourceLoc start_loc((tok_iter - 1)->get_location()), end_loc;
+  SourceLoc name_loc, type_loc;
+
+  std::optional<ASTNode> param_list_nd, param_nd;
+
+  do {
+    // A parameter.
+    param_nd = parse_expr();
+    if (!param_nd) break;
+
+    if (!param_list_nd) {
+      param_list_nd = ASTNode(ASTNode::Kind::FUNC_CALL_PARAM_LIST, SourceLoc::cat(start_loc, param_nd.value().get_location()));
+    }
+
+    param_list_nd->add_child(std::move(param_nd.value()));
+
+    // , or )
+    Punct p = comp_token(Punct::COMMA, Punct::RPAREN);
+    if (p == Punct::UNKNOWN) {
+      status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected ')' to close function call parameter list, or ',' to separate parameters", unexpected_token(Token::Kind::PUNCTUATOR)));
+      break;
+    }
+    // )
+    else if (p == Punct::RPAREN) {
+      if (param_list_nd) {
+        param_list_nd->set_location(SourceLoc::cat(param_list_nd->get_location(), tok_iter->get_location()));
+      }
+      break;
+    }
+    // ,
+    ++tok_iter;
+  } while (true);
+
+  return param_list_nd;
+}
+
 std::optional<ASTNode> Parser::parse_expr_unit() {
-  std::optional<ASTNode> unit_nd = std::nullopt;
+  std::optional<ASTNode> unit_nd;
 
   do {
     // TODO: Parentheses check.
 
     // TODO: Check for prefix operators (++, --, &, *, !, +, -, ~).
 
-    Token::Kind kind = comp_token(Token::Kind::IDENTIFIER, Token::Kind::INT_LITERAL, Token::Kind::FLOAT_LITERAL, Token::Kind::STRING_LITERAL, Token::Kind::CHAR_LITERAL);
+    Token::Kind kind(comp_token(Token::Kind::IDENTIFIER, Token::Kind::INT_LITERAL, Token::Kind::FLOAT_LITERAL, Token::Kind::STRING_LITERAL, Token::Kind::CHAR_LITERAL));
+    
     if (kind == Token::Kind::UNKNOWN) {
       status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected identifier or literal in an expression unit", unexpected_token(Token::Kind::IDENTIFIER)));
       break;
@@ -64,7 +131,7 @@ std::optional<ASTNode> Parser::parse_expr_unit() {
       if (comp_token(Punct::LPAREN) != Punct::UNKNOWN) {
         --tok_iter;
         // Function call.
-        // unit_nd = parse_func_call();
+        unit_nd = parse_func_call();
         if (!unit_nd) break;
       }
       else {
@@ -98,7 +165,7 @@ std::optional<ASTNode> Parser::parse_expr_unit() {
 }
 
 std::optional<ASTNode> Parser::parse_operator() {
-  std::optional<ASTNode> op_nd = std::nullopt;
+  std::optional<ASTNode> op_nd;
   
   do {
     if (comp_token(Token::Kind::PUNCTUATOR) == Token::Kind::UNKNOWN) {
@@ -167,6 +234,7 @@ std::optional<ASTNode> Parser::fragments_to_expr(std::vector<ExprFragment>& frag
   // Find the operator with the highest precedence level.
   for (auto it = frags.cbegin() + 1; it != frags.cend(); it += 2) {
     u16 lvl = OpUtil::get_prec_lvl(it->node.get_value<Operator>());
+    
     if (lvl > highest_prec.first) {
       highest_prec = prec_lvl(lvl, it);
     }

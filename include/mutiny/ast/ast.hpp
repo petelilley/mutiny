@@ -20,6 +20,8 @@ public:
       TYPE,                   // Type.
 
       EXPR,                   // Expression.
+      FUNC_CALL,              // Function call.
+      FUNC_CALL_PARAM_LIST,   // Function call parameter list.
 
       IDENTIFIER,             // Identifier.
       
