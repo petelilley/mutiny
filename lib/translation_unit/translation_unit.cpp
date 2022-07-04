@@ -15,14 +15,14 @@ TranslationUnit::TranslationUnit(TranslationUnit&&)
 
 void TranslationUnit::exec_lexer() {
   lexer.exec();
-  if (status.get_error_num() > 0) {
+  if (status.get_error_num()) {
     result = Result::INVALID_TOKENS;
   }
 }
 
 void TranslationUnit::exec_parser() {
   parser.exec(&lexer.get_tokens());
-  if (status.get_error_num() > 0) {
+  if (status.get_error_num()) {
     result = Result::INVALID_SYNTAX;
   }
   else if (dump_ast) {

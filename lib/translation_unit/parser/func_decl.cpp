@@ -4,8 +4,8 @@ using namespace mt;
 
 std::optional<ASTNode> Parser::parse_func_decl() {
   std::optional<ASTNode> func_nd, param_list_nd, body_nd, ret_type_nd;
-  SourceLoc start_loc, end_loc, ret_type_loc;
-  std::string name, return_type;
+  SourceLoc start_loc, end_loc;
+  std::string name;
 
   do {
     // func
@@ -30,7 +30,7 @@ std::optional<ASTNode> Parser::parse_func_decl() {
     // Function parameters.
     param_list_nd = parse_func_decl_param_list();
 
-    if (status.get_error_num() > 0) break;
+    if (status.get_error_num()) break;
     ++tok_iter;
 
     // ; or -> or {
@@ -38,7 +38,7 @@ std::optional<ASTNode> Parser::parse_func_decl() {
 
 END_DECL:
     if (p == Punct::UNKNOWN) {
-      if (return_type.empty()) {
+      if (!ret_type_nd) {
         status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected ';', '->', or '{{' following function parameter list", unexpected_token(Token::Kind::PUNCTUATOR)));
       }
       else {
@@ -55,15 +55,9 @@ END_DECL:
     // ->
     else if (p == Punct::ARROW) {
       ++tok_iter;
-      // Return type.
-      if (comp_token(Token::Kind::IDENTIFIER) == Token::Kind::UNKNOWN) {
-        status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected return type following '->'", unexpected_token()));
-        break;
-      }
       
-      return_type = tok_iter->get_value<std::string>();
-      ret_type_loc = tok_iter->get_location();
-      ++tok_iter;
+      // Return type.
+      ret_type_nd = parse_var_type();
 
       // ; or {
       p = comp_token(Punct::SEMICOLON, Punct::LBRACE);
@@ -77,13 +71,12 @@ END_DECL:
       
       end_loc = (tok_iter - 1)->get_location();
       
-      if (status.get_error_num() > 0) break;
+      if (status.get_error_num()) break;
     }
 
     func_nd = ASTNode(ASTNode::Kind::FUNC_DECL, SourceLoc::cat(start_loc, end_loc), name);
 
-    if (!return_type.empty()) {
-      ret_type_nd = ASTNode(ASTNode::Kind::TYPE, ret_type_loc, return_type);
+    if (ret_type_nd) {
       func_nd->add_child(std::move(ret_type_nd.value()));
     }
 
@@ -110,36 +103,28 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
   
   do {
     param_nd = name_nd = type_nd = std::nullopt;
-    
-    // Parameter name.
-    if (comp_token(Token::Kind::IDENTIFIER) == Token::Kind::UNKNOWN) {
-      status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected parameter name or type", unexpected_token()));
-      break;
-    }
-    name = tok_iter->get_value<std::string>();
-    name_loc = tok_iter->get_location();
+
     ++tok_iter;
-
     // :
-    if (comp_token(Punct::COLON) == Punct::UNKNOWN) {
-      // No colon, so its just an unamed parameter, therefore the first identifier is the type.
-      type = name;
-      type_loc = name_loc;
-      name = "";
-    }
-    else {
-      // Parameter type.
-      ++tok_iter;
-
-      // TODO: Dedicated type parser function.
+    if (comp_token(Punct::COLON) != Punct::UNKNOWN) {
+      --tok_iter;
+      // Parameter name.
       if (comp_token(Token::Kind::IDENTIFIER) == Token::Kind::UNKNOWN) {
-        status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected parameter type following ':'", unexpected_token()));
+        status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected parameter name", unexpected_token()));
         break;
       }
-      type = tok_iter->get_value<std::string>();
-      type_loc = tok_iter->get_location();
-      ++tok_iter;
+      
+      name = tok_iter->get_value<std::string>();
+      name_loc = tok_iter->get_location();
+      tok_iter += 2;
     }
+    else {
+      --tok_iter;
+    }
+
+    // Parameter type.
+    type_nd = parse_var_type();
+    if (status.get_error_num()) break;
 
     if (!param_list_nd) {
       param_list_nd = ASTNode(ASTNode::Kind::FUNC_DECL_PARAM_LIST, start_loc);
@@ -148,8 +133,6 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
     if (!name.empty()) {
       name_nd = ASTNode(ASTNode::Kind::IDENTIFIER, name_loc, name);
     }
-  
-    type_nd = ASTNode(ASTNode::Kind::TYPE, type_loc, type);
 
     if (name.empty()) {
       param_nd = ASTNode(ASTNode::Kind::FUNC_DECL_PARAM, type_loc);
@@ -161,6 +144,7 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
     if (name_nd) {
       param_nd->add_child(std::move(name_nd.value()));
     }
+
     param_nd->add_child(std::move(type_nd.value()));
 
     param_list_nd->add_child(std::move(param_nd.value()));

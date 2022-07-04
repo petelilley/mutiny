@@ -41,6 +41,8 @@ private:
   std::optional<ASTNode> parse_func_decl_param_list();
   std::optional<ASTNode> parse_var_decl();
 
+  std::optional<ASTNode> parse_var_type();
+
   std::optional<ASTNode> parse_expr();
   std::optional<ASTNode> parse_func_call();
   std::optional<ASTNode> parse_func_call_param_list();

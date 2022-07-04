@@ -88,11 +88,11 @@ Token Lexer::next_token() {
       return tokenize_punctuator();
     }
     else {
-      status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 1}, fmt::format("Invalid token '{}'", c));
+      status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num()}, fmt::format("Invalid token '{}'", c));
       ++file_iter;
       continue;
     }
   }
   
-  return Token(Token::Kind::END_OF_FILE, { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 0 });
+  return Token(Token::Kind::END_OF_FILE, { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num() });
 }

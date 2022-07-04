@@ -13,7 +13,7 @@ std::optional<ASTNode> Parser::parse_stmt_list() {
     
     // Statement.
     stmt_nd = parse_stmt();
-    if (status.get_error_num() > 0) break;
+    if (status.get_error_num()) break;
 
     if (stmt_nd) {
       stmt_list_nd.add_child(std::move(stmt_nd.value()));

@@ -58,7 +58,7 @@ std::optional<ASTNode> Parser::parse_func_call() {
     // Parameter list.
     param_list_nd = parse_func_call_param_list();
 
-    if (status.get_error_num() > 0) break;
+    if (status.get_error_num()) break;
 
     func_call_nd = ASTNode(ASTNode::Kind::FUNC_CALL, SourceLoc::cat(start_loc, tok_iter->get_location()), name);
 

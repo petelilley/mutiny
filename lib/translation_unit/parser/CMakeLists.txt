@@ -6,4 +6,5 @@ add_mutiny_sources(
   "${MT_LIB_DIR}/translation_unit/parser/func_decl.cpp"
   "${MT_LIB_DIR}/translation_unit/parser/var_decl.cpp"
   "${MT_LIB_DIR}/translation_unit/parser/statement.cpp"
+  "${MT_LIB_DIR}/translation_unit/parser/type.cpp"
 )

@@ -22,6 +22,8 @@ void Parser::exec(const std::vector<Token>* _tokens) {
     }
     ast.add_child(std::move(node.value()));
   }
+
+  ast.set_location(SourceLoc::cat(ast.get_location(), (tok_iter - 1)->get_location()));
 }
 
 Token::Kind Parser::comp_token(Token::Kind kind) {
