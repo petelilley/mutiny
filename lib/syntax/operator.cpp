@@ -119,6 +119,7 @@ u16 OpUtil::get_prec_lvl(Operator op) {
     case Operator::ASGN_BIT_XOR: // ^=
     case Operator::ASGN_BIT_SHL: // <<=
     case Operator::ASGN_BIT_SHR: // >>=
+    default:
       return MAX_PREC_LVL - 12;
   }
 }

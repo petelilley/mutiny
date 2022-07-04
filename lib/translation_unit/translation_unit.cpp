@@ -9,9 +9,9 @@ TranslationUnit::TranslationUnit(std::filesystem::path path, b8 warning_as_error
 
 TranslationUnit::~TranslationUnit() = default;
 
-TranslationUnit::TranslationUnit(TranslationUnit&&)
-: src_file(std::move(src_file)), status(std::move(status)),
-  lexer(std::move(lexer)), parser(std::move(parser)) { }
+TranslationUnit::TranslationUnit(TranslationUnit&& other)
+: src_file(std::move(other.src_file)), status(std::move(other.status)),
+lexer(std::move(other.lexer)), parser(std::move(other.parser)) { }
 
 void TranslationUnit::exec_lexer() {
   lexer.exec();

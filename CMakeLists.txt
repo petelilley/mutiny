@@ -19,11 +19,12 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Turn on warnings.
-if (MSVC)
-  add_compile_options(/W4)
-else()
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  add_compile_options(-Wall -Wextra -pedantic -Weverything)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   add_compile_options(-Wall -Wextra -pedantic)
-  # add_compile_options(-Weverything)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  add_compile_options(/W4)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

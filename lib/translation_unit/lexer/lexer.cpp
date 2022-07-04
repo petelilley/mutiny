@@ -12,7 +12,7 @@ Lexer::~Lexer() = default;
 
 void Lexer::exec() {
   while (true) {
-    tokens.push_back(std::move(next_token()));
+    tokens.push_back(next_token());
     if (tokens.back().get_kind() == Token::Kind::END_OF_FILE || status.get_error_num() > 0) {
       break;
     }

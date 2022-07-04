@@ -10,9 +10,8 @@ Status::Status(b8 warning_as_error)
 
 Status::~Status() = default;
 
-Status::Status(Status&&)
-: log_out(std::move(log_out)), log_err(std::move(log_err)),
-  warn_as_err(std::move(warn_as_err)) { }
+Status::Status(Status&& other)
+: log_out(std::move(other.log_out)), log_err(std::move(other.log_err)), warn_as_err(other.warn_as_err) { }
 
 void Status::report(ReportContext ctx, InputFile& file, std::string_view msg) {
   const char* title = "";
