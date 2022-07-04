@@ -9,16 +9,21 @@
 using namespace mt;
 
 Token Lexer::tokenize_identifier() {
-  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 1 };
+  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num() };
+
+  u64 len = 1;
 
   const c8* first = &*file_iter;
   for (c8 c = *++file_iter; c && (std::isalpha(c) || c == '_' || std::isdigit(c)); c = *++file_iter) {
-    loc.len++;
+    len++;
   }
   
-  Keyword kw = KeywordUtil::to_keyword(first, loc.len);
+  Keyword kw = KeywordUtil::to_keyword(first, len);
+  
+  loc.col_f = loc.col_i + len - 1;
+  
   if (kw == Keyword::UNKNOWN) {
-    return Token(Token::Kind::IDENTIFIER, loc, std::string(first, loc.len));
+    return Token(Token::Kind::IDENTIFIER, loc, std::string(first, len));
   }
   else {
     return Token(Token::Kind::KEYWORD, loc, kw);

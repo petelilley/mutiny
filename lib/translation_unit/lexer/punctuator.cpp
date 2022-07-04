@@ -32,17 +32,19 @@ Token Lexer::tokenize_punctuator() {
   c8 c = *file_iter;
   c8 c1 = *(file_iter + 1);
 
-  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 1 };
+  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num() };
+
+  u64 len = 1;
 
   switch (c) {
     case ':':
       if (c1 == ':') { // ::
-        loc.len = 2;
+        len = 2;
       }
       break;
     case '+': case '-':
       if (c1 == c || (c == '-' && c1 == '>')) { // ++ or -- or ->
-        loc.len = 2;
+        len = 2;
         break;
       }
       // fall through
@@ -50,28 +52,28 @@ Token Lexer::tokenize_punctuator() {
     case '%': case '&':
     case '|': case '^':
       if (c1 == '=') { // += or -= or *= or /= or %= or &= or |= or ^=
-        loc.len = 2;
+        len = 2;
       }
       else if ((c == '&' || c == '|') && c == c1) {
-        loc.len = 2;
+        len = 2;
       }
       break;
     case '<': case '>':
       if (c == c1) { // << or >>
         c8 c2 = *(file_iter + 2);
-        loc.len = 2;
+        len = 2;
         if (c2 == '=') { // <<= or >>=
-          loc.len = 3;
+          len = 3;
         }
       }
       else if (c1 == '=') { // <= or >=
-        loc.len = 2;
+        len = 2;
       }
       break;
     case '=':
     case '!':
       if (c1 == '=') { // == or !=
-        loc.len = 2;
+        len = 2;
       }
       break;
     default:
@@ -79,7 +81,8 @@ Token Lexer::tokenize_punctuator() {
   }
 
   const c8* first = &*file_iter;
-  file_iter += loc.len;
-
-  return Token(Token::Kind::PUNCTUATOR, loc, PunctUtil::to_punct(first, loc.len));
+  file_iter += len;
+  loc.col_f = loc.col_i + len - 1;
+  
+  return Token(Token::Kind::PUNCTUATOR, loc, PunctUtil::to_punct(first, len));
 }

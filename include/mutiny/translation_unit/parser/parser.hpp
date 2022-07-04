@@ -42,6 +42,7 @@ private:
   std::optional<ASTNode> parse_var_decl();
 
   std::optional<ASTNode> parse_expr();
+  std::optional<ASTNode> parse_func_call();
 
   struct ExprFragment {
     enum class Kind {

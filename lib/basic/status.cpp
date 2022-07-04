@@ -54,7 +54,6 @@ void Status::report_syntax(ReportContext ctx, InputFile& file, SourceLoc loc, st
       break;
     case ReportContext::NOTE:
       title = "Note: ";
-      std::cout << "NOTE?????\n";
       color = LogStyle::CYAN;
       log = &log_out;
       break;
@@ -72,12 +71,13 @@ void Status::report_syntax(ReportContext ctx, InputFile& file, SourceLoc loc, st
       err_num++;
       break;
   }
-  *log << color << LogStyle::BOLD << file.get_path_str() << ':' << loc.line << ',' << loc.col << ": " << LogStyle::CLEAR << LogStyle::BOLD << title << msg << LogStyle::CLEAR << "\n";
+  *log << color << LogStyle::BOLD << file.get_path_str() << ':' << loc.line_i << ',' << loc.col_i << ": " << LogStyle::CLEAR << LogStyle::BOLD << title << msg << LogStyle::CLEAR << "\n";
 
-  if (!loc.len) return;
+  // if (!loc.len) return;
+  if (loc.line_i != loc.line_f) return;
 
   // Extract the line from the file.
-  std::string line_str = file.get_line(loc.line);
+  std::string line_str = file.get_line(loc.line_i);
 
   if (line_str.empty()) return;
 
@@ -85,16 +85,13 @@ void Status::report_syntax(ReportContext ctx, InputFile& file, SourceLoc loc, st
   u64 start = line_str.find_first_not_of(' ');
   if (start == std::string::npos) start = 0;
 
-  // Adjust the length of the token to fit the line.
-  if (loc.col + loc.len > line_str.length()) {
-    loc.len = line_str.length() - loc.col + 1;
+  if (loc.col_i > loc.col_f) {
+    loc.col_i = loc.col_f;
   }
-
-std::cout << "len " << loc.len << '\n';
 
   u32 padding = 6;
 
-  const std::string line_num_str = std::to_string(loc.line);
+  const std::string line_num_str = std::to_string(loc.line_i);
 
   // Adjust the padding to fit the line number.
   if (line_num_str.length() > padding) {
@@ -104,14 +101,14 @@ std::cout << "len " << loc.len << '\n';
   // Display the line of the code where the error occurred.
   *log << std::string(padding - line_num_str.length() - 1, ' ') << line_num_str << " |   " << &line_str.at(start) << '\n';
 
-  const std::string line_start = std::string(padding, ' ') + '|' + std::string(2 + loc.col - start, ' ');
+  const std::string line_start = std::string(padding, ' ') + '|' + std::string(2 + loc.col_i - start, ' ');
 
   // Show an arrow pointing to the beginning of the error text.
   *log << line_start << LogStyle::BOLD << LogStyle::GREEN << '^';
 
   // Show the length of the error text.
-  if (loc.len > 1) {
-    *log << std::string(loc.len - 1, '~');
+  if (loc.col_f != loc.col_i) {
+    *log << std::string(loc.col_f - loc.col_i, '~');
   }
   *log << LogStyle::CLEAR << '\n';
 

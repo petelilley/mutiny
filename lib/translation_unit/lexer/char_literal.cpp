@@ -8,28 +8,33 @@
 using namespace mt;
 
 Token Lexer::tokenize_char_literal() {
-  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), 1 };
+  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num() };
+
+  u64 len = 1;
 
   c8 value = *(&*file_iter + 1);
   
   c8 c;
   for (c = *++file_iter; c && (c != '\'') && (c != '\n'); c = *++file_iter) {
-    loc.len++;
+    len++;
   }
 
   if (!c || c == '\n') {
+    loc.col_f = loc.col_i + len - 1;
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Unterminated character literal");
     return Token(Token::Kind::END_OF_FILE, loc);
   }
   
-  loc.len++;
+  len++;
   ++file_iter;
+  
+  loc.col_f = loc.col_i + len - 1;
 
-  if (loc.len > 3) {
+  if (len > 3) {
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Character literal is too long");
     return Token(Token::Kind::CHAR_LITERAL, loc);
   }
-  else if (loc.len == 2) {
+  else if (len == 2) {
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Character literal is empty");
     return Token(Token::Kind::CHAR_LITERAL, loc);
   }

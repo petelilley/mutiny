@@ -65,6 +65,13 @@ public:
   constexpr T get_value() const;
 
   /**
+   * @brief Sets the location of the node in the source file.
+   * 
+   * @param location The location of the node in the source file.
+   */
+  inline void set_location(SourceLoc location);
+
+  /**
    * @brief Sets the value of the node.
    * 
    * @tparam T The type of the value to set.

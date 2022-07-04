@@ -8,7 +8,7 @@ std::optional<ASTNode> Parser::parse_func_decl() {
                          body_nd = std::nullopt,
                          ret_type_nd;
 
-  SourceLoc start_loc;
+  SourceLoc start_loc, end_loc;
   SourceLoc ret_type_loc;
 
   std::string name, return_type = "";
@@ -62,6 +62,7 @@ END_DECL:
     // ;
     if (p == Punct::SEMICOLON) {
       // No definition.
+      end_loc = tok_iter->get_location();
       ++tok_iter;
     }
     // ->
@@ -87,10 +88,12 @@ END_DECL:
       // Function body.
       body_nd = parse_stmt_list();
       
+      end_loc = (tok_iter - 1)->get_location();
+      
       if (status.get_error_num() > 0) break;
     }
 
-    func_nd = ASTNode(ASTNode::Kind::FUNC_DECL, start_loc, name);
+    func_nd = ASTNode(ASTNode::Kind::FUNC_DECL, SourceLoc::cat(start_loc, end_loc), name);
 
     if (!return_type.empty()) {
       ret_type_nd = ASTNode(ASTNode::Kind::TYPE, ret_type_loc, return_type);
@@ -114,7 +117,7 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
   // )
   if (comp_token(Punct::RPAREN) != Punct::UNKNOWN) return std::nullopt;
 
-  SourceLoc start_loc = tok_iter->get_location();
+  SourceLoc start_loc = (tok_iter - 1)->get_location(), end_loc;
   SourceLoc name_loc, type_loc;
   
   std::optional<ASTNode> param_list_nd = std::nullopt,
@@ -164,7 +167,13 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
   
     type_nd = ASTNode(ASTNode::Kind::TYPE, type_loc, type);
 
-    param_nd = ASTNode(ASTNode::Kind::FUNC_DECL_PARAM, name.empty() ? type_loc : name_loc);
+
+    if (name.empty()) {
+      param_nd = ASTNode(ASTNode::Kind::FUNC_DECL_PARAM, type_loc);
+    }
+    else {
+      param_nd = ASTNode(ASTNode::Kind::FUNC_DECL_PARAM, SourceLoc::cat(name_loc, type_loc));
+    }
 
     if (name_nd) {
       param_nd->add_child(std::move(name_nd.value()));
@@ -181,6 +190,9 @@ std::optional<ASTNode> Parser::parse_func_decl_param_list() {
       break;
     }
     else if (p == Punct::RPAREN) {
+      if (param_list_nd) {
+        param_list_nd->set_location(SourceLoc::cat(param_list_nd->get_location(), tok_iter->get_location()));
+      }
       break;
     }
     ++tok_iter;

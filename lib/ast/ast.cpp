@@ -98,8 +98,8 @@ void ASTNode::dump(Logger& log, u32 indent) const {
       break;
   }
 
-  log << LogStyle::CLEAR << " location=(";
-  log << location.line << ", " << location.col << ") range=(" << location.len << ')';
+  log << LogStyle::CLEAR << " range=(";
+  log << location.line_i << "," << location.col_i << " to " << location.line_f << "," << location.col_f << ')';
   
   log << '\n';
 

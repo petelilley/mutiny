@@ -20,6 +20,8 @@ std::optional<ASTNode> Parser::parse_stmt_list() {
     }
   } while (true);
 
+  stmt_list_nd.set_location(SourceLoc::cat(stmt_list_nd.get_location(), tok_iter->get_location()));
+
   if (comp_token(Punct::RBRACE) != Punct::UNKNOWN) {
     ++tok_iter;
   }
@@ -49,8 +51,8 @@ std::optional<ASTNode> Parser::parse_stmt() {
         b8 sc = comp_token(Punct::SEMICOLON) != Punct::UNKNOWN;
         if (!sc) {
           SourceLoc sc_loc = (tok_iter - 1)->get_location();
-          sc_loc.col += sc_loc.len;
-          sc_loc.len = 1;
+          sc_loc.line_i = sc_loc.line_f;
+          sc_loc.col_i = ++sc_loc.col_f;
           status.report_syntax(Status::ReportContext::ERROR, src_file, sc_loc, "expected ';' following expression in statement list", "insert ';' here");
           break;
         }
@@ -96,8 +98,8 @@ std::optional<ASTNode> Parser::parse_stmt() {
       b8 sc = comp_token(Punct::SEMICOLON) != Punct::UNKNOWN;
       if (!sc) {
         SourceLoc sc_loc = (tok_iter - 1)->get_location();
-        sc_loc.col += sc_loc.len;
-        sc_loc.len = 1;
+        sc_loc.line_i = sc_loc.line_f;
+        sc_loc.col_i = ++sc_loc.col_f;
         status.report_syntax(Status::ReportContext::ERROR, src_file, sc_loc, "expected ';' following expression in statement list", "insert ';' here");
         break;
       }

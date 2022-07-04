@@ -177,7 +177,7 @@ std::optional<ASTNode> Parser::fragments_to_expr(std::vector<ExprFragment>& frag
           rhs_nd(frags.at(highest_prec.second - frags.cbegin() + 1).node);
 
   // Create the expression node.
-  ASTNode unit_nd(ASTNode::Kind::EXPR, lhs_nd.get_location());
+  ASTNode unit_nd(ASTNode::Kind::EXPR, SourceLoc::cat(lhs_nd.get_location(), rhs_nd.get_location()));
 
   unit_nd.add_child(std::move(lhs_nd));
   unit_nd.add_child(std::move(op_nd));
