@@ -120,7 +120,11 @@ std::optional<ASTNode> Parser::parse_expr_unit() {
 
     // TODO: Check for prefix operators (++, --, &, *, !, +, -, ~).
 
-    Token::Kind kind(comp_token(Token::Kind::IDENTIFIER, Token::Kind::INT_LITERAL, Token::Kind::FLOAT_LITERAL, Token::Kind::STRING_LITERAL, Token::Kind::CHAR_LITERAL));
+    Token::Kind kind(comp_token(Token::Kind::IDENTIFIER, Token::Kind::INT_LITERAL, Token::Kind::FLOAT_LITERAL, Token::Kind::STRING_LITERAL, Token::Kind::CHAR_LITERAL, Token::Kind::PUNCTUATOR));
+
+    if (kind == Token::Kind::PUNCTUATOR && comp_token(Punct::LPAREN) == Punct::UNKNOWN) {
+      kind = Token::Kind::UNKNOWN;
+    }
     
     if (kind == Token::Kind::UNKNOWN) {
       status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected identifier or literal in an expression unit", unexpected_token(Token::Kind::IDENTIFIER)));
@@ -156,6 +160,17 @@ std::optional<ASTNode> Parser::parse_expr_unit() {
     else if (kind == Token::Kind::CHAR_LITERAL) {
       unit_nd = ASTNode(ASTNode::Kind::CHAR_LITERAL, tok_iter->get_location(), tok_iter->get_value<c8>());
       ++tok_iter;
+    }
+    else if (kind == Token::Kind::PUNCTUATOR) {
+      ++tok_iter;
+      unit_nd = parse_expr();
+      if (status.get_error_num()) break;
+      if (comp_token(Punct::RPAREN) == Punct::UNKNOWN) {
+        status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected ')' to close parenthesized expression", unexpected_token(Token::Kind::PUNCTUATOR)));
+        break;
+      }
+      ++tok_iter;
+      break;
     }
 
     // TODO: Check for suffix operators (++, --).
