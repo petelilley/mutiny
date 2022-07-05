@@ -10,6 +10,7 @@ std::optional<ASTNode> Parser::parse_expr() {
   b8 expect_unit = true;
   do {
     if (expect_unit) {
+      // Look for a unit.
       tmp_nd = parse_expr_unit();
       if (!tmp_nd) break;
 
@@ -17,6 +18,7 @@ std::optional<ASTNode> Parser::parse_expr() {
       expect_unit = false;
     }
     else {
+      // Look for an operator.
       if (comp_token(Token::Kind::PUNCTUATOR) == Token::Kind::UNKNOWN) {
         expect_unit = true;
         status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected puncutator", unexpected_token(Token::Kind::PUNCTUATOR)));
@@ -31,10 +33,12 @@ std::optional<ASTNode> Parser::parse_expr() {
     }
 
     frags.push_back(std::move(frag).value());
+    
   } while (true);
 
   std::optional<ASTNode> expr_nd;
 
+  // Arrange the fragments into an expression using operator precedence.
   if (!expect_unit) {
     if (!frags.empty()) {
       expr_nd = fragments_to_expr(frags);
@@ -49,6 +53,7 @@ std::optional<ASTNode> Parser::parse_func_call() {
 
   SourceLoc start_loc(tok_iter->get_location());
 
+  // The name of the function being called.
   std::string name(tok_iter->get_value<std::string>());
 
   do {
@@ -107,6 +112,7 @@ std::optional<ASTNode> Parser::parse_func_call_param_list() {
     }
     // ,
     ++tok_iter;
+    
   } while (true);
 
   return param_list_nd;
@@ -116,55 +122,64 @@ std::optional<ASTNode> Parser::parse_expr_unit() {
   std::optional<ASTNode> unit_nd;
 
   do {
-    // TODO: Parentheses check.
-
     // TODO: Check for prefix operators (++, --, &, *, !, +, -, ~).
 
+    // Identifier, literal, or parenthesized expression.
     Token::Kind kind(comp_token(Token::Kind::IDENTIFIER, Token::Kind::INT_LITERAL, Token::Kind::FLOAT_LITERAL, Token::Kind::STRING_LITERAL, Token::Kind::CHAR_LITERAL, Token::Kind::PUNCTUATOR));
 
+    // Make sure the punctuator is a left parenthesis.
     if (kind == Token::Kind::PUNCTUATOR && comp_token(Punct::LPAREN) == Punct::UNKNOWN) {
       kind = Token::Kind::UNKNOWN;
     }
     
+    // Invalid token.
     if (kind == Token::Kind::UNKNOWN) {
       status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected identifier or literal in an expression unit", unexpected_token(Token::Kind::IDENTIFIER)));
       break;
     }
+    // Identifier.
     else if (kind == Token::Kind::IDENTIFIER) {
-      ++tok_iter;
-      if (comp_token(Punct::LPAREN) != Punct::UNKNOWN) {
-        --tok_iter;
+      // Look for a ( after the identifier.
+      if (peek_comp_token(Punct::LPAREN) != Punct::UNKNOWN) {
         // Function call.
         unit_nd = parse_func_call();
         if (!unit_nd) break;
       }
       else {
-        --tok_iter;
         // Some identifier.
         unit_nd = ASTNode(ASTNode::Kind::IDENTIFIER, tok_iter->get_location(), tok_iter->get_value<std::string>());
         ++tok_iter;
       }
     }
+    // Integer literal.
     else if (kind == Token::Kind::INT_LITERAL) {
       unit_nd = ASTNode(ASTNode::Kind::INT_LITERAL, tok_iter->get_location(), tok_iter->get_value<u64>());
       ++tok_iter;
     }
+    // Float literal.
     else if (kind == Token::Kind::FLOAT_LITERAL) {
       unit_nd = ASTNode(ASTNode::Kind::FLOAT_LITERAL, tok_iter->get_location(), tok_iter->get_value<f128>());
       ++tok_iter;
     }
+    // String literal.
     else if (kind == Token::Kind::STRING_LITERAL) {
       unit_nd = ASTNode(ASTNode::Kind::STRING_LITERAL, tok_iter->get_location(), tok_iter->get_value<std::string>());
       ++tok_iter;
     }
+    // Character literal.
     else if (kind == Token::Kind::CHAR_LITERAL) {
       unit_nd = ASTNode(ASTNode::Kind::CHAR_LITERAL, tok_iter->get_location(), tok_iter->get_value<c8>());
       ++tok_iter;
     }
+    // Parenthesized expression.
     else if (kind == Token::Kind::PUNCTUATOR) {
       ++tok_iter;
+      
+      // Parse the expression inside the parentheses.
       unit_nd = parse_expr();
       if (status.get_error_num()) break;
+      
+      // Closed parenthesis.
       if (comp_token(Punct::RPAREN) == Punct::UNKNOWN) {
         status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected ')' to close parenthesized expression", unexpected_token(Token::Kind::PUNCTUATOR)));
         break;
@@ -183,6 +198,7 @@ std::optional<ASTNode> Parser::parse_operator() {
   std::optional<ASTNode> op_nd;
   
   do {
+    // Make sure the token is a punctuator.
     if (comp_token(Token::Kind::PUNCTUATOR) == Token::Kind::UNKNOWN) {
       status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected operaror", unexpected_token(Token::Kind::PUNCTUATOR)));
       break;
@@ -230,10 +246,12 @@ std::optional<ASTNode> Parser::parse_operator() {
         break;
     }
     
+    // Convert the punctuator to an operator.
     if (op_nd) {
       op_nd->set_value<Operator>(OpUtil::to_operator(tok_iter->get_value<Punct>()));
       ++tok_iter;
     }
+    
   } while (false);
 
   return op_nd;
@@ -246,7 +264,7 @@ std::optional<ASTNode> Parser::fragments_to_expr(std::vector<ExprFragment>& frag
 
   prec_lvl highest_prec(OpUtil::MIN_PREC_LVL, frags.cbegin() + 1);
 
-  // Find the operator with the highest precedence level.
+  // Find the operator with the highest precedence level in the list of fragments.
   for (auto it = frags.cbegin() + 1; it != frags.cend(); it += 2) {
     u16 lvl = OpUtil::get_prec_lvl(it->node.get_value<Operator>());
     
@@ -255,6 +273,7 @@ std::optional<ASTNode> Parser::fragments_to_expr(std::vector<ExprFragment>& frag
     }
   }
 
+  // The surrounding nodes.
   ASTNode lhs_nd(frags.at(highest_prec.second - frags.cbegin() - 1).node),
           op_nd(frags.at(highest_prec.second - frags.cbegin()).node),
           rhs_nd(frags.at(highest_prec.second - frags.cbegin() + 1).node);

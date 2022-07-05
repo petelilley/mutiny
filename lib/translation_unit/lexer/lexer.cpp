@@ -20,73 +20,48 @@ void Lexer::exec() {
   if (tokens.empty() || tokens.front().get_kind() == Token::Kind::END_OF_FILE) {
     status.report(Status::ReportContext::WARNING, src_file, "Translation unit is empty.");
   }
-
-#if 1
-  for (const Token& tok : tokens) {
-    switch (tok.get_kind()) {
-      case Token::Kind::UNKNOWN:
-        std::cout << "unknown\n";
-        break;
-      case Token::Kind::IDENTIFIER:
-        std::cout << "Identifier: " << tok.get_value<std::string>() << std::endl;
-        break;
-      case Token::Kind::KEYWORD:
-        std::cout << "Keyword: " << KeywordUtil::to_string(tok.get_value<Keyword>()) << std::endl;
-        break;
-      case Token::Kind::PUNCTUATOR:
-        std::cout << "Punctuator: " << PunctUtil::to_string(tok.get_value<Punct>()) << std::endl;
-        break;
-      case Token::Kind::INT_LITERAL:
-        std::cout << "Integer literal: " << tok.get_value<u64>() << std::endl;
-        break;
-      case Token::Kind::FLOAT_LITERAL:
-        std::cout << "Float literal: " << tok.get_value<f128>() << std::endl;
-        break;
-      case Token::Kind::STRING_LITERAL:
-        std::cout << "String literal: " << tok.get_value<std::string>() << std::endl;
-        break;
-      case Token::Kind::CHAR_LITERAL:
-        std::cout << "Character literal: " << tok.get_value<c8>() << std::endl;
-        break;
-      case Token::Kind::END_OF_FILE:
-        std::cout << "EOF" << std::endl;
-        break;
-    }
-  }
-#endif
 }
 
 Token Lexer::next_token() {
   c8 c;
   while ((c = *file_iter)) {
+    // Skip whitespace.
     if (std::isspace(c)) {
       ++file_iter;
       continue;
     }
+    // Skip line comments.
     else if (file_iter.starts_with("//")) {
       skip_line_comment();
       continue;
     }
+    // Skip block comments.
     else if (file_iter.starts_with("/*")) {
       file_iter += 2;
       skip_block_comment();
       continue;
     }
+    // Read an identifier or keyword.
     else if (std::isalpha(c) || c == '_') {
       return tokenize_identifier();
     }
+    // Read a number literal.
     else if (std::isdigit(c) || (c == '.' && std::isdigit(*(file_iter + 1)))) {
       return tokenize_numeric_literal();
     }
+    // Read a string literal.
     else if (c == '"') {
       return tokenize_string_literal();
     }
+    // Read a character literal.
     else if (c == '\'') {
       return tokenize_char_literal();
     }
+    // Read a punctuator.
     else if (is_punctuator()) {
       return tokenize_punctuator();
     }
+    // Invalid token.
     else {
       status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num()}, fmt::format("Invalid token '{}'", c));
       ++file_iter;

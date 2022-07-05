@@ -9,6 +9,7 @@ std::optional<ASTNode> Parser::parse_stmt_list() {
   std::optional<ASTNode> stmt_nd;
 
   do {
+    // } Signifies the end of the statement list.
     if (comp_token(Punct::RBRACE) != Punct::UNKNOWN) break;
     
     // Statement.
@@ -36,20 +37,21 @@ std::optional<ASTNode> Parser::parse_stmt() {
 
   do {
     if (kind == Token::Kind::IDENTIFIER) {
-      ++tok_iter;
       // :
-      if (comp_token(Punct::COLON) != Punct::UNKNOWN) {
+      if (peek_comp_token(Punct::COLON) != Punct::UNKNOWN) {
         // Label.
         // stmt_nd = parse_label();
         ++tok_iter; //
       }
       else {
-        --tok_iter;
         // Expression.
         stmt_nd = parse_expr();
         if (!stmt_nd) break;
+
+        // ; Following an expression.
         b8 sc = comp_token(Punct::SEMICOLON) != Punct::UNKNOWN;
         if (!sc) {
+          // Point to the space directly following the expression.
           SourceLoc sc_loc = (tok_iter - 1)->get_location();
           sc_loc.line_i = sc_loc.line_f;
           sc_loc.col_i = ++sc_loc.col_f;
@@ -62,32 +64,39 @@ std::optional<ASTNode> Parser::parse_stmt() {
     else if (kind == Token::Kind::KEYWORD) {
       Keyword kw(comp_token(Keyword::VAR, Keyword::IF, Keyword::WHILE, Keyword::RETURN, Keyword::GOTO));
       
+      // Invalid keyword.
       if (kw == Keyword::UNKNOWN) {
         status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{} in statement list", unexpected_token(Token::Kind::KEYWORD)));
         break;
       }
-
+      // Local variable declaration.
       else if (kw == Keyword::VAR) {
         stmt_nd = parse_var_decl();
       }
+      // If statement.
       else if (kw == Keyword::IF) {
         // stmt_nd = parse_if_stmt();
         ++tok_iter; //
       }
+      // While statement.
       else if (kw == Keyword::WHILE) {
         // stmt_nd = parse_while_stmt();
         ++tok_iter; //
       }
+      // Return statement.
       else if (kw == Keyword::RETURN) {
         // stmt_nd = parse_return_stmt();
         ++tok_iter; //
       }
+      // Goto statement.
       else if (kw == Keyword::GOTO) {
         // stmt_nd = parse_goto_stmt();
         ++tok_iter; //
       }
     }
+    // An expression or an empty statement.
     else {
+      // An empty statement.
       if (comp_token(Punct::SEMICOLON) != Punct::UNKNOWN) {
         ++tok_iter;
         break;
@@ -95,8 +104,11 @@ std::optional<ASTNode> Parser::parse_stmt() {
       // Expression.
       stmt_nd = parse_expr();
       if (!stmt_nd) break;
+
+      // ; Following an expression.
       b8 sc = comp_token(Punct::SEMICOLON) != Punct::UNKNOWN;
       if (!sc) {
+        // Point to the space directly following the expression.
         SourceLoc sc_loc = (tok_iter - 1)->get_location();
         sc_loc.line_i = sc_loc.line_f;
         sc_loc.col_i = ++sc_loc.col_f;
@@ -105,6 +117,7 @@ std::optional<ASTNode> Parser::parse_stmt() {
       }
       ++tok_iter;
     }
+    
   } while (false);
 
   return stmt_nd;

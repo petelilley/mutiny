@@ -26,27 +26,6 @@ void Parser::exec(const std::vector<Token>* _tokens) {
   ast.set_location(SourceLoc::cat(ast.get_location(), (tok_iter - 1)->get_location()));
 }
 
-Token::Kind Parser::comp_token(Token::Kind kind) {
-  if (tok_iter->get_kind() == kind) {
-    return kind;
-  }
-  return Token::Kind::UNKNOWN;
-}
-
-Punct Parser::comp_token(Punct punct) {
-  if (tok_iter->get_kind() == Token::Kind::PUNCTUATOR && tok_iter->get_value<Punct>() == punct) {
-    return punct;
-  }
-  return Punct::UNKNOWN;
-}
-
-Keyword Parser::comp_token(Keyword keyword) {
-  if (tok_iter->get_kind() == Token::Kind::KEYWORD && tok_iter->get_value<Keyword>() == keyword) {
-    return keyword;
-  }
-  return Keyword::UNKNOWN;
-}
-
 std::string Parser::unexpected_token(Token::Kind kind) {
   if (tok_iter->get_kind() != kind || kind == Token::Kind::UNKNOWN) {
     return fmt::format("unexpected {}", TokenUtil::to_string(tok_iter->get_kind()));

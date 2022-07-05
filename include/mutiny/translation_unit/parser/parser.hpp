@@ -25,9 +25,13 @@ private:
   const std::vector<Token>* tokens = nullptr;
   std::vector<Token>::const_iterator tok_iter;
 
-  Token::Kind comp_token(Token::Kind kind);
-  Punct comp_token(Punct punct);
-  Keyword comp_token(Keyword keyword);
+  inline Token::Kind comp_token(Token::Kind kind);
+  inline Punct comp_token(Punct punct);
+  inline Keyword comp_token(Keyword keyword);
+
+  inline Token::Kind peek_comp_token(Token::Kind kind, u32 offset = 1);
+  inline Punct peek_comp_token(Punct punct, u32 offset = 1);
+  inline Keyword peek_comp_token(Keyword keyword, u32 offset = 1);
 
   template<typename... Args>
   Token::Kind comp_token(Token::Kind kind, Args... others);

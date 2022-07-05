@@ -11,14 +11,18 @@ Token Lexer::tokenize_string_literal() {
 
   u64 len = 1;
 
+  // The beginning of the string literal.
   const c8* first = &*file_iter;
+
+  // Count the number of characters before the next ", newline, or end of file.
   c8 c;
   for (c = *++file_iter; c && (c != '"') && (c != '\n'); c = *++file_iter) {
     len++;
   }
 
-  loc.col_f = loc.col_i + len - 1;
+  loc.col_f = loc.col_i + len;
 
+  // If the literal ended at a newline or end of file, report an error.
   if (!c || c == '\n') {
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Unterminated string literal");
     return Token(Token::Kind::END_OF_FILE, loc);

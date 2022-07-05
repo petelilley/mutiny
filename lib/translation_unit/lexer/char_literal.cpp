@@ -12,13 +12,16 @@ Token Lexer::tokenize_char_literal() {
 
   u64 len = 1;
 
+  // The character following the '
   c8 value = *(&*file_iter + 1);
   
+  // Count the number of characters before the next ', newline, or end of file.
   c8 c;
   for (c = *++file_iter; c && (c != '\'') && (c != '\n'); c = *++file_iter) {
     len++;
   }
 
+  // If the literal ended at a newline or end of file, report an error.
   if (!c || c == '\n') {
     loc.col_f = loc.col_i + len - 1;
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Unterminated character literal");
@@ -30,10 +33,12 @@ Token Lexer::tokenize_char_literal() {
   
   loc.col_f = loc.col_i + len - 1;
 
+  // Check if the character literal is too long.
   if (len > 3) {
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Character literal is too long");
     return Token(Token::Kind::CHAR_LITERAL, loc);
   }
+  // Check if the character literal is empty.
   else if (len == 2) {
     status.report_syntax(Status::ReportContext::ERROR, src_file, loc, "Character literal is empty");
     return Token(Token::Kind::CHAR_LITERAL, loc);
