@@ -121,7 +121,9 @@ std::optional<ASTNode> Parser::parse_func_call_param_list() {
 std::optional<ASTNode> Parser::parse_expr_unit() {
   std::optional<ASTNode> unit_nd, tmp_nd;
 
-  std::vector<std::pair<Operator, SourceLoc>> prefix_ops, suffix_ops;
+  using op_list = std::vector<std::pair<Operator, SourceLoc>>;
+
+  op_list prefix_ops, suffix_ops;
 
   do {
     // Check for prefix operators (++, --, &, *, !, +, -, ~).
@@ -230,19 +232,23 @@ std::optional<ASTNode> Parser::parse_expr_unit() {
       ++tok_iter;
     } while (true);
 
-    auto apply_ops = [&](const std::vector<std::pair<Operator, SourceLoc>>& ops, ASTNode::Kind kind) {
-      for (const auto& [op, loc] : ops) {
-        tmp_nd = ASTNode(ASTNode::Kind::EXPR, SourceLoc::cat(loc, unit_nd->get_location()));
-        tmp_nd->add_child(ASTNode(kind, loc, op));
-        tmp_nd->add_child(std::move(unit_nd).value());
-        unit_nd = std::move(tmp_nd);
-      }
+    auto apply_op = [&](Operator op, SourceLoc loc, ASTNode::Kind kind) {
+      tmp_nd = ASTNode(ASTNode::Kind::EXPR, SourceLoc::cat(loc, unit_nd->get_location()));
+      tmp_nd->add_child(ASTNode(kind, loc, op));
+      tmp_nd->add_child(std::move(unit_nd).value());
+      unit_nd = std::move(tmp_nd);
     };
 
-    // TODO: Backwards for prefix operators.
-    apply_ops(prefix_ops, ASTNode::Kind::PREFIX_OP);
+    // Apply prefix operators (Right to left).
+    for (op_list::const_reverse_iterator rit = prefix_ops.crbegin(); rit != prefix_ops.crend(); ++rit) {
+      const auto& [op, loc] = *rit;
+      apply_op(op, loc, ASTNode::Kind::PREFIX_OP);
+    }
     
-    apply_ops(suffix_ops, ASTNode::Kind::SUFFIX_OP);
+    // Apply the suffix operators (Left to right).
+    for (const auto& [op, loc] : suffix_ops) {
+      apply_op(op, loc, ASTNode::Kind::SUFFIX_OP);
+    }
     
   } while (false);
 
