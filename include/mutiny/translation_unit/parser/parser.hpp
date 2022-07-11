@@ -67,6 +67,7 @@ private:
 
   std::optional<ASTNode> parse_stmt_list();
   std::optional<ASTNode> parse_stmt();
+  std::optional<ASTNode> parse_label();
   std::optional<ASTNode> parse_if_stmt();
 
   std::string unexpected_token(Token::Kind kind = Token::Kind::UNKNOWN);

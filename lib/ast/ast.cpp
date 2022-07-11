@@ -39,6 +39,9 @@ void ASTNode::dump(Logger& log, u32 indent) const {
     case Kind::FUNC_CALL_PARAM_LIST:
       log << "FuncCallParamList";
       break;
+    case Kind::LABEL:
+      log << "Label";
+      break;
     case Kind::IF_STMT:
       log << "IfStmt";
       break;
@@ -91,6 +94,7 @@ void ASTNode::dump(Logger& log, u32 indent) const {
     case Kind::FUNC_DECL:
     case Kind::TYPE:
     case Kind::FUNC_CALL:
+    case Kind::LABEL:
     case Kind::IDENTIFIER:
     case Kind::STRING_LITERAL:
       log << LogStyle::YELLOW << " '" << get_value<std::string>() << '\'';

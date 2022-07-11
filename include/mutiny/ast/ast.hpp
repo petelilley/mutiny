@@ -23,6 +23,7 @@ public:
       FUNC_CALL,              // Function call.
       FUNC_CALL_PARAM_LIST,   // Function call parameter list.
 
+      LABEL,                  // Label.
       IF_STMT,                // If statement.
 
       IDENTIFIER,             // Identifier.

@@ -40,8 +40,7 @@ std::optional<ASTNode> Parser::parse_stmt() {
       // :
       if (peek_comp_token(Punct::COLON) != Punct::UNKNOWN) {
         // Label.
-        // stmt_nd = parse_label();
-        ++tok_iter; //
+        stmt_nd = parse_label();
       }
       else {
         // Expression.
@@ -122,6 +121,16 @@ std::optional<ASTNode> Parser::parse_stmt() {
   return stmt_nd;
 }
 
+std::optional<ASTNode> Parser::parse_label() {
+  // The identifier.
+  ASTNode label_nd(ASTNode::Kind::LABEL, tok_iter->get_location(), tok_iter->get_value<std::string>());
+  
+  // :
+  tok_iter += 2;
+  
+  return label_nd;
+}
+
 std::optional<ASTNode> Parser::parse_if_stmt() {
   std::optional<ASTNode> stmt_nd, cond_nd, body_nd;
 
@@ -134,8 +143,9 @@ std::optional<ASTNode> Parser::parse_if_stmt() {
     cond_nd = parse_expr();
     if (!cond_nd || status.get_error_num()) break;
 
-    // } following the condition.
+    // { following the condition.
     if (comp_token(Punct::LBRACE) != Punct::UNKNOWN) {
+      // The body.
       body_nd = parse_stmt_list();
       if (status.get_error_num()) break;
     }
