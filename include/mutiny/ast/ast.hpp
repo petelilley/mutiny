@@ -50,7 +50,7 @@ public:
   using ValueType = std::variant<c8, std::string, Operator, u64, f128>;
 
   inline ASTNode(Kind kind, SourceLoc location, ValueType value = static_cast<c8>(0));
-
+  inline ASTNode(std::vector<ASTNode>&& children);
   inline ~ASTNode();
 
   /**
@@ -106,12 +106,19 @@ public:
    */
   void dump(Logger& log, u32 indent = 0) const;
 
+  /**
+   * @brief Returns the children nodes.
+   * 
+   * @return The children nodes.
+   */
+  inline std::vector<ASTNode>& get_children();
+
 private:
   Kind kind;
   SourceLoc location;
   ValueType value;
 
-  std::vector<ASTNode> children {};
+  std::vector<ASTNode> children;
 };
 
 } // namespace mt

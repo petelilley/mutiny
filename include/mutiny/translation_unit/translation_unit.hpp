@@ -11,7 +11,7 @@ namespace mt {
 
 class TranslationUnit {
 public:
-  TranslationUnit(std::filesystem::path path, b8 warning_as_error, b8 dump_ast);
+  TranslationUnit(std::filesystem::path path, b8 warning_as_error);
   ~TranslationUnit();
   TranslationUnit(TranslationUnit&&);
   TranslationUnit(const TranslationUnit&) = delete;
@@ -52,6 +52,13 @@ public:
    */
   constexpr const Status& get_status() const;
 
+  /**
+   * @brief Returns the AST representation of the translation unit.
+   * 
+   * @return The AST representation of the translation unit.
+   */
+  inline std::optional<ASTNode> get_ast();
+
 private:
   Result result = Result::SUCCESS;
 
@@ -61,8 +68,6 @@ private:
 
   Lexer lexer;
   Parser parser;
-
-  b8 dump_ast;
 };
 
 } // namespace mt

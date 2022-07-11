@@ -2,6 +2,7 @@
 
 #include <mutiny/mutiny.hpp>
 #include <mutiny/util/logger.hpp>
+#include <mutiny/codegen/codegen.hpp>
 
 namespace mt {
 
@@ -144,6 +145,11 @@ private:
   std::vector<std::filesystem::path> link_libs;
   // The source files.
   std::vector<std::filesystem::path> src_paths;
+
+  // SemanticAnalyzer sema_analyzer;
+  CodeGenerator code_gen;
+  // CodeRunner code_runner;
+  // Linker linker;
 };
 
 } // namespace mt
