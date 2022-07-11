@@ -25,6 +25,9 @@ public:
 
       LABEL,                  // Label.
       IF_STMT,                // If statement.
+      WHILE_STMT,             // While statement.
+      RETURN_STMT,            // Return statement.
+      GOTO_STMT,              // Goto statement.
 
       IDENTIFIER,             // Identifier.
       

@@ -46,5 +46,14 @@ inline Keyword Parser::peek_comp_token(Keyword keyword, u32 offset) {
   return res;
 }
 
+inline b8 Parser::could_be_expr_unit() {
+  // Parenthesized expression or prefix operator.
+  if (comp_token(Punct::LPAREN, Punct::INC, Punct::DEC, Punct::BIT_AND, Punct::MUL, Punct::LOG_NOT, Punct::ADD, Punct::SUB, Punct::BIT_NOT) != Punct::UNKNOWN) return true;
+
+  // Identifier or literal.
+  if (comp_token(Token::Kind::IDENTIFIER, Token::Kind::INT_LITERAL, Token::Kind::FLOAT_LITERAL, Token::Kind::STRING_LITERAL, Token::Kind::CHAR_LITERAL) != Token::Kind::UNKNOWN) return true;
+  
+  return false;
+}
 
 } // namespace mt

@@ -60,6 +60,7 @@ private:
     ASTNode node;
   };
 
+  inline b8 could_be_expr_unit();
   std::optional<ASTNode> parse_expr_unit();
   std::optional<ASTNode> parse_operator();
 
@@ -67,8 +68,12 @@ private:
 
   std::optional<ASTNode> parse_stmt_list();
   std::optional<ASTNode> parse_stmt();
-  std::optional<ASTNode> parse_label();
+  ASTNode parse_label();
+  std::optional<ASTNode> parse_cond_stmt(ASTNode::Kind kind, std::string_view name);
   std::optional<ASTNode> parse_if_stmt();
+  std::optional<ASTNode> parse_while_stmt();
+  std::optional<ASTNode> parse_return_stmt();
+  std::optional<ASTNode> parse_goto_stmt();
 
   std::string unexpected_token(Token::Kind kind = Token::Kind::UNKNOWN);
 

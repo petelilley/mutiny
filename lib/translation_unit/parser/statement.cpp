@@ -51,10 +51,7 @@ std::optional<ASTNode> Parser::parse_stmt() {
         b8 sc = comp_token(Punct::SEMICOLON) != Punct::UNKNOWN;
         if (!sc) {
           // Point to the space directly following the expression.
-          SourceLoc sc_loc = (tok_iter - 1)->get_location();
-          sc_loc.line_i = sc_loc.line_f;
-          sc_loc.col_i = ++sc_loc.col_f;
-          status.report_syntax(Status::ReportContext::ERROR, src_file, sc_loc, "expected ';' following expression in statement list", "insert ';' here");
+          status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), (tok_iter - 1)->get_location().line_f, (tok_iter - 1)->get_location().col_f + 1), "expected ';' following expression in statement list", "insert ';' here");
           break;
         }
         ++tok_iter;
@@ -78,18 +75,15 @@ std::optional<ASTNode> Parser::parse_stmt() {
       }
       // While statement.
       else if (kw == Keyword::WHILE) {
-        // stmt_nd = parse_while_stmt();
-        ++tok_iter; //
+        stmt_nd = parse_while_stmt();
       }
       // Return statement.
       else if (kw == Keyword::RETURN) {
-        // stmt_nd = parse_return_stmt();
-        ++tok_iter; //
+        stmt_nd = parse_return_stmt();
       }
       // Goto statement.
       else if (kw == Keyword::GOTO) {
-        // stmt_nd = parse_goto_stmt();
-        ++tok_iter; //
+        stmt_nd = parse_goto_stmt();
       }
     }
     // An expression or an empty statement.
@@ -107,10 +101,7 @@ std::optional<ASTNode> Parser::parse_stmt() {
       b8 sc = comp_token(Punct::SEMICOLON) != Punct::UNKNOWN;
       if (!sc) {
         // Point to the space directly following the expression.
-        SourceLoc sc_loc = (tok_iter - 1)->get_location();
-        sc_loc.line_i = sc_loc.line_f;
-        sc_loc.col_i = ++sc_loc.col_f;
-        status.report_syntax(Status::ReportContext::ERROR, src_file, sc_loc, "expected ';' following expression in statement list", "insert ';' here");
+        status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), (tok_iter - 1)->get_location().line_f, (tok_iter - 1)->get_location().col_f + 1), "expected ';' following expression in statement list", "insert ';' here");
         break;
       }
       ++tok_iter;
@@ -121,7 +112,7 @@ std::optional<ASTNode> Parser::parse_stmt() {
   return stmt_nd;
 }
 
-std::optional<ASTNode> Parser::parse_label() {
+ASTNode Parser::parse_label() {
   // The identifier.
   ASTNode label_nd(ASTNode::Kind::LABEL, tok_iter->get_location(), tok_iter->get_value<std::string>());
   
@@ -131,7 +122,7 @@ std::optional<ASTNode> Parser::parse_label() {
   return label_nd;
 }
 
-std::optional<ASTNode> Parser::parse_if_stmt() {
+std::optional<ASTNode> Parser::parse_cond_stmt(ASTNode::Kind kind, std::string_view name) {
   std::optional<ASTNode> stmt_nd, cond_nd, body_nd;
 
   SourceLoc start(tok_iter->get_location());
@@ -150,10 +141,10 @@ std::optional<ASTNode> Parser::parse_if_stmt() {
       if (status.get_error_num()) break;
     }
     else {
-      status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), cond_nd->get_location().line_f, cond_nd->get_location().col_f + 1), "expected '{' following condition in if statement");
+      status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), cond_nd->get_location().line_f, cond_nd->get_location().col_f + 1), fmt::format("expected '{{' following condition in {} statement", name));
     }
 
-    stmt_nd = ASTNode(ASTNode::Kind::IF_STMT, SourceLoc::cat(start, (tok_iter - 1)->get_location()));
+    stmt_nd = ASTNode(kind, SourceLoc::cat(start, (tok_iter - 1)->get_location()));
     stmt_nd->add_child(std::move(cond_nd.value()));
     
     if (body_nd) {
@@ -162,5 +153,83 @@ std::optional<ASTNode> Parser::parse_if_stmt() {
     
   } while (false);
 
+  return stmt_nd;
+}
+
+std::optional<ASTNode> Parser::parse_if_stmt() {
+  return parse_cond_stmt(ASTNode::Kind::IF_STMT, "if");
+}
+
+std::optional<ASTNode> Parser::parse_while_stmt() {
+  return parse_cond_stmt(ASTNode::Kind::WHILE_STMT, "while");
+}
+
+std::optional<ASTNode> Parser::parse_return_stmt() {
+  std::optional<ASTNode> stmt_nd, expr_nd;
+
+  SourceLoc start(tok_iter->get_location());
+
+  do {
+    ++tok_iter;
+
+    // An expression before the ';'.
+    if (could_be_expr_unit()) {
+      // The expression.
+      expr_nd = parse_expr();
+      if (!expr_nd || status.get_error_num()) break;
+    }
+
+    // ;
+    if (comp_token(Punct::SEMICOLON) == Punct::UNKNOWN) {
+      status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), (tok_iter - 1)->get_location().line_f, (tok_iter - 1)->get_location().col_f + 1), "expected ';' following return statement", "insert ';' here");
+      break;
+    }
+
+    stmt_nd = ASTNode(ASTNode::Kind::RETURN_STMT, SourceLoc::cat(start, tok_iter->get_location()));
+
+    ++tok_iter;
+
+    if (expr_nd) {
+      stmt_nd->add_child(std::move(expr_nd.value()));
+    }
+
+  } while (false);
+
+  return stmt_nd;
+}
+
+std::optional<ASTNode> Parser::parse_goto_stmt() {
+  std::optional<ASTNode> stmt_nd, label_nd;
+
+  SourceLoc start(tok_iter->get_location()), label_loc;
+  std::string label_name;
+  
+  do {
+    ++tok_iter;
+
+    if (comp_token(Token::Kind::IDENTIFIER) == Token::Kind::UNKNOWN) {
+      status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), (tok_iter - 1)->get_location().line_f, (tok_iter - 1)->get_location().col_f + 1), "expected label name following 'goto'", "insert label name here");
+      break;
+    }
+
+    label_name.assign(tok_iter->get_value<std::string>());
+    label_loc = tok_iter->get_location();
+
+    ++tok_iter;
+
+    if (comp_token(Punct::SEMICOLON) == Punct::UNKNOWN) {
+      status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), (tok_iter - 1)->get_location().line_f, (tok_iter - 1)->get_location().col_f + 1), "expected ';' following goto statement", "insert ';' here");
+      break;
+    }
+
+    stmt_nd = ASTNode(ASTNode::Kind::GOTO_STMT, SourceLoc::cat(start, tok_iter->get_location()));
+
+    ++tok_iter;
+
+    label_nd = ASTNode(ASTNode::Kind::IDENTIFIER, label_loc, label_name);
+    stmt_nd->add_child(std::move(label_nd.value()));
+
+  } while (false);
+  
   return stmt_nd;
 }

@@ -45,6 +45,15 @@ void ASTNode::dump(Logger& log, u32 indent) const {
     case Kind::IF_STMT:
       log << "IfStmt";
       break;
+    case Kind::WHILE_STMT:
+      log << "WhileStmt";
+      break;
+    case Kind::RETURN_STMT:
+      log << "ReturnStmt";
+      break;
+    case Kind::GOTO_STMT:
+      log << "GotoStmt";
+      break;
     case Kind::IDENTIFIER:
       log << "Identifier";
       break;
