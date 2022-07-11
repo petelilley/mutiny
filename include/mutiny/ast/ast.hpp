@@ -30,6 +30,8 @@ public:
       STRING_LITERAL,         // String literal.
       CHAR_LITERAL,           // Character literal.
 
+      PREFIX_OP,              // Prefix operator.
+      SUFFIX_OP,              // Suffix operator.
       ARITH_OP,               // Arithmetic operator.
       ASGN_OP,                // Assignment operator.
       CMP_OP,                 // Comparison operator.

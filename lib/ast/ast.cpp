@@ -54,6 +54,12 @@ void ASTNode::dump(Logger& log, u32 indent) const {
     case Kind::CHAR_LITERAL:
       log << "Char";
       break;
+    case Kind::PREFIX_OP:
+      log << "OpPrefix";
+      break;
+    case Kind::SUFFIX_OP:
+      log << "OpSuffix";
+      break;
     case Kind::ARITH_OP:
       log << "OpArith";
       break;
@@ -94,6 +100,8 @@ void ASTNode::dump(Logger& log, u32 indent) const {
     case Kind::CHAR_LITERAL:
       log << LogStyle::YELLOW << " '" << get_value<c8>() << '\'';
       break;
+    case Kind::PREFIX_OP:
+    case Kind::SUFFIX_OP:
     case Kind::ARITH_OP:
     case Kind::ASGN_OP:
     case Kind::CMP_OP:

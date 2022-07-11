@@ -119,10 +119,33 @@ std::optional<ASTNode> Parser::parse_func_call_param_list() {
 }
 
 std::optional<ASTNode> Parser::parse_expr_unit() {
-  std::optional<ASTNode> unit_nd;
+  std::optional<ASTNode> unit_nd, tmp_nd;
+
+  std::vector<std::pair<Operator, SourceLoc>> prefix_ops, suffix_ops;
 
   do {
-    // TODO: Check for prefix operators (++, --, &, *, !, +, -, ~).
+    // Check for prefix operators (++, --, &, *, !, +, -, ~).
+    do {
+      Punct p(comp_token(Punct::INC, Punct::DEC, Punct::BIT_AND, Punct::MUL, Punct::LOG_NOT, Punct::ADD, Punct::SUB, Punct::BIT_NOT));
+      if (p == Punct::UNKNOWN) break;
+
+      Operator op;
+      switch (p) {
+        case Punct::INC:
+          op = Operator::INC_PRE;
+          break;
+        case Punct::DEC:
+          op = Operator::DEC_PRE;
+          break;
+        default:
+          op = OpUtil::to_operator(p);
+          break;
+      }
+
+      prefix_ops.emplace_back(op, tok_iter->get_location());
+      
+      ++tok_iter;
+    } while (true);
 
     // Identifier, literal, or parenthesized expression.
     Token::Kind kind(comp_token(Token::Kind::IDENTIFIER, Token::Kind::INT_LITERAL, Token::Kind::FLOAT_LITERAL, Token::Kind::STRING_LITERAL, Token::Kind::CHAR_LITERAL, Token::Kind::PUNCTUATOR));
@@ -185,10 +208,42 @@ std::optional<ASTNode> Parser::parse_expr_unit() {
         break;
       }
       ++tok_iter;
-      break;
     }
 
-    // TODO: Check for suffix operators (++, --).
+    if (!unit_nd) break;
+
+    // Check for suffix operators (++, --).
+    do {
+      Punct p(comp_token(Punct::INC, Punct::DEC));
+      if (p == Punct::UNKNOWN) break;
+
+      Operator op;
+      if (p == Punct::INC) {
+        op = Operator::INC_POST;
+      }
+      else {
+        op = Operator::DEC_POST;
+      }
+
+      suffix_ops.emplace_back(op, tok_iter->get_location());
+      
+      ++tok_iter;
+    } while (true);
+
+    auto apply_ops = [&](const std::vector<std::pair<Operator, SourceLoc>>& ops, ASTNode::Kind kind) {
+      for (const auto& [op, loc] : ops) {
+        tmp_nd = ASTNode(ASTNode::Kind::EXPR, SourceLoc::cat(loc, unit_nd->get_location()));
+        tmp_nd->add_child(ASTNode(kind, loc, op));
+        tmp_nd->add_child(std::move(unit_nd).value());
+        unit_nd = std::move(tmp_nd);
+      }
+    };
+
+    // TODO: Backwards for prefix operators.
+    apply_ops(prefix_ops, ASTNode::Kind::PREFIX_OP);
+    
+    apply_ops(suffix_ops, ASTNode::Kind::SUFFIX_OP);
+    
   } while (false);
 
   return unit_nd;
