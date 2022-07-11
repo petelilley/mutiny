@@ -19,6 +19,8 @@ public:
 
       TYPE,                   // Type.
 
+      VAR_DECL,               // Variable declaration.
+
       EXPR,                   // Expression.
       FUNC_CALL,              // Function call.
       FUNC_CALL_PARAM_LIST,   // Function call parameter list.

@@ -30,6 +30,9 @@ void ASTNode::dump(Logger& log, u32 indent) const {
     case Kind::TYPE:
       log << "Type";
       break;
+    case Kind::VAR_DECL:
+      log << "VarDecl";
+      break;
     case Kind::EXPR:
       log << "Expr";
       break;
@@ -102,6 +105,7 @@ void ASTNode::dump(Logger& log, u32 indent) const {
       break;
     case Kind::FUNC_DECL:
     case Kind::TYPE:
+    case Kind::VAR_DECL:
     case Kind::FUNC_CALL:
     case Kind::LABEL:
     case Kind::IDENTIFIER:
