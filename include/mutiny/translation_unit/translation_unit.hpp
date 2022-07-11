@@ -28,6 +28,7 @@ public:
 
   enum class Result {
     SUCCESS = 0,
+    EMPTY_FILE,
     INVALID_TOKENS,
     INVALID_SYNTAX,
   };

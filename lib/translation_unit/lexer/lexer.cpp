@@ -63,11 +63,11 @@ Token Lexer::next_token() {
     }
     // Invalid token.
     else {
-      status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num()}, fmt::format("Invalid token '{}'", c));
+      status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), file_iter.line_num(), file_iter.column_num()), fmt::format("Invalid token '{}'", c));
       ++file_iter;
       continue;
     }
   }
-  
-  return Token(Token::Kind::END_OF_FILE, { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num() });
+
+  return Token(Token::Kind::END_OF_FILE, SourceLoc::at(src_file.get_path(), file_iter.line_num(), file_iter.column_num()));
 }

@@ -70,14 +70,16 @@ s32 Compiler::exec() {
     
     switch (tu.get_result()) {
       case TranslationUnit::Result::SUCCESS:
-        break;
+      case TranslationUnit::Result::EMPTY_FILE:
+        if (!error_warnings) break;
+        // fall through
       case TranslationUnit::Result::INVALID_TOKENS:
-        log_err << "Lexical analysis failed. Exiting now.\n";
+        log_err << LogStyle::BOLD << LogStyle::RED << "Lexical analysis failed. Exiting now.\n" << LogStyle::CLEAR;
         should_exit = true;
         exit_code = ExitCode::INVALID_TOKENS;
         break;
       case TranslationUnit::Result::INVALID_SYNTAX:
-        log_err << "Syntax analysis failed. Exiting now.\n";
+        log_err << LogStyle::BOLD << LogStyle::RED << "Syntax analysis failed. Exiting now.\n" << LogStyle::CLEAR;
         should_exit = true;
         exit_code = ExitCode::INVALID_SYNTAX;
         break;

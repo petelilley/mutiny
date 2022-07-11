@@ -18,7 +18,7 @@ void Lexer::skip_block_comment() {
   while (true) {
     // End of the file, so report an error.
     if (!c) {
-      status.report_syntax(Status::ReportContext::ERROR, src_file, { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num() }, "Unterminated /* comment");
+      status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), file_iter.line_num(), file_iter.column_num()), "Unterminated /* comment");
       break;
     }
     // Begin a nested block comment.

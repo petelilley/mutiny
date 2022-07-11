@@ -7,8 +7,7 @@
 using namespace mt;
 
 Token Lexer::tokenize_string_literal() {
-  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num() };
-
+  SourceLoc loc(SourceLoc::at(src_file.get_path(), file_iter.line_num(), file_iter.column_num()));
   u64 len = 1;
 
   // The beginning of the string literal.

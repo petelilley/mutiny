@@ -87,6 +87,7 @@ void ASTNode::dump(Logger& log, u32 indent) const {
       break;
     case Kind::FUNC_DECL:
     case Kind::TYPE:
+    case Kind::FUNC_CALL:
     case Kind::IDENTIFIER:
     case Kind::STRING_LITERAL:
       log << LogStyle::YELLOW << " '" << get_value<std::string>() << '\'';

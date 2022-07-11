@@ -17,6 +17,8 @@ public:
 
   inline std::vector<Token>& get_tokens();
 
+  inline b8 is_empty() const;
+
 private:
   InputFile& src_file;
   InputFile::const_iterator file_iter;

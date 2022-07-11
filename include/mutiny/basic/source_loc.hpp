@@ -20,9 +20,19 @@ struct SourceLoc {
    * 
    * @param begin The beginning source location.
    * @param end The ending source location.
-   * @return A new source location structture.
+   * @return The concatenated source location.
    */
   static inline SourceLoc cat(SourceLoc begin, SourceLoc end);
+
+  /**
+   * @brief Constructs a structure pointing to a single character.
+   * 
+   * @param path The path to the source file.
+   * @param line The line number.
+   * @param col The column number.
+   * @return A new source location structure.
+   */
+  static inline SourceLoc at(std::filesystem::path path, u64 line, u64 col);
 };
 
 } // namespace mt

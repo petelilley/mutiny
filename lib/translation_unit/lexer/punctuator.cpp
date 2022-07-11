@@ -32,8 +32,7 @@ Token Lexer::tokenize_punctuator() {
   c8 c = *file_iter;
   c8 c1 = *(file_iter + 1);
 
-  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num() };
-
+  SourceLoc loc(SourceLoc::at(src_file.get_path(), file_iter.line_num(), file_iter.column_num()));
   u64 len = 1;
 
   switch (c) {

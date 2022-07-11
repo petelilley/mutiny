@@ -7,8 +7,7 @@
 using namespace mt;
 
 Token Lexer::tokenize_numeric_literal() {
-  SourceLoc loc = { src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num() };
-
+  SourceLoc loc(SourceLoc::at(src_file.get_path(), file_iter.line_num(), file_iter.column_num()));
   u64 len = 1;
   
   // The beginning of the numeric literal.
@@ -24,9 +23,10 @@ Token Lexer::tokenize_numeric_literal() {
   // The first character of the literal.
   c8 c = *first;
 
+  b8 is_float = false;
   // Decimal number.
   if (c - '0' > 0 || c == '.' || *(file_iter + 1) == '.') {
-    b8 is_float = (c == '.');
+    is_float = (c == '.');
 
     // Count the number of characters before a non-numeric character.
     for (c = *++file_iter; c && std::isdigit(c); c = *++file_iter) {
@@ -45,7 +45,7 @@ Token Lexer::tokenize_numeric_literal() {
     }
     
     // Take the substring containing the numeric literal.
-    val_str.assign(std::string(first, len));
+    val_str.assign(first, len);
     
     if (is_float) {
       // Convert the string to a floating point number.
@@ -69,18 +69,18 @@ Token Lexer::tokenize_numeric_literal() {
 
       // Check if the alphabetical character is not a valid hexadecimal digit.
       if ((c > 'f' && c < 'z') || (c > 'F' && c < 'Z')) {
-        status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num()}, fmt::format("Invalid suffix 'x{}' on integer literal", c));
+        status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), file_iter.line_num(), file_iter.column_num()), fmt::format("Invalid suffix 'x{}' on integer literal", c));
       }
       c = *++file_iter;
     }
     
     // Check if the hexadecimal number is empty.
     if (len == 1) {
-      status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_path(), file_iter.line_num(), file_iter.column_num() - 1, file_iter.line_num(), file_iter.column_num() - 1}, "Invalid suffix 'x' on integer literal");
+      status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), file_iter.line_num(), file_iter.column_num() - 1), "Invalid suffix 'x' on integer literal");
     }
     else {
       // Take the substring containing the numeric literal.
-      val_str.assign(std::string(first, len));
+      val_str.assign(first, len);
 
       // Convert the string to an integer number with base 16.
       int_val = std::stoull(val_str, nullptr, 16);
@@ -95,12 +95,12 @@ Token Lexer::tokenize_numeric_literal() {
 
       // Check if the number is not a valid octal number.
       if (c - '0' > 7) {
-        status.report_syntax(Status::ReportContext::ERROR, src_file, {src_file.get_path(), file_iter.line_num(), file_iter.column_num(), file_iter.line_num(), file_iter.column_num()}, fmt::format("Invalid digit '{}' in octal literal", c));
+        status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), file_iter.line_num(), file_iter.column_num()), fmt::format("Invalid digit '{}' in octal literal", c));
       }
     }
 
     // Take the substring containing the numeric literal.
-    val_str.assign(std::string(first, len));
+    val_str.assign(first, len);
 
     // Convert the string to an integer number with base 8.
     int_val = std::stoull(val_str, nullptr, 8);

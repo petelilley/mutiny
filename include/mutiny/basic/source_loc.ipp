@@ -1,13 +1,11 @@
 namespace mt {
 
 inline SourceLoc SourceLoc::cat(SourceLoc begin, SourceLoc end) {
-  SourceLoc loc;
-  loc.path = begin.path;
-  loc.line_i = begin.line_i;
-  loc.col_i = begin.col_i;
-  loc.line_f = end.line_f;
-  loc.col_f = end.col_f;
-  return loc;
+  return { begin.path, begin.line_i, begin.col_i, end.line_f, end.col_f };
+}
+
+inline SourceLoc SourceLoc::at(std::filesystem::path path, u64 line, u64 col) {
+  return { path, line, col, line, col };
 }
 
 } // namespace mt

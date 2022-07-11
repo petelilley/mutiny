@@ -18,6 +18,9 @@ void TranslationUnit::exec_lexer() {
   if (status.get_error_num()) {
     result = Result::INVALID_TOKENS;
   }
+  else if (lexer.is_empty()) {
+    result = Result::EMPTY_FILE;
+  }
 }
 
 void TranslationUnit::exec_parser() {

@@ -240,8 +240,8 @@ std::optional<ASTNode> Parser::parse_expr_unit() {
     };
 
     // Apply prefix operators (Right to left).
-    for (op_list::const_reverse_iterator rit = prefix_ops.crbegin(); rit != prefix_ops.crend(); ++rit) {
-      const auto& [op, loc] = *rit;
+    for (op_list::const_reverse_iterator it = prefix_ops.crbegin(); it != prefix_ops.crend(); ++it) {
+      const auto& [op, loc] = *it;
       apply_op(op, loc, ASTNode::Kind::PREFIX_OP);
     }
     
