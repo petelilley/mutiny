@@ -75,8 +75,7 @@ std::optional<ASTNode> Parser::parse_stmt() {
       }
       // If statement.
       else if (kw == Keyword::IF) {
-        // stmt_nd = parse_if_stmt();
-        ++tok_iter; //
+        stmt_nd = parse_if_stmt();
       }
       // While statement.
       else if (kw == Keyword::WHILE) {
@@ -116,6 +115,39 @@ std::optional<ASTNode> Parser::parse_stmt() {
         break;
       }
       ++tok_iter;
+    }
+    
+  } while (false);
+
+  return stmt_nd;
+}
+
+std::optional<ASTNode> Parser::parse_if_stmt() {
+  std::optional<ASTNode> stmt_nd, cond_nd, body_nd;
+
+  SourceLoc start(tok_iter->get_location());
+
+  do {
+    ++tok_iter;
+
+    // The condition.
+    cond_nd = parse_expr();
+    if (!cond_nd || status.get_error_num()) break;
+
+    // } following the condition.
+    if (comp_token(Punct::LBRACE) != Punct::UNKNOWN) {
+      body_nd = parse_stmt_list();
+      if (status.get_error_num()) break;
+    }
+    else {
+      status.report_syntax(Status::ReportContext::ERROR, src_file, SourceLoc::at(src_file.get_path(), cond_nd->get_location().line_f, cond_nd->get_location().col_f + 1), "expected '{' following condition in if statement");
+    }
+
+    stmt_nd = ASTNode(ASTNode::Kind::IF_STMT, SourceLoc::cat(start, (tok_iter - 1)->get_location()));
+    stmt_nd->add_child(std::move(cond_nd.value()));
+    
+    if (body_nd) {
+      stmt_nd->add_child(std::move(body_nd.value()));
     }
     
   } while (false);

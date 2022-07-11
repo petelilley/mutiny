@@ -198,6 +198,8 @@ std::optional<ASTNode> Parser::parse_expr_unit() {
     }
     // Parenthesized expression.
     else if (kind == Token::Kind::PUNCTUATOR) {
+      SourceLoc start(tok_iter->get_location());
+      
       ++tok_iter;
       
       // Parse the expression inside the parentheses.
@@ -209,6 +211,10 @@ std::optional<ASTNode> Parser::parse_expr_unit() {
         status.report_syntax(Status::ReportContext::ERROR, src_file, tok_iter->get_location(), fmt::format("{}, expected ')' to close parenthesized expression", unexpected_token(Token::Kind::PUNCTUATOR)));
         break;
       }
+
+      // Add the parentheses to the source location.
+      unit_nd->set_location(SourceLoc::cat(start, tok_iter->get_location()));
+
       ++tok_iter;
     }
 

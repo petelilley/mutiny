@@ -39,6 +39,9 @@ void ASTNode::dump(Logger& log, u32 indent) const {
     case Kind::FUNC_CALL_PARAM_LIST:
       log << "FuncCallParamList";
       break;
+    case Kind::IF_STMT:
+      log << "IfStmt";
+      break;
     case Kind::IDENTIFIER:
       log << "Identifier";
       break;
@@ -116,7 +119,7 @@ void ASTNode::dump(Logger& log, u32 indent) const {
   log << LogStyle::CLEAR << " range=(";
   log << location.line_i << "," << location.col_i << " to " << location.line_f << "," << location.col_f << ')';
   
-  log << '\n';
+  log << ">\n";
 
   for (const auto& child : children) {
     child.dump(log, indent + 1);
