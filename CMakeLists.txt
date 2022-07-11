@@ -87,6 +87,29 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
 add_subdirectory("${MT_THIRDPARTY_DIR}/fmt")
 target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
 
+# LLVM
+find_package(LLVM REQUIRED CONFIG)
+
+if (LLVM_FOUND)
+  message(STATUS "Found LLVM: ${LLVM_DIR} (found version \"${LLVM_PACKAGE_VERSION}\")")
+  message(STATUS "Found LLVM Tools: ${LLVM_TOOLS_BINARY_DIR}")
+
+  if (${LLVM_PACKAGE_VERSION} VERSION_LESS "5")
+    message(FATAL_ERROR "Mutiny requires LLVM 5 or newer")
+  endif()
+else ()
+  message(FATAL_ERROR "LLVM not found")
+endif ()
+
+separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
+
+llvm_map_components_to_libnames(LLVM_LIBS core)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LLVM_LIBS})
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${LLVM_INCLUDE_DIRS})
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${LLVM_DEFINITIONS_LIST})
+
 # --- Definitions ---
 
 # Debug.
@@ -97,14 +120,12 @@ endif()
 target_compile_definitions(${PROJECT_NAME} PRIVATE "MT_OS_${MT_OS}")
 target_compile_definitions(${PROJECT_NAME} PRIVATE "MT_ARCH_${MT_ARCH}")
 
-# --- Install ---
-
-include(GNUInstallDirs)
-install(TARGETS ${PROJECT_NAME})
-
-# --- Configuration file ---
-
 configure_file(
   "${MT_INC_DIR}/mutiny/config/config.hpp.in"
   "${MT_INC_DIR}/mutiny/config/config.hpp"
 )
+
+# --- Install ---
+
+include(GNUInstallDirs)
+install(TARGETS ${PROJECT_NAME})
