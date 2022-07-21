@@ -2,8 +2,8 @@
 #include <mutiny/compiler.hpp>
 #include <mutiny/util/logger.hpp>
 #include <mutiny/util/file.hpp>
-#include <mutiny/translation_unit/translation_unit.hpp>
-#include <mutiny/codegen/codegen.hpp>
+#include <mutiny/src_unit/src_unit.hpp>
+#include <mutiny/code_gen/code_gen.hpp>
 
 using namespace mt;
 
@@ -27,8 +27,8 @@ s32 Compiler::exec() {
   do {
     if (should_exit) break;
     
-    std::list<TranslationUnit> translation_units;
-    std::vector<std::thread> translation_unit_threads;
+    std::list<SrcUnit> src_units;
+    std::vector<std::thread> src_unit_threads;
 
     for (const std::filesystem::path& path : src_paths) {
       // Check if file is directory. Might do something with directories in the future, but right now it's an error.
@@ -46,41 +46,41 @@ s32 Compiler::exec() {
         break;
       }
 
-      // Translation units must be stored in a std::list instead of a std::vector because std::vectors may reallocate memory for the entire vector when adding new elements, making whatever elements that have been passed to threads become invalidated.
-      translation_units.emplace_back(path, error_warnings);
+      // Source units must be stored in a std::list instead of a std::vector because std::vectors may reallocate memory for the entire vector when adding new elements, making whatever elements that have been passed to threads become invalidated.
+      src_units.emplace_back(path, error_warnings);
       
       // Start a thread for the translation unit.
-      translation_unit_threads.emplace_back([](TranslationUnit* tu) {
+      src_unit_threads.emplace_back([](SrcUnit* tu) {
         tu->exec_lexer();
-        if (tu->get_result() != TranslationUnit::Result::SUCCESS) return;
+        if (tu->get_result() != SrcUnit::Result::SUCCESS) return;
 
         tu->exec_parser();
-        if (tu->get_result() != TranslationUnit::Result::SUCCESS) return;
-      }, &translation_units.back());
+        if (tu->get_result() != SrcUnit::Result::SUCCESS) return;
+      }, &src_units.back());
     }
 
     // Join all the threads.
-    for (std::thread& thread : translation_unit_threads) {
+    for (std::thread& thread : src_unit_threads) {
       thread.join();
     }
     
     if (should_exit) break;
 
-    for (TranslationUnit& tu : translation_units) {
-      // Show all the messages from the translation units.
+    for (SrcUnit& tu : src_units) {
+      // Show all the messages from the source units.
       tu.dump_logs();
       
       switch (tu.get_result()) {
-        case TranslationUnit::Result::SUCCESS:
-        case TranslationUnit::Result::EMPTY_FILE:
+        case SrcUnit::Result::SUCCESS:
+        case SrcUnit::Result::EMPTY_FILE:
           if (!error_warnings) break;
           // fall through
-        case TranslationUnit::Result::INVALID_TOKENS:
+        case SrcUnit::Result::INVALID_TOKENS:
           log_err << LogStyle::BOLD << LogStyle::RED << "Lexical analysis failed. Exiting now.\n" << LogStyle::CLEAR;
           should_exit = true;
           exit_code = ExitCode::INVALID_TOKENS;
           break;
-        case TranslationUnit::Result::INVALID_SYNTAX:
+        case SrcUnit::Result::INVALID_SYNTAX:
           log_err << LogStyle::BOLD << LogStyle::RED << "Syntax analysis failed. Exiting now.\n" << LogStyle::CLEAR;
           should_exit = true;
           exit_code = ExitCode::INVALID_SYNTAX;
@@ -91,7 +91,7 @@ s32 Compiler::exec() {
     if (should_exit) break;
 
     std::vector<ASTNode> ast_nodes;
-    for (TranslationUnit& tu : translation_units) {
+    for (SrcUnit& tu : src_units) {
       std::optional<ASTNode> nd = tu.get_ast();
       if (nd) {
         ast_nodes.push_back(std::move(nd.value()));

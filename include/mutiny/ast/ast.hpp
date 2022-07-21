@@ -113,6 +113,25 @@ public:
    */
   inline std::vector<ASTNode>& get_children();
 
+  /**
+   * @brief Returns children nodes that match the specified kind.
+   * 
+   * @tparam K The kind of nodes search for.
+   * @return Children nodes that match the specified kind.
+   */
+  template<Kind K>
+  inline std::vector<ASTNode*> get_children_of_kind();
+
+  /**
+   * @brief Returns a child node that matches the specified kind.
+   * 
+   * @tparam K The kind of node to search for.
+   * @param index The preferred index in the list of children of the given kind.
+   * @return The child node that matches the specified kind, nullptr if not found.
+   */
+  template<Kind K>
+  inline ASTNode* get_child_of_kind(u32 index = 0);
+
 private:
   Kind kind;
   SourceLoc location;
